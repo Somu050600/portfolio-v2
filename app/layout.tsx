@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
 import { Geist, Geist_Mono } from "next/font/google";
+import Header from "@/components/Header";
 import IntroProvider from "@/components/intro/IntroProvider";
 import "./globals.css";
 
@@ -31,6 +33,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // next-themes mutates the class on <html> before hydration
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
@@ -40,7 +44,17 @@ export default function RootLayout({
         </noscript>
       </head>
       <body className="min-h-full flex flex-col">
-        <IntroProvider>{children}</IntroProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <IntroProvider>
+            <Header />
+            {children}
+          </IntroProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

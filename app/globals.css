@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ece8e1;
+  --foreground: #0c0c10;
+}
+
+.dark {
+  --background: #0c0c10;
+  --foreground: #ece8e1;
 }
 
 @theme inline {
@@ -12,13 +19,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* No transition on themed colors: the View Transitions API owns the visual.
+   A CSS color transition here would fight the clip-path wipe. */
 body {
   background: var(--background);
   color: var(--foreground);
@@ -29,4 +31,20 @@ body {
    kills the overlay before the browser ever paints it. */
 html[data-intro-seen] [data-intro-overlay] {
   display: none;
+}
+
+/* Theme switch slant wipe: disable the default cross-fade so the animated
+   clip-path on ::view-transition-new(root) is the only visual. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+::view-transition-old(root) {
+  z-index: 0;
 }
