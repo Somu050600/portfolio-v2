@@ -1,9 +1,23 @@
+import { readFileSync } from "fs";
+import { join } from "path";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import IntroProvider from "@/components/intro/IntroProvider";
 import "./globals.css";
+
+// s1 is the single source of truth for the animation driver path.
+// Extracted at build time so the SVG file, not the component, owns the data.
+function readStrokePath(): string {
+  const svg = readFileSync(
+    join(process.cwd(), "assets/svg/signature-stroke.svg"),
+    "utf-8",
+  );
+  const match = svg.match(/\bd="([^"]+)"/);
+  if (!match) throw new Error("Could not extract path d from signature-stroke.svg");
+  return match[1];
+}
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +44,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const strokePath = readStrokePath();
   return (
     <html
       lang="en"
@@ -50,7 +65,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <IntroProvider>
+          <IntroProvider strokePath={strokePath}>
             <Header />
             {children}
           </IntroProvider>
