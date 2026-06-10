@@ -14,9 +14,11 @@ function lockScroll(locked: boolean) {
 export default function IntroProvider({
   children,
   strokePath,
+  fillContent,
 }: {
   children: ReactNode;
   strokePath: string;
+  fillContent: string;
 }) {
   // Render the overlay on first paint so first-time visitors never see the
   // site flash; returning visitors get it removed pre-paint in the effect.
@@ -111,7 +113,7 @@ export default function IntroProvider({
           aria-hidden="true"
           className="fixed inset-0 z-9999 flex items-center justify-center bg-[#0c0c10] will-change-transform"
         >
-          <SignatureSvg pathRef={pathRef} strokePath={strokePath} />
+          <SignatureSvg pathRef={pathRef} strokePath={strokePath} fillContent={fillContent} />
           <div className="absolute bottom-8 right-8 font-mono text-sm tabular-nums text-[#ece8e1]/50 select-none md:bottom-10 md:right-12">
             <span ref={counterRef}>0</span>
             <span className="ml-0.5">%</span>
