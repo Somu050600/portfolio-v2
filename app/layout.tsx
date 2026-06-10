@@ -7,8 +7,9 @@ import Header from "@/components/Header";
 import IntroProvider from "@/components/intro/IntroProvider";
 import "./globals.css";
 
-// s1 is the single source of truth for the animation driver path.
-// Extracted at build time so the SVG file, not the component, owns the data.
+// Both signature SVG files are the single source of truth.
+// Extracted at build time so the SVG files, not the component, own the data.
+
 function readStrokePath(): string {
   const svg = readFileSync(
     join(process.cwd(), "assets/svg/signature-stroke.svg"),
@@ -17,6 +18,19 @@ function readStrokePath(): string {
   const match = svg.match(/\bd="([^"]+)"/);
   if (!match) throw new Error("Could not extract path d from signature-stroke.svg");
   return match[1];
+}
+
+// Extracts inner SVG content (everything between the <svg> tags).
+// Colors are owned by the SVG file itself — export with the correct fills.
+function readFillContent(): string {
+  const svg = readFileSync(
+    join(process.cwd(), "assets/svg/signature-fill.svg"),
+    "utf-8",
+  );
+  return svg
+    .replace(/^[\s\S]*?<svg[^>]*>/, "")
+    .replace(/<\/svg>\s*$/, "")
+    .trim();
 }
 
 const geistSans = Geist({
@@ -45,6 +59,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const strokePath = readStrokePath();
+  const fillContent = readFillContent();
   return (
     <html
       lang="en"
@@ -65,7 +80,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <IntroProvider strokePath={strokePath}>
+          <IntroProvider strokePath={strokePath} fillContent={fillContent}>
             <Header />
             {children}
           </IntroProvider>
