@@ -32,8 +32,13 @@ export default function IntroProvider({
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    if (sessionStorage.getItem(SESSION_KEY) === "true" || reducedMotion) {
-      sessionStorage.setItem(SESSION_KEY, "true");
+    // NEXT_PUBLIC_INTRO_ONCE=true → play once per session (production default).
+    // Unset or false → play every page load (useful during development).
+    const oncePerSession = process.env.NEXT_PUBLIC_INTRO_ONCE === "true";
+    const alreadySeen = oncePerSession && sessionStorage.getItem(SESSION_KEY) === "true";
+
+    if (alreadySeen || reducedMotion) {
+      if (alreadySeen) sessionStorage.setItem(SESSION_KEY, "true");
       // Intentional pre-paint setState: useLayoutEffect runs before the browser
       // paints, so returning visitors never see the overlay flash.
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -57,7 +62,9 @@ export default function IntroProvider({
 
     const tl = gsap.timeline({
       onComplete: () => {
-        sessionStorage.setItem(SESSION_KEY, "true");
+        if (process.env.NEXT_PUBLIC_INTRO_ONCE === "true") {
+          sessionStorage.setItem(SESSION_KEY, "true");
+        }
         lockScroll(false);
         setPhase("done");
       },
