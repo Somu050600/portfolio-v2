@@ -9,9 +9,8 @@ export default function Hero() {
   const rootRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
-    const lines = rootRef.current?.querySelectorAll<HTMLElement>(
-      "[data-hero-line]",
-    );
+    const lines =
+      rootRef.current?.querySelectorAll<HTMLElement>("[data-hero-line]");
     if (!lines?.length) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 

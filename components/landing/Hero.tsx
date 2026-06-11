@@ -3,7 +3,8 @@
 import { landingConfig } from "@/lib/landing.config";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { useEnterTransition } from "./EnterTransition";
+import { usePageTransition } from "@/lib/page-transition-context";
+import { useRouter } from "next/navigation";
 import {
   LANDING_POINTER_EVENT,
   type LandingPointerDetail,
@@ -28,7 +29,13 @@ export default function Hero() {
   const interactive = finePointer && !reducedMotion;
 
   const { hero, interaction } = landingConfig;
-  const enter = useEnterTransition(hero.skipTarget);
+  const cover = usePageTransition();
+  const router = useRouter();
+
+  // Prefetch /home so it's ready before the transition cover completes.
+  useEffect(() => {
+    router.prefetch(hero.skipTarget);
+  }, [router, hero.skipTarget]);
 
   // Enter key triggers the same flow as clicking the CTA.
   useEffect(() => {
@@ -37,11 +44,11 @@ export default function Hero() {
       const t = e.target as HTMLElement | null;
       if (t && t.closest("a, button, input, textarea, select")) return;
       e.preventDefault();
-      enter(ctaRef.current);
+      cover({ href: hero.skipTarget, originEl: ctaRef.current });
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [enter]);
+  }, [cover, hero.skipTarget]);
 
   // Cursor shove + parallax, one rAF loop off the single pointer source.
   useEffect(() => {
@@ -166,7 +173,7 @@ export default function Hero() {
         <button
           ref={ctaRef}
           type="button"
-          onClick={() => enter(ctaRef.current)}
+          onClick={() => cover({ href: hero.skipTarget, originEl: ctaRef.current })}
           className="group inline-flex items-center gap-3 bg-[#F3F1EB] text-[#0C0C10] rounded-xl  px-3 py-1.5 font-mono text-xs sm:text-sm uppercase tracking-wide transition-colors hover:scale-105"
         >
           {hero.ctaLabel}

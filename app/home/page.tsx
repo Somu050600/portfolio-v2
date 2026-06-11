@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import BackButton from "@/components/BackButton";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 
@@ -15,6 +16,9 @@ export default function HomePage() {
       <main>
         <Hero />
       </main>
+      <div className="fixed bottom-8 left-8 z-50 md:bottom-10 md:left-12">
+        <BackButton />
+      </div>
     </>
   );
 }
