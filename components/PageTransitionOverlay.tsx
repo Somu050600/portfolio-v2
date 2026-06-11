@@ -52,9 +52,8 @@ export default function PageTransitionOverlay() {
       const ox = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
       const oy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
       const maxR =
-        Math.ceil(
-          Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2),
-        ) + 50;
+        Math.ceil(Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2)) +
+        50;
 
       let resolveFn!: () => void;
       const navCommitted = new Promise<void>((res) => {
@@ -82,7 +81,7 @@ export default function PageTransitionOverlay() {
           ],
         },
         {
-          duration: 600,
+          duration: 1500,
           easing: "cubic-bezier(0.4, 0, 0.2, 1)",
           pseudoElement: "::view-transition-new(root)",
         },
