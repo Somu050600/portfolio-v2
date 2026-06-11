@@ -1,7 +1,6 @@
 import Hero from "./Hero";
 import LandingCursor from "./LandingCursor";
-import ShootingStars from "./ShootingStars";
-import Starfield from "./Starfield";
+import SceneCanvas from "./SceneCanvas";
 import StatusClock from "./StatusClock";
 
 /**
@@ -12,8 +11,7 @@ import StatusClock from "./StatusClock";
 export default function WelcomeScene() {
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#242424] text-[#ece8e1]">
-      <Starfield />
-      <ShootingStars />
+      <SceneCanvas />
       <Hero />
       <StatusClock />
       <LandingCursor />

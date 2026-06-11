@@ -59,7 +59,7 @@ html[data-intro-seen] [data-intro-overlay] {
 }
 
 /* ---------------------------------------------------------------------------
-   Landing scene (/) — starfield, shooting stars, cursor, status clock
+   Landing scene (/) — cursor, status clock
 --------------------------------------------------------------------------- */
 
 /* Custom landing cursor active: hide native cursor everywhere. */
@@ -94,69 +94,6 @@ html[data-landing-cursor] {
   height: 32px;
 }
 
-/* Starfield: each layer rotates as a whole; one reverses so the sky
-   doesn't spin as a single sheet. Durations set inline per layer. */
-@keyframes starfield-spin {
-  to {
-    rotate: 360deg;
-  }
-}
-
-@keyframes starfield-spin-reverse {
-  to {
-    rotate: -360deg;
-  }
-}
-
-@keyframes star-twinkle {
-  0%,
-  100% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.landing-star {
-  box-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
-  animation: star-twinkle 9s ease-in-out infinite;
-}
-
-/* ASCII shooting stars: single transform+fade animation per spawn. */
-@keyframes shoot {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(var(--shoot-angle));
-    opacity: 0;
-  }
-  8% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(var(--shoot-dx), var(--shoot-dy), 0)
-      rotate(var(--shoot-angle));
-    opacity: 0;
-  }
-}
-
-.shooting-star {
-  position: absolute;
-  font-family: var(--font-geist-mono), monospace;
-  color: rgba(255, 255, 255, 0.85);
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  white-space: nowrap;
-  will-change: transform, opacity;
-  pointer-events: none;
-  user-select: none;
-  transform-origin: left center;
-  animation: shoot var(--shoot-duration) cubic-bezier(0.16, 0.84, 0.44, 1)
-    forwards;
-}
 
 /* StatusClock: softly-pulsing green "alive" dot. */
 @keyframes status-dot-pulse {
@@ -183,10 +120,7 @@ html[data-landing-cursor] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing-star,
-  .shooting-star,
-  .status-dot,
-  [data-starfield-layer] {
+  .status-dot {
     animation: none !important;
   }
 }
