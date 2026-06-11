@@ -25,6 +25,21 @@ export type StarLayer = {
   reverse?: boolean;
 };
 
+export type SparkleConfig = {
+  /** number of particles per click (random between min and max) */
+  countMin: number;
+  countMax: number;
+  /** px/s speed range */
+  speedMin: number;
+  speedMax: number;
+  /** lifetime ms range */
+  lifeMin: number;
+  lifeMax: number;
+  /** particle radius range in px */
+  rMin: number;
+  rMax: number;
+};
+
 export type LandingConfig = {
   intro: {
     /** gate behind env so dev sees the intro every load */
@@ -52,6 +67,7 @@ export type LandingConfig = {
       maxDelayMs: number;
       shapes: string[];
     };
+    sparkles: SparkleConfig;
   };
   statusClock: {
     enabled: boolean;
@@ -116,7 +132,7 @@ export const landingConfig: LandingConfig = {
         // Far: sparse tiny dim stars, slowest rotation
         {
           seed: 17,
-          grid: 12,
+          grid: 20,
           maxRadius: 45,
           skipChance: 0.22,
           size: [0.8, 1, 1.5],
@@ -127,7 +143,7 @@ export const landingConfig: LandingConfig = {
         // Mid: a handful of mid-brightness stars
         {
           seed: 53,
-          grid: 10,
+          grid: 15,
           maxRadius: 38,
           skipChance: 0.28,
           size: [0.65, 1.5, 2],
@@ -137,11 +153,11 @@ export const landingConfig: LandingConfig = {
         // Near: few brighter stars clustered near center
         {
           seed: 91,
-          grid: 9,
-          maxRadius: 30,
+          grid: 15,
+          maxRadius: 50,
           skipChance: 0.32,
           size: [0.5, 2, 2.5],
-          opacity: [0.6, 0.9],
+          opacity: [0.8, 1],
           rotationS: 190,
           reverse: true,
         },
@@ -152,7 +168,17 @@ export const landingConfig: LandingConfig = {
       minDelayMs: 4000,
       maxDelayMs: 7000,
       // Trail FIRST, star LAST — after rotation the star leads the trajectory.
-      shapes: ["──────✦", "─────·", "──────⋆", "·─────✦", "─────˚"],
+      shapes: ["──────✦", "──────✦", "──────✦", "·─────✦", "──────✦"],
+    },
+    sparkles: {
+      countMin: 10,
+      countMax: 16,
+      speedMin: 120,
+      speedMax: 320,
+      lifeMin: 450,
+      lifeMax: 750,
+      rMin: 1,
+      rMax: 2.5,
     },
   },
 
