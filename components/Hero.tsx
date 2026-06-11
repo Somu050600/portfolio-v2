@@ -1,48 +1,33 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
-import { useIntroPhase } from "./intro/intro-context";
+import { useLayoutEffect, useRef } from "react";
 
 const LINES = ["Somu", "Software engineer &", "builder of things."];
 
 export default function Hero() {
-  const phase = useIntroPhase();
   const rootRef = useRef<HTMLElement>(null);
-  const playedRef = useRef(false);
 
   useLayoutEffect(() => {
     const lines = rootRef.current?.querySelectorAll<HTMLElement>(
-      "[data-hero-line]"
+      "[data-hero-line]",
     );
     if (!lines?.length) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    if (phase === "covered") {
-      // Safe to hide: the overlay is covering the page.
-      gsap.set(lines, { yPercent: 110 });
-      return;
-    }
+    // gsap.from in a layout effect runs pre-paint — no flash of unhidden text.
+    const tween = gsap.from(lines, {
+      yPercent: 110,
+      duration: 1,
+      ease: "power4.out",
+      stagger: 0.12,
+      delay: 0.15,
+    });
 
-    if (phase === "revealing" && !playedRef.current) {
-      playedRef.current = true;
-      const tween = gsap.to(lines, {
-        yPercent: 0,
-        duration: 1,
-        ease: "power4.out",
-        stagger: 0.12,
-        delay: 0.15,
-      });
-      return () => {
-        tween.kill();
-      };
-    }
-
-    if (phase === "done" && !playedRef.current) {
-      // Intro was skipped (already seen / reduced motion): show instantly.
-      playedRef.current = true;
-      gsap.set(lines, { yPercent: 0 });
-    }
-  }, [phase]);
+    return () => {
+      tween.kill();
+    };
+  }, []);
 
   return (
     <section
