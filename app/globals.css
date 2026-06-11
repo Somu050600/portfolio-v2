@@ -16,7 +16,16 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-source-code-pro);
+  --font-serif: var(--font-glass-antiqua);
+}
+
+/* Motion tokens — shared easing vocabulary for the landing scene. */
+:root {
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --scene-ink: #ece8e1;
+  --scene-surface: #0c0c10;
+  --scene-green: #7db592;
 }
 
 /* No transition on themed colors: the View Transitions API owns the visual.
@@ -47,4 +56,137 @@ html[data-intro-seen] [data-intro-overlay] {
 
 ::view-transition-old(root) {
   z-index: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Landing scene (/) — starfield, shooting stars, cursor, status clock
+--------------------------------------------------------------------------- */
+
+/* Custom landing cursor active: hide native cursor everywhere. */
+html[data-landing-cursor] *,
+html[data-landing-cursor] {
+  cursor: none !important;
+}
+
+.landing-cursor__shape {
+  position: absolute;
+  top: -9px;
+  left: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 0 16px rgba(255, 255, 255, 0.6),
+    0 0 32px rgba(255, 255, 255, 0.35),
+    0 0 64px rgba(255, 255, 255, 0.18);
+  transition:
+    width 0.28s var(--ease-out-soft),
+    height 0.28s var(--ease-out-soft),
+    top 0.28s var(--ease-out-soft),
+    left 0.28s var(--ease-out-soft);
+}
+
+.landing-cursor[data-mode="link"] .landing-cursor__shape {
+  top: -16px;
+  left: -16px;
+  width: 32px;
+  height: 32px;
+}
+
+/* Starfield: each layer rotates as a whole; one reverses so the sky
+   doesn't spin as a single sheet. Durations set inline per layer. */
+@keyframes starfield-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes starfield-spin-reverse {
+  to {
+    rotate: -360deg;
+  }
+}
+
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.landing-star {
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
+  animation: star-twinkle 9s ease-in-out infinite;
+}
+
+/* ASCII shooting stars: single transform+fade animation per spawn. */
+@keyframes shoot {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(var(--shoot-angle));
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--shoot-dx), var(--shoot-dy), 0)
+      rotate(var(--shoot-angle));
+    opacity: 0;
+  }
+}
+
+.shooting-star {
+  position: absolute;
+  font-family: var(--font-geist-mono), monospace;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  will-change: transform, opacity;
+  pointer-events: none;
+  user-select: none;
+  transform-origin: left center;
+  animation: shoot var(--shoot-duration) cubic-bezier(0.16, 0.84, 0.44, 1)
+    forwards;
+}
+
+/* StatusClock: softly-pulsing green "alive" dot. */
+@keyframes status-dot-pulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    box-shadow: 0 0 0 0 rgba(125, 181, 146, 0.55);
+  }
+  50% {
+    opacity: 0.5;
+    box-shadow: 0 0 0 4px rgba(125, 181, 146, 0);
+  }
+}
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--scene-green);
+  margin-right: 6px;
+  transform: translateY(-1px);
+  animation: status-dot-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-star,
+  .shooting-star,
+  .status-dot,
+  [data-starfield-layer] {
+    animation: none !important;
+  }
 }
