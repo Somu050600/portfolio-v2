@@ -14,7 +14,6 @@ export default function Hero() {
     if (!lines?.length) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    // gsap.from in a layout effect runs pre-paint — no flash of unhidden text.
     const tween = gsap.from(lines, {
       yPercent: 110,
       duration: 1,
@@ -25,6 +24,9 @@ export default function Hero() {
 
     return () => {
       tween.kill();
+      // Clear the transform so lines aren't stuck off-screen on remount
+      // (e.g. after a view-transition re-renders this component).
+      gsap.set(lines, { clearProps: "transform" });
     };
   }, []);
 
