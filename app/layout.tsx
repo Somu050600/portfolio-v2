@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Geist, Glass_Antiqua, Source_Code_Pro } from "next/font/google";
+import PageTransitionOverlay from "@/components/PageTransitionOverlay";
+import { PageTransitionProvider } from "@/lib/page-transition-context";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -55,7 +57,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <PageTransitionProvider>
+            <PageTransitionOverlay />
+            {children}
+          </PageTransitionProvider>
         </ThemeProvider>
       </body>
     </html>
