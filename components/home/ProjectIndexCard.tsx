@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useRef, type MouseEvent } from "react";
 import type { Project, Status } from "@/lib/projects.config";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { cn } from "@/lib/utils";
+import CardPreview from "./CardPreview";
 
 function StatusBadge({ status }: { status: Status }) {
   return (
@@ -41,7 +41,8 @@ function CardContent({
   status,
   description,
   preview,
-}: Omit<ProjectIndexCardProps, "tilt" | "external" | "href" | "slug" | "caseStudy">) {
+  slug,
+}: Omit<ProjectIndexCardProps, "tilt" | "external" | "href" | "caseStudy">) {
   const num = String(number).padStart(2, "0");
   const statuses = Array.isArray(status) ? status : [status];
 
@@ -57,20 +58,16 @@ function CardContent({
         </span>
       </div>
 
-      {preview?.kind === "image" && (
-        <div
-          className="relative w-full overflow-hidden rounded-xl"
-          style={{ height: preview.height ?? 228 }}
-        >
-          <Image
-            src={preview.src}
-            alt=""
-            fill
-            className="object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
-            style={{ objectPosition: preview.position ?? "center" }}
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-        </div>
+      {preview && (
+        <CardPreview
+          preview={preview}
+          height={
+            preview.kind === "image"
+              ? preview.height ?? 228
+              : preview.height ?? 228
+          }
+          cardId={slug}
+        />
       )}
 
       <div className="mt-1 flex flex-col">
@@ -174,14 +171,14 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
           ? { target: "_blank", rel: "noopener noreferrer" }
           : {})}
       >
-        <CardContent {...contentProps} />
+        <CardContent {...contentProps} slug={slug} />
       </a>
     );
   }
 
   return (
     <article className={cardClass} style={cardStyle}>
-      <CardContent {...contentProps} />
+      <CardContent {...contentProps} slug={slug} />
     </article>
   );
 }
