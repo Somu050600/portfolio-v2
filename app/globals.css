@@ -1,49 +1,211 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ==========================================================================
+   SEMANTIC TOKEN SYSTEM
+   Our semantic vars are the source of truth. shadcn vars are mapped to them
+   so shadcn components automatically reflect our design system.
+   AccentProvider writes --accent / --accent-fg / --accent-soft at runtime.
+   Pre-paint script in layout.tsx writes the accent vars before first paint.
+   NO CSS transitions on any of these — the View Transitions API owns the visual.
+   ========================================================================== */
+
 :root {
-  --background: #ece8e1;
-  --foreground: #0c0c10;
+  /* Landing page background color */
+  --landing-bg: #242424;
+
+  /* --- Portfolio semantic tokens (LIGHT — cream paper) ------------------- */
+  --bg: #efe7d4;
+  --surface: #e5dcc4;
+  --elevated: #fbf6ea;
+  --border-color: #d7ccb0;
+  --ink: #2a2620;
+  --ink-dim: #6e6553;
+  --ink-faint: #9a917e;
+  --status: #3e7a36;
+  --punch: #c9be9f;
+  /* --accent / --accent-fg / --accent-soft are written by AccentProvider
+     (and pre-paint script) — fallbacks below match THEME_DEFAULTS.lightAccent */
+  --accent: #b85423;
+  --accent-fg: #ffffff;
+  --accent-soft: rgba(184, 84, 35, 0.14);
+
+  /* --- shadcn vars mapped to our semantic tokens ------------------------- */
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --card: var(--elevated);
+  --card-foreground: var(--ink);
+  --popover: var(--elevated);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--bg);
+  --secondary: var(--surface);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface);
+  --muted-foreground: var(--ink-dim);
+  /* shadcn --accent = our portfolio accent (bold color, not a muted hover) */
+  --accent: var(--accent);
+  --accent-foreground: var(--accent-fg);
+  --destructive: #dc2626;
+  --border: var(--border-color);
+  --input: var(--border-color);
+  --ring: var(--accent);
+  --radius: 0.5rem;
+
+  /* --- Motion / scene tokens -------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --scene-ink: #ece8e1;
+  --scene-surface: #0a0a0a;
+  --scene-green: #7db592;
+
+  /* sidebar (used by shadcn sidebar components) */
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-fg);
+  --sidebar-accent: var(--surface);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--border-color);
+  --sidebar-ring: var(--accent);
 }
 
 .dark {
-  --background: #0c0c10;
-  --foreground: #ece8e1;
+  /* --- Portfolio semantic tokens (DARK — Vercel near-black) -------------- */
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --elevated: #1c1c1c;
+  --border-color: #2a2a2a;
+  --ink: #ededed;
+  --ink-dim: #8f8f8f;
+  --ink-faint: #5a5a5a;
+  --status: #3fb950;
+  --punch: #2a2a2a;
+  /* fallbacks — AccentProvider / pre-paint script override these at runtime */
+  --accent: #3b82f6;
+  --accent-fg: #ffffff;
+  --accent-soft: rgba(59, 130, 246, 0.14);
+
+  /* --- shadcn vars ------------------------------------------------------- */
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --card: var(--elevated);
+  --card-foreground: var(--ink);
+  --popover: var(--elevated);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--bg);
+  --secondary: var(--surface);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface);
+  --muted-foreground: var(--ink-dim);
+  --accent: var(--accent);
+  --accent-foreground: var(--accent-fg);
+  --destructive: #f87171;
+  --border: var(--border-color);
+  --input: var(--border-color);
+  --ring: var(--accent);
+
+  /* sidebar */
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-fg);
+  --sidebar-accent: var(--surface);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--border-color);
+  --sidebar-ring: var(--accent);
 }
 
+/* ==========================================================================
+   TAILWIND @THEME INLINE
+   Maps Tailwind utility classes to our semantic CSS vars.
+   bg-bg, text-ink, text-ink-dim, border-border-color, bg-accent,
+   text-accent-fg, bg-accent-soft  — all live-update when vars change.
+   ========================================================================== */
 @theme inline {
+  /* Portfolio semantic utilities */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-border-color: var(--border-color);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-ink-faint: var(--ink-faint);
+  --color-status: var(--status);
+  --color-punch: var(--punch);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+
+  /* shadcn utilities (keep working) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-source-code-pro);
   --font-serif: var(--font-glass-antiqua);
+
+  /* Radii */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
 }
 
-/* Motion tokens — shared easing vocabulary for the landing scene. */
-:root {
-  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
-  --scene-ink: #ece8e1;
-  --scene-surface: #0c0c10;
-  --scene-green: #7db592;
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    /* Use semantic token — resolves to --bg via --background */
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-source-code-pro), ui-monospace, monospace;
+  }
 }
 
-/* No transition on themed colors: the View Transitions API owns the visual.
-   A CSS color transition here would fight the clip-path wipe. */
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Set pre-paint by the inline script in layout.tsx for returning visitors:
-   kills the overlay before the browser ever paints it. */
+/* ==========================================================================
+   INTRO OVERLAY — pre-paint attr hides overlay for returning visitors
+   ========================================================================== */
 html[data-intro-seen] [data-intro-overlay] {
   display: none;
 }
 
-/* Theme switch slant wipe: disable the default cross-fade so the animated
-   clip-path on ::view-transition-new(root) is the only visual. */
+/* ==========================================================================
+   VIEW TRANSITIONS — disable default cross-fade so WAAPI clip-path is sole visual.
+   Theme toggle uses a slant-wipe; page transitions use a circle-reveal.
+   Both animate ::view-transition-new(root); old sits underneath.
+   ========================================================================== */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -58,12 +220,9 @@ html[data-intro-seen] [data-intro-overlay] {
   z-index: 0;
 }
 
-
-/* ---------------------------------------------------------------------------
-   Landing scene (/) — cursor, status clock
---------------------------------------------------------------------------- */
-
-/* Custom landing cursor active: hide native cursor everywhere. */
+/* ==========================================================================
+   LANDING SCENE  (/  — always dark, isolated from global theme)
+   ========================================================================== */
 html[data-landing-cursor] *,
 html[data-landing-cursor] {
   cursor: none !important;
@@ -95,8 +254,6 @@ html[data-landing-cursor] {
   height: 32px;
 }
 
-
-/* StatusClock: softly-pulsing green "alive" dot. */
 @keyframes status-dot-pulse {
   0%,
   100% {
