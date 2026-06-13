@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 import { homeNavItems, type HomeNavKey } from "@/lib/home.config";
+import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
 
 function resolveActiveKey(pathname: string): HomeNavKey {
@@ -80,7 +81,14 @@ export default function TableOfContents() {
   }, [active, movePillTo, activeItem]);
 
   return (
-    <nav aria-label="Site sections" data-toc>
+    <nav
+      aria-label="Site sections"
+      data-toc
+      {...componentAttrs(
+        "TableOfContents",
+        "Numbered section nav with sliding active pill — mirrors Megan's TOC pattern.",
+      )}
+    >
       <p className="mb-3 font-mono text-[11px] tracking-[0.18em] text-ink-dim uppercase">
         Explore
       </p>

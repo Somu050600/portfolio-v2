@@ -4,6 +4,7 @@ import { useRef, type MouseEvent } from "react";
 import type { Project, Status } from "@/lib/projects.config";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { cn } from "@/lib/utils";
+import { componentAttrs } from "@/lib/build-mode";
 import CardPreview from "./CardPreview";
 
 function StatusBadge({ status }: { status: Status }) {
@@ -28,6 +29,7 @@ type ProjectIndexCardProps = Pick<
   | "href"
   | "slug"
   | "caseStudy"
+  | "note"
 > & {
   preview?: Project["preview"];
 };
@@ -133,6 +135,7 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     href,
     slug,
     caseStudy,
+    note,
     ...contentProps
   } = props;
 
@@ -140,6 +143,10 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const hasCaseStudy = !!caseStudy;
   const targetHref = external ? href : hasCaseStudy ? `/home/work/${slug}` : undefined;
+  const inspect = componentAttrs(
+    "ProjectIndexCard",
+    note ?? "Cream index card — hover reveals ROLE / TEAM / TIMEFRAME meta grid.",
+  );
 
   const cardClass = cn(
     "group index-card flex flex-col gap-2 rounded-2xl bg-elevated p-4 text-ink shadow-[0_0_4px_0_#999079] motion-reduce:transition-none",
@@ -167,6 +174,7 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
         onClick={handleClick}
         className={cardClass}
         style={cardStyle}
+        {...inspect}
         {...(external
           ? { target: "_blank", rel: "noopener noreferrer" }
           : {})}
@@ -177,7 +185,7 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   }
 
   return (
-    <article className={cardClass} style={cardStyle}>
+    <article className={cardClass} style={cardStyle} {...inspect}>
       <CardContent {...contentProps} slug={slug} />
     </article>
   );

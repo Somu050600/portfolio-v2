@@ -1,8 +1,12 @@
 import { skillGroups } from "@/lib/about.config";
+import { componentAttrs } from "@/lib/build-mode";
 
 export default function SkillsGrid() {
   return (
-    <div className="grid gap-6 sm:grid-cols-2">
+    <div
+      className="grid gap-6 sm:grid-cols-2"
+      {...componentAttrs("SkillsGrid", "Grouped skill chips from the résumé stack.")}
+    >
       {skillGroups.map((group) => (
         <section
           key={group.label}

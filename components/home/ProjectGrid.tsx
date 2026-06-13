@@ -5,6 +5,7 @@ import {
   getProjectsByCategory,
 } from "@/lib/projects.config";
 import ProjectIndexCard from "./ProjectIndexCard";
+import { componentAttrs } from "@/lib/build-mode";
 
 export default function ProjectGrid() {
   const proProjects = getProjectsByCategory("pro");
@@ -12,7 +13,13 @@ export default function ProjectGrid() {
   const moreProjects = getMoreProjects();
 
   return (
-    <div className="px-6 py-10 md:px-12 md:py-14 lg:px-16">
+    <div
+      className="px-6 py-10 md:px-12 md:py-14 lg:px-16"
+      {...componentAttrs(
+        "ProjectGrid",
+        "Two-column masonry grouped by Pro / Creative, plus compact More list.",
+      )}
+    >
       <header className="mb-12 max-w-2xl">
         <h1 className="font-serif text-4xl font-light tracking-tight text-ink md:text-5xl">
           Work
@@ -28,7 +35,16 @@ export default function ProjectGrid() {
         if (items.length === 0) return null;
 
         return (
-          <section key={category} className="mb-14">
+          <section
+            key={category}
+            className="mb-14"
+            {...componentAttrs(
+              `ProjectGrid.${category}`,
+              category === "pro"
+                ? "Shipped product work — design systems, compliance, SSO, perf."
+                : "Creative experiments — WebGL, shaders, motion studies.",
+            )}
+          >
             <h2 className="mb-6 font-mono text-xs tracking-[0.2em] text-ink-dim uppercase">
               {categoryLabels[category]}
             </h2>
@@ -49,6 +65,7 @@ export default function ProjectGrid() {
                     external={project.external}
                     href={project.href}
                     caseStudy={project.caseStudy}
+                    note={project.note}
                   />
                 </div>
               ))}

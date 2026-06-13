@@ -77,6 +77,7 @@ export const projects: Project[] = [
       poster: "/posters/design-system.svg",
       height: 228,
     },
+    note: "Live canvas preview on hover — token pipeline case study with full BlockRenderer content.",
     caseStudy: {
       tagline: "From two-week UI cycles to under one week — without sacrificing craft.",
       tags: ["Design Systems", "Tokens", "React", "Storybook"],
@@ -218,6 +219,7 @@ export const projects: Project[] = [
       poster: "/posters/fluid-dye.svg",
       height: 240,
     },
+    note: "Card-mount fluid dye sketch — also a full-screen playground experiment.",
   },
   {
     slug: "liquid-distortion",
@@ -237,6 +239,7 @@ export const projects: Project[] = [
       poster: "/posters/liquid-distortion.svg",
       height: 228,
     },
+    note: "Shader distortion WIP — card uses shared fluid-dye sketch as preview.",
   },
   {
     slug: "brush-reveal",
@@ -264,6 +267,7 @@ export const projects: Project[] = [
     status: "IN PROGRESS",
     tech: ["Next.js", "Tailwind", "GSAP", "View Transitions"],
     tilt: 1.3,
+    note: "This portfolio — cmdk palette, build mode, and circle-reveal nav included.",
   },
 
   // ── More (compact list) ────────────────────────────────────────────────────
