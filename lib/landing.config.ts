@@ -85,6 +85,19 @@ export type LandingConfig = {
     /** lerp factor for the trailing cursor */
     cursorLerp: number;
   };
+  /** Per-character "flashlight" spotlight on the hero title */
+  spotlight: {
+    /** px radius of the spotlight falloff */
+    radius: number;
+    /** minimum opacity for fully-dimmed glyphs (0–1) */
+    dimFloor: number;
+    /** lerp factor for the per-char proximity easing */
+    ease: number;
+    /** tight bright core blur radius (px, at full proximity) */
+    glowCorePx: number;
+    /** wider soft bloom blur radius (px, at full proximity) */
+    glowBloomPx: number;
+  };
   enterTransition: {
     coverMs: number;
     coverEase: string;
@@ -104,7 +117,7 @@ export const landingConfig: LandingConfig = {
   hero: {
     eyebrow: "WELCOME TO",
     // TODO: replace with your final title phrase
-    title: ["Somu's ", " World"],
+    title: ["Somu's", "World"],
     ctaLabel: "EXPLORE",
     showSkip: true,
     skipLabel: "skip intro",
@@ -193,6 +206,14 @@ export const landingConfig: LandingConfig = {
     shoveLerp: 0.18,
     parallaxMax: 18,
     cursorLerp: 0.35,
+  },
+
+  spotlight: {
+    radius: 175,
+    dimFloor: 0.24,
+    ease: 0.16,
+    glowCorePx: 11,
+    glowBloomPx: 24,
   },
 
   enterTransition: {
