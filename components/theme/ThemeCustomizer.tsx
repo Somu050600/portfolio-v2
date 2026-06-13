@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useTheme } from "next-themes";
-import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
+import { useSettings } from "@/components/settings/SettingsProvider";
 import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useAccent } from "./AccentProvider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   ACCENTS,
   THEME_DEFAULTS,
@@ -13,6 +14,10 @@ import {
   type Mode,
   type ThemeDraft,
 } from "@/lib/theme.config";
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { useAccent } from "./AccentProvider";
 
 // ---------------------------------------------------------------------------
 // Gear icon — exported so Header / Sidebar can mount the full panel anywhere
@@ -56,7 +61,6 @@ export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<ThemeDraft>(committed);
 
-
   const dirty =
     draft.mode !== ((theme ?? THEME_DEFAULTS.mode) as Mode) ||
     draft.darkAccent !== committed.darkAccent ||
@@ -84,8 +88,50 @@ export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
     reset();
   };
 
-  const coolKeys: AccentKey[] = ["blue", "sky", "cyan", "indigo", "violet", "emerald"];
+  const coolKeys: AccentKey[] = [
+    "blue",
+    "sky",
+    "cyan",
+    "indigo",
+    "violet",
+    "emerald",
+  ];
   const warmKeys: AccentKey[] = ["terracotta", "coral", "amber"];
+
+  useEffect(() => {
+    const onOpen = () => {
+      setDraft({
+        mode: (theme ?? THEME_DEFAULTS.mode) as Mode,
+        darkAccent: committed.darkAccent,
+        lightAccent: committed.lightAccent,
+      });
+      setOpen(true);
+    };
+    window.addEventListener("theme:open-customizer", onOpen);
+    return () => window.removeEventListener("theme:open-customizer", onOpen);
+  }, [theme, committed]);
+
+  useEffect(() => {
+    document.documentElement.toggleAttribute(
+      "data-theme-customizer-open",
+      open,
+    );
+    return () => {
+      document.documentElement.removeAttribute("data-theme-customizer-open");
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        clearPreview();
+        setOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, clearPreview]);
 
   return (
     <DialogPrimitive.Root
@@ -109,9 +155,9 @@ export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
 
       <DialogPrimitive.Portal>
         {/* Transparent backdrop — page stays fully interactive for live preview */}
-        <DialogPrimitive.Backdrop className="pointer-events-none fixed inset-0 z-[9980] bg-transparent" />
+        <DialogPrimitive.Backdrop className="pointer-events-none fixed inset-0 z-9980 bg-transparent" />
         <DialogPrimitive.Popup
-          className="fixed right-4 top-16 z-[9981] w-[296px] rounded-xl border border-border-color bg-elevated p-5 shadow-xl outline-none md:right-6"
+          className="fixed bottom-6 left-12 z-9981 w-[min(calc(100vw-3rem),296px)] rounded-xl border border-border-color bg-elevated p-5 shadow-xl outline-none lg:bottom-10 lg:left-26"
           aria-label="Theme customizer"
         >
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.3em] text-ink-dim">
@@ -175,6 +221,10 @@ export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
 
           <Separator className="my-4 bg-border-color" />
 
+          <BuildModeAdvanced />
+
+          <Separator className="my-4 bg-border-color" />
+
           {/* Footer */}
           <div className="flex items-center justify-between">
             <button
@@ -228,12 +278,24 @@ function AccentGrid({
     <div className="space-y-2">
       <div className="flex gap-2">
         {coolKeys.map((k) => (
-          <Swatch key={k} accentKey={k} mode={mode} selected={selected === k} onSelect={onSelect} />
+          <Swatch
+            key={k}
+            accentKey={k}
+            mode={mode}
+            selected={selected === k}
+            onSelect={onSelect}
+          />
         ))}
       </div>
       <div className="flex gap-2">
         {warmKeys.map((k) => (
-          <Swatch key={k} accentKey={k} mode={mode} selected={selected === k} onSelect={onSelect} />
+          <Swatch
+            key={k}
+            accentKey={k}
+            mode={mode}
+            selected={selected === k}
+            onSelect={onSelect}
+          />
         ))}
       </div>
     </div>
@@ -276,12 +338,50 @@ function Swatch({
   );
 }
 
+function BuildModeAdvanced() {
+  const { buildMode, setBuildMode } = useSettings();
+
+  return (
+    <section>
+      <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-ink-faint">
+        Advanced
+      </p>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={buildMode}
+        onClick={() => setBuildMode(!buildMode)}
+        className={`flex w-full items-center justify-between rounded-md border px-3 py-2 font-mono text-[11px] tracking-wide transition-colors ${
+          buildMode
+            ? "border-accent bg-accent-soft text-ink"
+            : "border-border-color text-ink-dim hover:text-ink"
+        }`}
+      >
+        <span>Build mode</span>
+        <span>{buildMode ? "On" : "Off"}</span>
+      </button>
+      <p className="mt-2 text-[10px] leading-snug text-ink-faint">
+        Inspect overlays, perf HUD, and component notes. Also in ⌘K.
+      </p>
+    </section>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Gear icon SVG
 // ---------------------------------------------------------------------------
 function GearIcon() {
   return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
       <circle cx="12" cy="12" r="3" />
     </svg>

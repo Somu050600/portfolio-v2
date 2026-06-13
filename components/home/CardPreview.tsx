@@ -13,6 +13,7 @@ import {
 import type { Preview } from "@/lib/projects.config";
 import { useFinePointer, useReducedMotion } from "@/lib/use-reduced-motion";
 import { isSketchName, SketchComponents } from "@/sketches/registry";
+import { componentAttrs } from "@/lib/build-mode";
 
 type CardPreviewProps = {
   preview?: Preview;
@@ -102,6 +103,14 @@ export default function CardPreview({
       style={{ height }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
+      {...componentAttrs(
+        "CardPreview",
+        preview.kind === "canvas"
+          ? "Poster by default; live sketch mounts on hover + in-viewport (≤2 global)."
+          : preview.kind === "video"
+            ? "Video plays on hover when in view."
+            : "Static image preview frame.",
+      )}
     >
       {(preview.kind === "canvas" || preview.kind === "video") && (
         <div

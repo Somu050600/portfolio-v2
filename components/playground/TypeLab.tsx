@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ACCENTS, THEME_DEFAULTS, type AccentKey } from "@/lib/theme.config";
 import { useFinePointer, useReducedMotion } from "@/lib/use-reduced-motion";
+import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
 
 const MODES = ["spotlight", "magnetic", "decode", "swell"] as const;
@@ -175,7 +176,13 @@ export default function TypeLab() {
   }, [mode, reducedMotion, chars]);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div
+      className="flex flex-col gap-8"
+      {...componentAttrs(
+        "TypeLab",
+        "Per-char type modes — spotlight, magnetic, decode scramble, swell.",
+      )}
+    >
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Type modes">
         {MODES.map((m) => (
           <button

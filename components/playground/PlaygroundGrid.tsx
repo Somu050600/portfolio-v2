@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { experiments } from "@/lib/playground.config";
+import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
 
 export default function PlaygroundGrid() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div
+      className="grid gap-4 sm:grid-cols-2"
+      {...componentAttrs(
+        "PlaygroundGrid",
+        "Experiment index — live demos are code-split; stubs marked Soon.",
+      )}
+    >
       {experiments.map((exp) => {
         const live = exp.status === "live";
         const inner = (

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { profile } from "@/lib/profile.config";
+import { componentAttrs, UI_EVENTS } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import TableOfContents from "./TableOfContents";
@@ -69,6 +70,10 @@ export default function Sidebar({ children }: SidebarProps) {
 
       <aside
         data-open={open ? "" : undefined}
+        {...componentAttrs(
+          "Sidebar",
+          "Persistent home shell — nav, contact, theme controls, and ⌘K entry.",
+        )}
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-bg px-6 py-8 transition-transform duration-300 ease-[var(--ease-out-soft)] motion-reduce:transition-none lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[300px] lg:translate-x-0 lg:shadow-none",
           open ? "translate-x-0 shadow-xl" : "-translate-x-full lg:translate-x-0",
@@ -134,7 +139,23 @@ export default function Sidebar({ children }: SidebarProps) {
             </li>
           </ul>
 
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() =>
+                window.dispatchEvent(
+                  new CustomEvent(UI_EVENTS.commandPaletteOpen),
+                )
+              }
+              className="flex w-full items-center justify-between rounded-lg border border-border-color bg-surface px-3 py-2 font-mono text-[11px] tracking-wide text-ink-dim transition-colors hover:border-ink-faint hover:text-ink"
+              {...componentAttrs(
+                "CommandPaletteTrigger",
+                "Fuzzy command menu — navigate, theme, build mode, links.",
+              )}
+            >
+              <span>Command palette</span>
+              <span className="text-ink-faint">⌘K</span>
+            </button>
             <ThemeToggle />
           </div>
         </div>

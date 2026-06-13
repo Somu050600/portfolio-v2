@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { roles, type Role } from "@/lib/experience.config";
+import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
 import Counter from "./Counter";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -47,6 +48,10 @@ function RoleCard({ role, index }: { role: Role; index: number }) {
   return (
     <article
       ref={ref}
+      {...componentAttrs(
+        `ExperienceTimeline.${role.company}`,
+        `${role.role} at ${role.company} — ${role.start} to ${role.end}.`,
+      )}
       className={cn(
         "relative pl-8 opacity-0 translate-y-6 transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] motion-reduce:translate-y-0 motion-reduce:opacity-100",
         "data-visible:opacity-100 data-visible:translate-y-0",
@@ -105,7 +110,13 @@ function RoleCard({ role, index }: { role: Role; index: number }) {
 
 export default function ExperienceTimeline() {
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      {...componentAttrs(
+        "ExperienceTimeline",
+        "Vertical résumé timeline — scroll-staggered roles with metric counters.",
+      )}
+    >
       <span
         className="absolute top-0 bottom-0 left-[5px] w-px bg-border-color"
         aria-hidden
