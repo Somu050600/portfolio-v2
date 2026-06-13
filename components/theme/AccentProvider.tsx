@@ -88,6 +88,8 @@ function applyAccentVars(draft: ThemeDraft, resolvedMode: "light" | "dark") {
   const root = document.documentElement.style;
   // Write without any CSS transition — the VT API owns the visual.
   Object.entries(vars).forEach(([k, v]) => root.setProperty(k, v));
+  // Let accent-reactive effects (e.g. the hero spotlight glow) re-read --accent.
+  window.dispatchEvent(new CustomEvent("theme:accent-change"));
 }
 
 // ---------------------------------------------------------------------------

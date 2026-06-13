@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { useRouter } from "next/navigation";
+import SpotlightTitle from "./SpotlightTitle";
 import {
   LANDING_POINTER_EVENT,
   type LandingPointerDetail,
@@ -153,19 +154,12 @@ export default function Hero() {
         </p>
       </div>
 
-      {/* Title: Glass Antiqua display serif */}
+      {/* Title: Glass Antiqua display serif — per-character spotlight */}
       <div data-parallax="0" className="will-change-transform">
-        <h1 className="font-serif text-5xl tracking-wide leading-none text-white gap-1 flex flex-row">
-          {hero.title.map((word) => (
-            <span
-              key={word}
-              data-shove
-              className="inline-block will-change-transform"
-            >
-              {word}{" "}
-            </span>
-          ))}
-        </h1>
+        <SpotlightTitle
+          text={hero.title.join(" ")}
+          className="font-serif text-5xl tracking-wide leading-none text-white"
+        />
       </div>
 
       {/* CTA + skip */}
