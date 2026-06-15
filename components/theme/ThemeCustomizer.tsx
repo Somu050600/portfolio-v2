@@ -157,7 +157,8 @@ export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
         {/* Transparent backdrop — page stays fully interactive for live preview */}
         <DialogPrimitive.Backdrop className="pointer-events-none fixed inset-0 z-9980 bg-transparent" />
         <DialogPrimitive.Popup
-          className="fixed bottom-6 left-12 z-9981 w-[min(calc(100vw-3rem),296px)] rounded-xl border border-border-color bg-elevated p-5 shadow-xl outline-none lg:bottom-10 lg:left-26"
+          data-lenis-prevent
+          className="fixed bottom-6 left-12 z-9981 max-h-[min(85vh,640px)] w-[min(calc(100vw-3rem),296px)] overflow-y-auto rounded-xl border border-border-color bg-elevated p-5 shadow-xl outline-none lg:bottom-10 lg:left-26"
           aria-label="Theme customizer"
         >
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.3em] text-ink-dim">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLenis } from "lenis/react";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ export default function CaseStudySidebar({
   projectTitle,
 }: CaseStudySidebarProps) {
   const cover = usePageTransition();
+  const lenis = useLenis();
   const homeRef = useRef<HTMLAnchorElement>(null);
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState(sections[0]?.id ?? "");
@@ -144,10 +146,16 @@ export default function CaseStudySidebar({
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    target.scrollIntoView({
-      behavior: reduced ? "auto" : "smooth",
-      block: "start",
-    });
+
+    if (lenis && !reduced) {
+      lenis.scrollTo(target, { offset: -112, immediate: reduced });
+    } else {
+      target.scrollIntoView({
+        behavior: reduced ? "auto" : "smooth",
+        block: "start",
+      });
+    }
+
     history.replaceState(null, "", `#${id}`);
     setOpen(false);
   };
@@ -156,7 +164,13 @@ export default function CaseStudySidebar({
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+
+    if (lenis && !reduced) {
+      lenis.scrollTo(0, { immediate: reduced });
+    } else {
+      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+    }
+
     history.replaceState(null, "", " ");
     setOpen(false);
   };
@@ -197,6 +211,7 @@ export default function CaseStudySidebar({
       <aside
         data-cs-sidebar
         data-open={open ? "" : undefined}
+        data-lenis-prevent
         {...componentAttrs(
           "CaseStudySidebar",
           "Scroll-spy case study TOC — replaces home sidebar on /work/*.",

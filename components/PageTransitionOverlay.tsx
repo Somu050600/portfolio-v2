@@ -27,7 +27,9 @@ import {
 export default function PageTransitionOverlay() {
   const router = useRouter();
   const pathname = usePathname();
-  const { _register } = useContext(PageTransitionContext);
+  const { _register, _notifyTransitionComplete } = useContext(
+    PageTransitionContext,
+  );
 
   const prevPathRef = useRef(pathname);
   const resolveNavRef = useRef<(() => void) | null>(null);
@@ -92,9 +94,10 @@ export default function PageTransitionOverlay() {
       } finally {
         activeRef.current = false;
         resolveNavRef.current = null;
+        _notifyTransitionComplete(prevPathRef.current);
       }
     },
-    [router],
+    [router, _notifyTransitionComplete],
   );
 
   useEffect(() => _register(handleCover), [_register, handleCover]);
@@ -106,7 +109,14 @@ export default function PageTransitionOverlay() {
     prevPathRef.current = pathname;
     resolveNavRef.current?.();
     resolveNavRef.current = null;
-  }, [pathname]);
+
+    // Hard nav / back-forward — no VT animation in flight.
+    if (!activeRef.current) {
+      requestAnimationFrame(() => {
+        _notifyTransitionComplete(pathname);
+      });
+    }
+  }, [pathname, _notifyTransitionComplete]);
 
   // No DOM needed — view transitions are a pure browser API.
   return null;
