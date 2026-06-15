@@ -8,6 +8,7 @@ import {
   type CSSProperties,
 } from "react";
 import type { Thumbnail as ThumbnailData } from "@/lib/thumbnail";
+import { CHEAP_KINDS } from "@/lib/thumbnail";
 import { componentAttrs } from "@/lib/build-mode";
 import { useFinePointer, useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,7 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
 
   const Treatment = registry[thumbnail.kind];
   const hasTreatment = !!Treatment;
+  const isCheap = CHEAP_KINDS.has(thumbnail.kind);
 
   useEffect(() => {
     const el = frameRef.current;
@@ -84,7 +86,7 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
   useEffect(() => {
     let cancelled = false;
 
-    if (!baseActive || !hasTreatment) {
+    if (isCheap || !baseActive || !hasTreatment) {
       releaseSlot(slotId);
       const id = requestAnimationFrame(() => {
         if (!cancelled) setSlotOk(false);
@@ -106,9 +108,16 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
       cancelAnimationFrame(id);
       releaseSlot(slotId);
     };
-  }, [baseActive, hasTreatment, slotId]);
+  }, [isCheap, baseActive, hasTreatment, slotId]);
 
-  const treatmentActive = baseActive && hasTreatment && slotOk;
+  const treatmentActiveProp = isCheap
+    ? motionOK && finePointer && inView && hovered && !hidden
+    : baseActive && slotOk;
+
+  const treatmentMounted = isCheap
+    ? inView && !hidden && hasTreatment
+    : treatmentActiveProp && hasTreatment;
+
   const videoActive = baseActive && thumbnail.kind === "video" && !!videoSrc;
 
   const frameStyle: CSSProperties = { height };
@@ -118,9 +127,11 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
       ? "Static image — poster layer only."
       : thumbnail.kind === "video"
         ? "Poster by default; native video on hover when in view."
-        : hasTreatment
-          ? `Poster fallback; ${thumbnail.kind} treatment mounts on hover (≤3 global).`
-          : "Poster only — treatment not registered yet.";
+        : isCheap && hasTreatment
+          ? `CSS ${thumbnail.kind} treatment — static front at rest, animates on hover.`
+          : hasTreatment
+            ? `Poster fallback; ${thumbnail.kind} treatment mounts on hover (≤3 global).`
+            : "Poster only — treatment not registered yet.";
 
   return (
     <div
@@ -134,7 +145,7 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
       onPointerLeave={() => setHovered(false)}
       {...componentAttrs("Thumbnail", posterNote)}
     >
-      {thumbnail.poster && (
+      {thumbnail.poster && !(isCheap && treatmentMounted) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={thumbnail.poster}
@@ -142,15 +153,15 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
           className={cn(
             "absolute inset-0 h-full w-full object-cover",
             thumbnail.kind === "image" &&
-              "transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-[1.03] motion-reduce:group-hover:scale-100",
+              "transition-transform duration-500 ease-(--ease-out-soft) group-hover:scale-[1.03] motion-reduce:group-hover:scale-100",
           )}
           style={{ objectPosition }}
         />
       )}
 
-      {treatmentActive && Treatment && size.width > 0 && (
+      {treatmentMounted && Treatment && size.width > 0 && (
         <Treatment
-          active={treatmentActive}
+          active={treatmentActiveProp}
           width={size.width}
           height={size.height}
           accent={thumbnail.accent}

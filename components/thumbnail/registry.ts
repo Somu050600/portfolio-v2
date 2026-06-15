@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 import type { AccentKey } from "@/lib/theme.config";
 import type { ThumbnailKind } from "@/lib/thumbnail";
@@ -14,6 +15,7 @@ export type TreatmentProps = {
 export const registry: Partial<
   Record<ThumbnailKind, ComponentType<TreatmentProps>>
 > = {
+  flip: dynamic(() => import("./treatments/FlipCard"), { ssr: false }),
   // generative: dynamic(() => import("./treatments/Generative"), { ssr: false }),
   // ...added one at a time
 };
