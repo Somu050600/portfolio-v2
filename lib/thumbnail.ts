@@ -19,3 +19,30 @@ export interface Thumbnail {
   /** Per-treatment options (typed per kind as built) */
   params?: Record<string, unknown>;
 }
+
+export interface FlipThumbParams {
+  front: {
+    label?: string;
+    sublabel?: string;
+    swatches: string[];
+    type?: { display: string; sample: string; scaleLabel?: string };
+    button?: { label: string };
+    badge?: string;
+    showToggle?: boolean;
+    input?: string;
+    showRadii?: boolean;
+  };
+  back: {
+    heading?: string;
+    rows: { k: string; v: string; accent?: boolean }[];
+  };
+  /** Force compact layout (hides secondary row + badge/toggle). */
+  compact?: boolean;
+}
+
+/** CSS-only treatments — mount in-view without consuming animation slots. */
+export const CHEAP_KINDS = new Set<ThumbnailKind>([
+  "flip",
+  "parallax",
+  "glitch",
+]);

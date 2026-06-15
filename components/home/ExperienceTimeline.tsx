@@ -53,7 +53,7 @@ function RoleCard({ role, index }: { role: Role; index: number }) {
         `${role.role} at ${role.company} — ${role.start} to ${role.end}.`,
       )}
       className={cn(
-        "relative pl-8 opacity-0 translate-y-6 transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] motion-reduce:translate-y-0 motion-reduce:opacity-100",
+        "relative pl-8 opacity-0 translate-y-6 transition-[opacity,transform] duration-700 ease-(--ease-out-soft) motion-reduce:translate-y-0 motion-reduce:opacity-100",
         "data-visible:opacity-100 data-visible:translate-y-0",
         index % 2 === 1 && "md:translate-x-4 md:data-visible:translate-x-4",
       )}

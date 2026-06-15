@@ -119,6 +119,21 @@
   --sidebar-ring: var(--accent);
 }
 
+/* Thumbnail "screen" — always dark regardless of page theme */
+:root,
+.dark {
+  --thumb-bg: #121316;
+  --thumb-border: rgba(255, 255, 255, 0.09);
+  --thumb-dot: rgba(255, 255, 255, 0.05);
+  --thumb-ink: #ededed;
+  --thumb-ink-dim: #a9a9ad;
+  --thumb-ink-faint: #6f6f73;
+}
+
+.dark {
+  --thumb-bg: #16171a;
+}
+
 /* ==========================================================================
    TAILWIND @THEME INLINE
    Maps Tailwind utility classes to our semantic CSS vars.
@@ -139,6 +154,10 @@
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
   --color-accent-soft: var(--accent-soft);
+  --color-thumb-ink: var(--thumb-ink);
+  --color-thumb-ink-dim: var(--thumb-ink-dim);
+  --color-thumb-ink-faint: var(--thumb-ink-faint);
+  --color-thumb-border: var(--thumb-border);
 
   /* shadcn utilities (keep working) */
   --color-background: var(--background);
@@ -281,4 +300,50 @@ html[data-landing-cursor] {
   .status-dot {
     animation: none !important;
   }
+}
+
+@keyframes thumb-flip-swatch-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    transform: scale(1.14);
+    box-shadow: 0 0 10px 2px color-mix(in oklab, var(--swatch-glow) 55%, transparent);
+  }
+}
+
+/* Flip thumbnail — dark screen surface + container-query density */
+.thumb-flip {
+  container-type: inline-size;
+  container-name: thumb;
+}
+
+.thumb-screen {
+  background-color: var(--thumb-bg);
+  background-image: radial-gradient(
+    circle,
+    var(--thumb-dot) 1px,
+    transparent 1px
+  );
+  background-size: 15px 15px;
+  border: 0.5px solid var(--thumb-border);
+  border-radius: 11px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 8px 22px rgba(0, 0, 0, 0.18);
+  color: var(--thumb-ink);
+}
+
+@container thumb (max-width: 279px) {
+  .thumb-flip__secondary,
+  .thumb-flip__badge-toggle {
+    display: none;
+  }
+}
+
+.thumb-flip--compact .thumb-flip__secondary,
+.thumb-flip--compact .thumb-flip__badge-toggle {
+  display: none;
 }

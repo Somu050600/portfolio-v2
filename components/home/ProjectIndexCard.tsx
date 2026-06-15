@@ -80,7 +80,7 @@ function CardContent({
           )}
         </div>
 
-        <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-[var(--ease-out-soft)] group-hover:grid-rows-[1fr] motion-reduce:grid-rows-[1fr]">
+        <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-(--ease-out-soft) group-hover:grid-rows-[1fr] motion-reduce:grid-rows-[1fr]">
           <div className="min-h-0 overflow-hidden">
             <span
               className="mt-3 mb-3 block h-px w-full opacity-0 transition-opacity duration-200 group-hover:opacity-100 motion-reduce:opacity-100"
@@ -146,7 +146,7 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
 
   const cardClass = cn(
     "group index-card flex flex-col gap-2 rounded-2xl bg-elevated p-4 text-ink shadow-[0_0_4px_0_#999079] motion-reduce:transition-none",
-    "origin-[50%_40%] transition-[transform,box-shadow] duration-300 ease-[var(--ease-out-soft)]",
+    "origin-[50%_40%] transition-[transform,box-shadow] duration-300 ease-(--ease-out-soft)",
     // "hover:-translate-y-0.5 hover:rotate-0 hover:shadow-[0_12px_22px_-14px_rgba(36,36,36,0.35),0_0_4px_0_#999079] motion-reduce:hover:translate-y-0",
     targetHref && "cursor-pointer",
   );
