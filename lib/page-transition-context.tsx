@@ -21,27 +21,28 @@ export type CoverOptions = {
   direction?: "forward" | "backward";
 };
 
+type TransitionCompleteListener = (pathname: string) => void;
+
 type PageTransitionContextValue = {
-  /**
-   * Trigger a covered page transition from any client component:
-   *   const cover = usePageTransition();
-   *   cover({ href: '/work', originEl: btnRef.current });
-   */
   cover: (opts: CoverOptions) => void;
-  /**
-   * Internal — called once by PageTransitionOverlay to register itself.
-   * Returns a cleanup function.
-   */
   _register: (fn: (opts: CoverOptions) => void | Promise<void>) => () => void;
+  /** Fires after the circle-reveal animation finishes (or on hard nav). */
+  subscribeTransitionComplete: (
+    listener: TransitionCompleteListener,
+  ) => () => void;
+  _notifyTransitionComplete: (pathname: string) => void;
 };
 
 const PageTransitionContext = createContext<PageTransitionContextValue>({
   cover: () => {},
   _register: () => () => {},
+  subscribeTransitionComplete: () => () => {},
+  _notifyTransitionComplete: () => {},
 });
 
 export function PageTransitionProvider({ children }: { children: ReactNode }) {
   const handlerRef = useRef<((opts: CoverOptions) => void) | null>(null);
+  const completeListenersRef = useRef(new Set<TransitionCompleteListener>());
 
   const cover = useCallback((opts: CoverOptions) => {
     handlerRef.current?.(opts);
@@ -54,14 +55,34 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const subscribeTransitionComplete = useCallback(
+    (listener: TransitionCompleteListener) => {
+      completeListenersRef.current.add(listener);
+      return () => {
+        completeListenersRef.current.delete(listener);
+      };
+    },
+    [],
+  );
+
+  const _notifyTransitionComplete = useCallback((pathname: string) => {
+    completeListenersRef.current.forEach((fn) => fn(pathname));
+  }, []);
+
   return (
-    <PageTransitionContext.Provider value={{ cover, _register }}>
+    <PageTransitionContext.Provider
+      value={{
+        cover,
+        _register,
+        subscribeTransitionComplete,
+        _notifyTransitionComplete,
+      }}
+    >
       {children}
     </PageTransitionContext.Provider>
   );
 }
 
-/** Call from any client component to trigger a page transition. */
 export function usePageTransition() {
   return useContext(PageTransitionContext).cover;
 }

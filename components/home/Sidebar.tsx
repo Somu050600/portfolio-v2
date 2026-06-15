@@ -70,6 +70,7 @@ export default function Sidebar({ children }: SidebarProps) {
 
       <aside
         data-open={open ? "" : undefined}
+        data-lenis-prevent
         {...componentAttrs(
           "Sidebar",
           "Persistent home shell — nav, contact, theme controls, and ⌘K entry.",
