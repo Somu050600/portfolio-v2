@@ -6,6 +6,7 @@ import {
   PageTransitionContext,
   type CoverOptions,
 } from "@/lib/page-transition-context";
+import { setMorphPending } from "@/lib/morph";
 
 /**
  * Handles all page transitions via the View Transitions API — same pattern as
@@ -36,8 +37,11 @@ export default function PageTransitionOverlay() {
   const activeRef = useRef(false);
 
   const handleCover = useCallback(
-    async ({ href, originEl }: CoverOptions) => {
-      if (activeRef.current) return;
+    async ({ href, originEl, morph }: CoverOptions) => {
+      if (activeRef.current) {
+        setMorphPending(null);
+        return;
+      }
 
       const reducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
@@ -63,31 +67,33 @@ export default function PageTransitionOverlay() {
       });
       resolveNavRef.current = resolveFn;
 
-      const transition = document.startViewTransition(async () => {
+      const update = async () => {
         router.push(href);
         await navCommitted;
-      });
+      };
+
+      // Morph navigations skip the circle reveal below; the cs-* shared-element
+      // groups animate via their default group animation (timing tuned in
+      // globals.css). Non-morph navigations get the circle clip-path.
+      const transition = document.startViewTransition(update);
 
       await transition.ready;
 
-      // Always animate ::view-transition-new(root) (z-index: 1, always on top)
-      // growing in as a circle from the origin element.
-      // Forward: new page grows from the CTA (center).
-      // Backward: new page grows from the back button (bottom-left) — same
-      //   animation type, distinct origin gives it a different spatial feel.
-      document.documentElement.animate(
-        {
-          clipPath: [
-            `circle(0px at ${ox}px ${oy}px)`,
-            `circle(${maxR}px at ${ox}px ${oy}px)`,
-          ],
-        },
-        {
-          duration: 1500,
-          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
-          pseudoElement: "::view-transition-new(root)",
-        },
-      );
+      if (!morph) {
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(0px at ${ox}px ${oy}px)`,
+              `circle(${maxR}px at ${ox}px ${oy}px)`,
+            ],
+          },
+          {
+            duration: 1500,
+            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+            pseudoElement: "::view-transition-new(root)",
+          },
+        );
+      }
 
       try {
         await transition.finished;
