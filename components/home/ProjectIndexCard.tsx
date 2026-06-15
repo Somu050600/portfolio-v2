@@ -2,10 +2,30 @@
 
 import Thumbnail from "@/components/thumbnail/Thumbnail";
 import { componentAttrs } from "@/lib/build-mode";
-import { usePageTransition } from "@/lib/page-transition-context";
+import {
+  clearEl,
+  getBackMorphSlug,
+  setBackMorphSlug,
+  setMorphPending,
+  tagEl,
+} from "@/lib/morph";
+import {
+  PageTransitionContext,
+  usePageTransition,
+} from "@/lib/page-transition-context";
 import type { Project, Status } from "@/lib/projects.config";
 import { cn } from "@/lib/utils";
-import { useRef, type MouseEvent } from "react";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type MouseEvent,
+} from "react";
+
+// useLayoutEffect on the client, useEffect on the server, to avoid SSR warnings.
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 function StatusBadge({ status }: { status: Status }) {
   return (
@@ -56,17 +76,27 @@ function CardContent({
           className="h-[13px] w-[13px] rounded-full bg-bg shadow-[inset_0_1px_1.5px_rgba(36,36,36,0.35),inset_0_-0.5px_0.5px_rgba(255,255,255,0.4),0_0_0_1px_color-mix(in_oklab,var(--ink)_14%,transparent)]"
           aria-hidden
         />
-        <span className="font-mono text-xs tracking-wide text-ink-dim uppercase">
+        <span
+          data-morph="no"
+          className="font-mono text-xs tracking-wide text-ink-dim uppercase"
+        >
           No. {num}
         </span>
       </div>
 
-      {thumbnail && <Thumbnail thumbnail={thumbnail} />}
+      {thumbnail && (
+        <div data-morph="thumb">
+          <Thumbnail thumbnail={thumbnail} />
+        </div>
+      )}
 
       <div className="mt-1 flex flex-col">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2.5">
-            <h3 className="min-w-0 flex-1 truncate font-serif text-xl font-light text-ink">
+            <h3
+              data-morph="title"
+              className="min-w-0 flex-1 truncate font-serif text-xl font-light text-ink"
+            >
               {title}
             </h3>
             <div className="flex shrink-0 items-center gap-3">
@@ -131,6 +161,7 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   } = props;
 
   const cover = usePageTransition();
+  const { subscribeTransitionComplete } = useContext(PageTransitionContext);
   const cardRef = useRef<HTMLAnchorElement>(null);
   const hasCaseStudy = !!caseStudy;
   const targetHref = external
@@ -159,8 +190,30 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   const handleClick = (e: MouseEvent) => {
     if (external || !targetHref) return;
     e.preventDefault();
-    cover({ href: targetHref, originEl: cardRef.current });
+    const willMorph =
+      !!document.startViewTransition &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (willMorph) {
+      tagEl(cardRef.current);
+      setMorphPending("forward");
+    }
+    cover({ href: targetHref, originEl: cardRef.current, morph: willMorph });
   };
+
+  // Backward morph: if a back-navigation targeted this card's slug, tag it on
+  // mount (before the overlay resolves the nav → before the new snapshot) so
+  // the browser pairs it with the outgoing case study.
+  useIsoLayoutEffect(() => {
+    if (!hasCaseStudy || getBackMorphSlug() !== slug) return;
+    const root = cardRef.current;
+    tagEl(root);
+    const unsub = subscribeTransitionComplete(() => {
+      clearEl(root);
+      setBackMorphSlug(null);
+      unsub();
+    });
+    return () => unsub();
+  }, [hasCaseStudy, slug, subscribeTransitionComplete]);
 
   if (targetHref) {
     return (

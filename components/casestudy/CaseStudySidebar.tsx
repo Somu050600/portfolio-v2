@@ -5,6 +5,7 @@ import { useLenis } from "lenis/react";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
+import { tagEl } from "@/lib/morph";
 
 export type SectionLink = {
   id: string;
@@ -239,7 +240,18 @@ export default function CaseStudySidebar({
           href="/home"
           onClick={(e) => {
             e.preventDefault();
-            cover({ href: "/home", originEl: homeRef.current, direction: "backward" });
+            const willMorph =
+              !!document.startViewTransition &&
+              !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            if (willMorph) {
+              tagEl(document.querySelector<HTMLElement>("[data-cs-main]"));
+            }
+            cover({
+              href: "/home",
+              originEl: homeRef.current,
+              direction: "backward",
+              morph: willMorph,
+            });
           }}
           className="group mb-8 inline-flex items-center gap-2 font-mono text-sm text-ink-dim hover:text-ink"
         >
