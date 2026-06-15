@@ -60,7 +60,7 @@ export default function ProjectGrid() {
                     shipped={project.shipped}
                     status={project.status}
                     description={project.description}
-                    preview={project.preview}
+                    thumbnail={project.thumbnail}
                     tilt={project.tilt}
                     external={project.external}
                     href={project.href}

@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef, type MouseEvent } from "react";
-import type { Project, Status } from "@/lib/projects.config";
-import { usePageTransition } from "@/lib/page-transition-context";
-import { cn } from "@/lib/utils";
+import Thumbnail from "@/components/thumbnail/Thumbnail";
 import { componentAttrs } from "@/lib/build-mode";
-import CardPreview from "./CardPreview";
+import { usePageTransition } from "@/lib/page-transition-context";
+import type { Project, Status } from "@/lib/projects.config";
+import { cn } from "@/lib/utils";
+import { useRef, type MouseEvent } from "react";
 
 function StatusBadge({ status }: { status: Status }) {
   return (
@@ -30,9 +30,8 @@ type ProjectIndexCardProps = Pick<
   | "slug"
   | "caseStudy"
   | "note"
-> & {
-  preview?: Project["preview"];
-};
+  | "thumbnail"
+>;
 
 function CardContent({
   title,
@@ -42,9 +41,11 @@ function CardContent({
   shipped,
   status,
   description,
-  preview,
-  slug,
-}: Omit<ProjectIndexCardProps, "tilt" | "external" | "href" | "caseStudy">) {
+  thumbnail,
+}: Omit<
+  ProjectIndexCardProps,
+  "tilt" | "external" | "href" | "caseStudy" | "slug"
+>) {
   const num = String(number).padStart(2, "0");
   const statuses = Array.isArray(status) ? status : [status];
 
@@ -60,17 +61,7 @@ function CardContent({
         </span>
       </div>
 
-      {preview && (
-        <CardPreview
-          preview={preview}
-          height={
-            preview.kind === "image"
-              ? preview.height ?? 228
-              : preview.height ?? 228
-          }
-          cardId={slug}
-        />
-      )}
+      {thumbnail && <Thumbnail thumbnail={thumbnail} />}
 
       <div className="mt-1 flex flex-col">
         <div className="flex flex-col gap-2">
@@ -142,16 +133,21 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   const cover = usePageTransition();
   const cardRef = useRef<HTMLAnchorElement>(null);
   const hasCaseStudy = !!caseStudy;
-  const targetHref = external ? href : hasCaseStudy ? `/home/work/${slug}` : undefined;
+  const targetHref = external
+    ? href
+    : hasCaseStudy
+      ? `/home/work/${slug}`
+      : undefined;
   const inspect = componentAttrs(
     "ProjectIndexCard",
-    note ?? "Cream index card — hover reveals ROLE / TEAM / TIMEFRAME meta grid.",
+    note ??
+      "Cream index card — hover reveals ROLE / TEAM / TIMEFRAME meta grid.",
   );
 
   const cardClass = cn(
     "group index-card flex flex-col gap-2 rounded-2xl bg-elevated p-4 text-ink shadow-[0_0_4px_0_#999079] motion-reduce:transition-none",
     "origin-[50%_40%] transition-[transform,box-shadow] duration-300 ease-[var(--ease-out-soft)]",
-    "hover:-translate-y-0.5 hover:rotate-0 hover:shadow-[0_12px_22px_-14px_rgba(36,36,36,0.35),0_0_4px_0_#999079] motion-reduce:hover:translate-y-0",
+    // "hover:-translate-y-0.5 hover:rotate-0 hover:shadow-[0_12px_22px_-14px_rgba(36,36,36,0.35),0_0_4px_0_#999079] motion-reduce:hover:translate-y-0",
     targetHref && "cursor-pointer",
   );
 
@@ -175,18 +171,16 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
         className={cardClass}
         style={cardStyle}
         {...inspect}
-        {...(external
-          ? { target: "_blank", rel: "noopener noreferrer" }
-          : {})}
+        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       >
-        <CardContent {...contentProps} slug={slug} />
+        <CardContent {...contentProps} />
       </a>
     );
   }
 
   return (
     <article className={cardClass} style={cardStyle} {...inspect}>
-      <CardContent {...contentProps} slug={slug} />
+      <CardContent {...contentProps} />
     </article>
   );
 }
