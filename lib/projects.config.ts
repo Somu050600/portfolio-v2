@@ -2,10 +2,7 @@ export type Category = "pro" | "creative" | "more";
 export type Status = "SHIPPED" | "INTERNSHIP" | "IN PROGRESS" | "OPEN SOURCE";
 export type Accent = "blue" | "teal" | "orange" | "green" | "neutral";
 
-export type Preview =
-  | { kind: "image"; src: string; height?: number; position?: string }
-  | { kind: "canvas"; sketch: string; poster: string; height?: number }
-  | { kind: "video"; src: string; poster: string; height?: number };
+import type { Thumbnail } from "./thumbnail";
 
 export type Block =
   | { type: "paragraph"; text: string; emphasis?: string[] }
@@ -49,7 +46,7 @@ export interface Project {
   status: Status | Status[];
   tech: string[];
   tilt?: number;
-  preview?: Preview;
+  thumbnail?: Thumbnail;
   external?: boolean;
   href?: string;
   note?: string;
@@ -71,11 +68,11 @@ export const projects: Project[] = [
     status: "SHIPPED",
     tech: ["React", "TypeScript", "Storybook", "Figma Tokens"],
     tilt: -1.2,
-    preview: {
-      kind: "canvas",
-      sketch: "fluid-dye",
+    thumbnail: {
+      kind: "generative",
+      alt: "AI-Optimized Design System preview",
       poster: "/posters/design-system.svg",
-      height: 228,
+      params: { sketch: "fluid-dye", height: 228 },
     },
     note: "Live canvas preview on hover — token pipeline case study with full BlockRenderer content.",
     caseStudy: {
@@ -191,10 +188,11 @@ export const projects: Project[] = [
     status: "SHIPPED",
     tech: ["Webpack", "React", "Lighthouse", "CDN"],
     tilt: 1.1,
-    preview: {
+    thumbnail: {
       kind: "image",
-      src: "/posters/design-system.svg",
-      height: 200,
+      alt: "Performance Pass preview",
+      poster: "/posters/design-system.svg",
+      params: { height: 200 },
     },
   },
 
@@ -213,11 +211,11 @@ export const projects: Project[] = [
     tilt: -1.5,
     external: true,
     href: "https://github.com/Somu050600",
-    preview: {
-      kind: "canvas",
-      sketch: "fluid-dye",
+    thumbnail: {
+      kind: "generative",
+      alt: "Fluid simulation preview",
       poster: "/posters/fluid-dye.svg",
-      height: 240,
+      params: { sketch: "fluid-dye", height: 240 },
     },
     note: "Card-mount fluid dye sketch — also a full-screen playground experiment.",
   },
@@ -233,11 +231,11 @@ export const projects: Project[] = [
     status: "IN PROGRESS",
     tech: ["Three.js", "GLSL", "React"],
     tilt: 0.5,
-    preview: {
-      kind: "canvas",
-      sketch: "fluid-dye",
+    thumbnail: {
+      kind: "generative",
+      alt: "Liquid distortion preview",
       poster: "/posters/liquid-distortion.svg",
-      height: 228,
+      params: { sketch: "fluid-dye", height: 228 },
     },
     note: "Shader distortion WIP — card uses shared fluid-dye sketch as preview.",
   },
