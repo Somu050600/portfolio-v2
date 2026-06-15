@@ -1,9 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ACCENTS, type AccentKey } from "@/lib/theme.config";
 import type { FlipThumbParams } from "@/lib/thumbnail";
 import { cn } from "@/lib/utils";
 import type { TreatmentProps } from "../registry";
+
+// Hover-intent delay: only flip to the back once the cursor has lingered this
+// long, so sweeping across cards doesn't trigger a burst of distracting flips.
+const FLIP_ENTER_DELAY = 200;
 
 function parseFlipParams(params?: Record<string, unknown>): FlipThumbParams {
   const front = params?.front as FlipThumbParams["front"] | undefined;
@@ -66,6 +71,19 @@ export default function FlipCard({
   const accentTokens = thumbAccent(accent);
   const typeScale = front.type;
 
+  // Debounce the hover-driven flip: enter only after a brief dwell, leave
+  // immediately. A quick cursor sweep cancels the pending enter before it
+  // fires, so it never flips.
+  const [flipped, setFlipped] = useState(false);
+
+  useEffect(() => {
+    const id = window.setTimeout(
+      () => setFlipped(active),
+      active ? FLIP_ENTER_DELAY : 0,
+    );
+    return () => clearTimeout(id);
+  }, [active]);
+
   return (
     <div
       className={cn(
@@ -77,7 +95,7 @@ export default function FlipCard({
       <div
         className={cn(
           "relative h-full w-full transform-3d transition-transform duration-500 ease-(--ease-out-soft) motion-reduce:transition-none",
-          active && "motion-safe:rotate-y-180",
+          flipped && "motion-safe:rotate-y-180",
         )}
       >
         {/* Front — living tokens artboard */}
@@ -106,12 +124,12 @@ export default function FlipCard({
                   key={`${color}-${i}`}
                   className={cn(
                     "h-[22px] w-[22px] shrink-0 rounded-[5px] ring-1 ring-white/10",
-                    active &&
+                    flipped &&
                       "motion-safe:animate-[thumb-flip-swatch-pulse_1.4s_ease-in-out_infinite]",
                   )}
                   style={{
                     backgroundColor: color,
-                    animationDelay: active ? `${i * 80}ms` : undefined,
+                    animationDelay: flipped ? `${i * 80}ms` : undefined,
                     ["--swatch-glow" as string]: color,
                   }}
                 />

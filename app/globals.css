@@ -240,6 +240,18 @@ html[data-intro-seen] [data-intro-overlay] {
 }
 
 /* ==========================================================================
+   CARD ↔ CASE-STUDY MORPH — tuned timing for the shared-element groups.
+   These names only exist while a morph transition is in flight.
+   ========================================================================== */
+::view-transition-group(cs-frame),
+::view-transition-group(cs-title),
+::view-transition-group(cs-no),
+::view-transition-group(cs-thumb) {
+  animation-duration: 600ms;
+  animation-timing-function: var(--ease-out-soft);
+}
+
+/* ==========================================================================
    LANDING SCENE  (/  — always dark, isolated from global theme)
    ========================================================================== */
 html[data-landing-cursor] *,
