@@ -6,7 +6,7 @@ import {
   PageTransitionContext,
   type CoverOptions,
 } from "@/lib/page-transition-context";
-import { setMorphPending } from "@/lib/morph";
+import { swallowViewTransitionAbort } from "@/lib/view-transition-coordinator";
 
 /**
  * Handles all page transitions via the View Transitions API — same pattern as
@@ -37,11 +37,8 @@ export default function PageTransitionOverlay() {
   const activeRef = useRef(false);
 
   const handleCover = useCallback(
-    async ({ href, originEl, morph }: CoverOptions) => {
-      if (activeRef.current) {
-        setMorphPending(null);
-        return;
-      }
+    async ({ href, originEl }: CoverOptions) => {
+      if (activeRef.current) return;
 
       const reducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
@@ -72,28 +69,24 @@ export default function PageTransitionOverlay() {
         await navCommitted;
       };
 
-      // Morph navigations skip the circle reveal below; the cs-* shared-element
-      // groups animate via their default group animation (timing tuned in
-      // globals.css). Non-morph navigations get the circle clip-path.
       const transition = document.startViewTransition(update);
+      swallowViewTransitionAbort(transition);
 
       await transition.ready;
 
-      if (!morph) {
-        document.documentElement.animate(
-          {
-            clipPath: [
-              `circle(0px at ${ox}px ${oy}px)`,
-              `circle(${maxR}px at ${ox}px ${oy}px)`,
-            ],
-          },
-          {
-            duration: 1500,
-            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
-            pseudoElement: "::view-transition-new(root)",
-          },
-        );
-      }
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${ox}px ${oy}px)`,
+            `circle(${maxR}px at ${ox}px ${oy}px)`,
+          ],
+        },
+        {
+          duration: 1500,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+          pseudoElement: "::view-transition-new(root)",
+        },
+      );
 
       try {
         await transition.finished;

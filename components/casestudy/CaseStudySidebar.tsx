@@ -1,11 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
-import { usePageTransition } from "@/lib/page-transition-context";
 import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
-import { tagEl } from "@/lib/morph";
 
 export type SectionLink = {
   id: string;
@@ -21,9 +20,7 @@ export default function CaseStudySidebar({
   sections,
   projectTitle,
 }: CaseStudySidebarProps) {
-  const cover = usePageTransition();
   const lenis = useLenis();
-  const homeRef = useRef<HTMLAnchorElement>(null);
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState(sections[0]?.id ?? "");
   const listRef = useRef<HTMLUListElement>(null);
@@ -235,31 +232,16 @@ export default function CaseStudySidebar({
           {projectTitle}
         </p>
 
-        <a
-          ref={homeRef}
+        <Link
           href="/home"
-          onClick={(e) => {
-            e.preventDefault();
-            const willMorph =
-              !!document.startViewTransition &&
-              !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            if (willMorph) {
-              tagEl(document.querySelector<HTMLElement>("[data-cs-main]"));
-            }
-            cover({
-              href: "/home",
-              originEl: homeRef.current,
-              direction: "backward",
-              morph: willMorph,
-            });
-          }}
+          transitionTypes={["nav-back"]}
           className="group mb-8 inline-flex items-center gap-2 font-mono text-sm text-ink-dim hover:text-ink"
         >
           <span className="transition-transform group-hover:-translate-x-0.5 motion-reduce:transition-none">
             ←
           </span>
           Home
-        </a>
+        </Link>
 
         <nav ref={tocRef} aria-label="Case study sections" data-cs-toc>
           <p className="mb-3 font-mono text-[11px] tracking-[0.18em] text-ink-dim uppercase">

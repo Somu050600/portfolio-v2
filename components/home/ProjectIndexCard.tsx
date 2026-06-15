@@ -2,30 +2,10 @@
 
 import Thumbnail from "@/components/thumbnail/Thumbnail";
 import { componentAttrs } from "@/lib/build-mode";
-import {
-  clearEl,
-  getBackMorphSlug,
-  setBackMorphSlug,
-  setMorphPending,
-  tagEl,
-} from "@/lib/morph";
-import {
-  PageTransitionContext,
-  usePageTransition,
-} from "@/lib/page-transition-context";
 import type { Project, Status } from "@/lib/projects.config";
 import { cn } from "@/lib/utils";
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  type MouseEvent,
-} from "react";
-
-// useLayoutEffect on the client, useEffect on the server, to avoid SSR warnings.
-const useIsoLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+import Link from "next/link";
+import { ViewTransition } from "react";
 
 function StatusBadge({ status }: { status: Status }) {
   return (
@@ -62,12 +42,28 @@ function CardContent({
   status,
   description,
   thumbnail,
+  morphSlug,
 }: Omit<
   ProjectIndexCardProps,
   "tilt" | "external" | "href" | "caseStudy" | "slug"
->) {
+> & { morphSlug?: string }) {
   const num = String(number).padStart(2, "0");
   const statuses = Array.isArray(status) ? status : [status];
+
+  // When the card links to a case study, name the shared elements so React's
+  // View Transitions morph them into the case-study header (and back, including
+  // browser back/forward/gestures). `default="none"` keeps them inert on
+  // unrelated navigations.
+  const numEl = (
+    <span className="font-mono text-xs tracking-wide text-ink-dim uppercase">
+      No. {num}
+    </span>
+  );
+  const titleEl = (
+    <h3 className="min-w-0 flex-1 truncate font-serif text-xl font-light text-ink">
+      {title}
+    </h3>
+  );
 
   return (
     <>
@@ -76,29 +72,48 @@ function CardContent({
           className="h-[13px] w-[13px] rounded-full bg-bg shadow-[inset_0_1px_1.5px_rgba(36,36,36,0.35),inset_0_-0.5px_0.5px_rgba(255,255,255,0.4),0_0_0_1px_color-mix(in_oklab,var(--ink)_14%,transparent)]"
           aria-hidden
         />
-        <span
-          data-morph="no"
-          className="font-mono text-xs tracking-wide text-ink-dim uppercase"
-        >
-          No. {num}
-        </span>
+        {morphSlug ? (
+          <ViewTransition
+            name={`card-${morphSlug}-no`}
+            share="morph"
+            default="none"
+          >
+            {numEl}
+          </ViewTransition>
+        ) : (
+          numEl
+        )}
       </div>
 
-      {thumbnail && (
-        <div data-morph="thumb">
+      {thumbnail &&
+        (morphSlug ? (
+          <ViewTransition
+            name={`card-${morphSlug}-thumb`}
+            share="morph"
+            default="none"
+          >
+            <div>
+              <Thumbnail thumbnail={thumbnail} />
+            </div>
+          </ViewTransition>
+        ) : (
           <Thumbnail thumbnail={thumbnail} />
-        </div>
-      )}
+        ))}
 
       <div className="mt-1 flex flex-col">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2.5">
-            <h3
-              data-morph="title"
-              className="min-w-0 flex-1 truncate font-serif text-xl font-light text-ink"
-            >
-              {title}
-            </h3>
+            {morphSlug ? (
+              <ViewTransition
+                name={`card-${morphSlug}-title`}
+                share="morph"
+                default="none"
+              >
+                {titleEl}
+              </ViewTransition>
+            ) : (
+              titleEl
+            )}
             <div className="flex shrink-0 items-center gap-3">
               {statuses.map((s) => (
                 <StatusBadge key={s} status={s} />
@@ -160,9 +175,6 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     ...contentProps
   } = props;
 
-  const cover = usePageTransition();
-  const { subscribeTransitionComplete } = useContext(PageTransitionContext);
-  const cardRef = useRef<HTMLAnchorElement>(null);
   const hasCaseStudy = !!caseStudy;
   const targetHref = external
     ? href
@@ -178,7 +190,6 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   const cardClass = cn(
     "group index-card flex flex-col gap-2 rounded-2xl bg-elevated p-4 text-ink shadow-[0_0_4px_0_#999079] motion-reduce:transition-none",
     "origin-[50%_40%] transition-[transform,box-shadow] duration-300 ease-(--ease-out-soft)",
-    // "hover:-translate-y-0.5 hover:rotate-0 hover:shadow-[0_12px_22px_-14px_rgba(36,36,36,0.35),0_0_4px_0_#999079] motion-reduce:hover:translate-y-0",
     targetHref && "cursor-pointer",
   );
 
@@ -187,44 +198,35 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     transform: "rotate(var(--card-tilt, 0deg))",
   } as React.CSSProperties;
 
-  const handleClick = (e: MouseEvent) => {
-    if (external || !targetHref) return;
-    e.preventDefault();
-    const willMorph =
-      !!document.startViewTransition &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (willMorph) {
-      tagEl(cardRef.current);
-      setMorphPending("forward");
-    }
-    cover({ href: targetHref, originEl: cardRef.current, morph: willMorph });
-  };
+  // Internal case-study link — declarative morph via matching view-transition
+  // names. Plain <Link> navigation lets React drive the transition on click and
+  // on browser back/forward/gestures.
+  if (targetHref && !external) {
+    return (
+      <ViewTransition name={`card-${slug}`} share="morph" default="none">
+        <Link
+          href={targetHref}
+          transitionTypes={["nav-forward"]}
+          className={cardClass}
+          style={cardStyle}
+          {...inspect}
+        >
+          <CardContent {...contentProps} morphSlug={slug} />
+        </Link>
+      </ViewTransition>
+    );
+  }
 
-  // Backward morph: if a back-navigation targeted this card's slug, tag it on
-  // mount (before the overlay resolves the nav → before the new snapshot) so
-  // the browser pairs it with the outgoing case study.
-  useIsoLayoutEffect(() => {
-    if (!hasCaseStudy || getBackMorphSlug() !== slug) return;
-    const root = cardRef.current;
-    tagEl(root);
-    const unsub = subscribeTransitionComplete(() => {
-      clearEl(root);
-      setBackMorphSlug(null);
-      unsub();
-    });
-    return () => unsub();
-  }, [hasCaseStudy, slug, subscribeTransitionComplete]);
-
+  // External link — open in a new tab, no morph.
   if (targetHref) {
     return (
       <a
-        ref={cardRef}
         href={targetHref}
-        onClick={handleClick}
         className={cardClass}
         style={cardStyle}
+        target="_blank"
+        rel="noopener noreferrer"
         {...inspect}
-        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       >
         <CardContent {...contentProps} />
       </a>

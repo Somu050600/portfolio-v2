@@ -240,15 +240,19 @@ html[data-intro-seen] [data-intro-overlay] {
 }
 
 /* ==========================================================================
-   CARD ↔ CASE-STUDY MORPH — tuned timing for the shared-element groups.
-   These names only exist while a morph transition is in flight.
+   CARD ↔ CASE-STUDY MORPH — tuned timing for share="morph" groups.
    ========================================================================== */
-::view-transition-group(cs-frame),
-::view-transition-group(cs-title),
-::view-transition-group(cs-no),
-::view-transition-group(cs-thumb) {
+::view-transition-group(.morph) {
   animation-duration: 600ms;
   animation-timing-function: var(--ease-out-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(.morph),
+  ::view-transition-old(.morph),
+  ::view-transition-new(.morph) {
+    animation: none !important;
+  }
 }
 
 /* ==========================================================================

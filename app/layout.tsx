@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Glass_Antiqua, Source_Code_Pro } from "next/font/google";
+import BrowserNativeTransitions from "@/components/BrowserNativeTransitions";
 import PageTransitionOverlay from "@/components/PageTransitionOverlay";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { PageTransitionProvider } from "@/lib/page-transition-context";
@@ -58,7 +59,7 @@ export default function RootLayout({
         <ThemeProvider>
           <PageTransitionProvider>
             <PageTransitionOverlay />
-            {children}
+            <BrowserNativeTransitions>{children}</BrowserNativeTransitions>
           </PageTransitionProvider>
         </ThemeProvider>
       </body>

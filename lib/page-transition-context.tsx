@@ -19,12 +19,6 @@ export type CoverOptions = {
    *             revealing the new page underneath.
    */
   direction?: "forward" | "backward";
-  /**
-   * When true, skip the circle clip-path and run a shared-element morph
-   * instead (elements tagged with view-transition-name interpolate). Used by
-   * the card ↔ case-study transition; tagging is done by the caller.
-   */
-  morph?: boolean;
 };
 
 type TransitionCompleteListener = (pathname: string) => void;
