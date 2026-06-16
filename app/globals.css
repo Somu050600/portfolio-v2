@@ -251,6 +251,30 @@ html[data-intro-seen] [data-intro-overlay] {
   animation-timing-function: var(--ease-out-soft);
 }
 
+/* Sidebar: slides in from the left on forward nav, out on back nav. */
+::view-transition-new(cs-sidebar) {
+  animation: cs-sidebar-enter 500ms var(--ease-out-soft) forwards;
+}
+::view-transition-old(cs-sidebar) {
+  animation: cs-sidebar-leave 400ms var(--ease-out-soft) forwards;
+}
+@keyframes cs-sidebar-enter {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes cs-sidebar-leave {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
 /* ==========================================================================
    LANDING SCENE  (/  — always dark, isolated from global theme)
    ========================================================================== */
@@ -322,7 +346,8 @@ html[data-landing-cursor] {
   }
   50% {
     transform: scale(1.14);
-    box-shadow: 0 0 10px 2px color-mix(in oklab, var(--swatch-glow) 55%, transparent);
+    box-shadow: 0 0 10px 2px
+      color-mix(in oklab, var(--swatch-glow) 55%, transparent);
   }
 }
 

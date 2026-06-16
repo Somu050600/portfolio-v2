@@ -38,7 +38,10 @@ function ScrollReset() {
   useEffect(() => {
     return subscribeTransitionComplete(() => {
       lenisRef.current?.scrollTo(0, { immediate: true });
-      requestAnimationFrame(() => ScrollTrigger.refresh());
+      requestAnimationFrame(() => {
+        lenisRef.current?.resize();
+        ScrollTrigger.refresh();
+      });
     });
   }, [subscribeTransitionComplete]);
 

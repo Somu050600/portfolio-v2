@@ -19,7 +19,8 @@ export type Block =
       ordered?: boolean;
       items: { num?: string; title?: string; text: string }[];
     }
-  | { type: "metrics"; items: { value: string; label: string }[] };
+  | { type: "metrics"; items: { value: string; label: string }[] }
+  | { type: "diagram"; kind: "token-mismatch" };
 
 export interface CaseStudySection {
   id: string;
@@ -109,32 +110,63 @@ export const projects: Project[] = [
     },
     note: "Flip thumbnail — dark token artboard front, spec sheet back on hover.",
     caseStudy: {
-      tagline: "From two-week UI cycles to under one week — without sacrificing craft.",
-      tags: ["Design Systems", "Tokens", "React", "Storybook"],
+      tagline:
+        "We didn't set out to build a design system. We were trying to stop an AI from generating the wrong shade of blue.",
+      tags: ["AI Agents", "Figma Tokens", "Tailwind", "Storybook"],
       hero: { accent: "teal" },
       sections: [
         {
-          id: "context",
-          heading: "Context",
+          id: "the-wrong-blue",
+          heading: "Confidently Wrong",
           blocks: [
             {
               type: "paragraph",
-              text: "Product teams were shipping features faster than design could keep up. Every screen started from scratch — inconsistent spacing, one-off colors, and hand-rolled components that drifted from the Figma source of truth within a sprint.",
+              text: "It started with a button. We ran a Figma design through our MCP setup, asked the agent to implement it, and got back clean, confident code. The button was blue. Just not the right blue.",
             },
             {
-              type: "callout",
-              accent: "teal",
-              text: "The goal wasn't a prettier component gallery — it was shrinking the gap between design intent and production UI.",
+              type: "paragraph",
+              text: "Our brand blue lives at av-blue-500 — a custom token in our Tailwind config. In Figma, it was simply labeled blue. When the LLM saw that coming through the MCP context, it mapped it to Tailwind's stock blue-500. Same name, different hex. The output looked plausible enough to slip past a quick review.",
+              emphasis: ["av-blue-500", "blue", "blue-500"],
+            },
+            {
+              type: "diagram",
+              kind: "token-mismatch",
+            },
+            {
+              type: "paragraph",
+              text: "And it wasn't just blue. Any Figma variable name that overlapped with Tailwind's built-in vocabulary was a potential mismatch. We'd catch it in review, ask for corrections, re-run. The frustrating part wasn't that the AI got it wrong — it had no way to know it was wrong.",
             },
           ],
         },
         {
-          id: "approach",
-          heading: "Approach",
+          id: "the-bandaid",
+          heading: "The Fix That Wasn't",
           blocks: [
             {
               type: "paragraph",
-              text: "I built a token-first pipeline: Figma variables export to JSON, a build step generates CSS custom properties and TypeScript theme objects, and Storybook documents every component variant with visual regression hooks.",
+              text: "The fastest thing we could do was write a .md file. Token naming convention, Figma-to-Tailwind translation, a line telling the agent 'when Figma says blue, use av-blue-500.' Dropped it into agent context for every UI task. It worked.",
+            },
+            {
+              type: "callout",
+              accent: "orange",
+              text: "Until someone forgot to include it. Until context filled up and it got truncated. Until a new session started with a clean slate. A doc that has to be manually loaded every time is not a system — it's a reminder that the system is broken.",
+            },
+          ],
+        },
+        {
+          id: "fixing-the-source",
+          heading: "Both Sides Were Ready",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The real problem was structural. Figma had variables — just blue, green, brand-primary — declared with no architecture. No primitive layer, no semantic mappings, no consistent naming convention to anchor anything to.",
+            },
+            {
+              type: "paragraph",
+              text: "When we brought this to the design and product team, they weren't surprised. They'd wanted to fix Figma's token structure for a while too — the old setup had variables but no reusable component mappings, and designers were working around it constantly. The AI problem gave everyone a concrete reason to finally do it.",
+              emphasis: [
+                "The AI problem gave everyone a concrete reason to finally do it.",
+              ],
             },
             {
               type: "list",
@@ -142,38 +174,125 @@ export const projects: Project[] = [
               items: [
                 {
                   num: "01",
-                  title: "Audit",
-                  text: "Mapped 40+ ad-hoc color/spacing usages across three apps into a single semantic token set.",
+                  title: "Primitives",
+                  text: "Raw values — every color in the palette named by scale. av-blue-50 through av-blue-950, matching the frontend token names exactly.",
                 },
                 {
                   num: "02",
-                  title: "Primitives",
-                  text: "Shipped Button, Input, Select, and layout primitives with strict accessibility contracts.",
+                  title: "Semantic layer",
+                  text: "Intent-based tokens — action-primary, surface-default, text-muted. What designers reference in components.",
                 },
                 {
                   num: "03",
-                  title: "Adoption",
-                  text: "Paired with feature teams on two pilot flows, then rolled out via codemods and lint rules.",
+                  title: "Maps",
+                  text: "Explicit bindings from Figma semantic tokens to frontend Tailwind tokens. What the LLM actually resolves when it reads a design.",
                 },
               ],
             },
           ],
         },
         {
+          id: "the-tradeoff",
+          heading: "The Call We Almost Got Wrong",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Once tokens were cleaner on both sides, there was an obvious next question: should the frontend match it completely? Build a full custom design system — primitives, semantic layer, component styles — using CSS custom properties and typed objects instead of Tailwind utilities?",
+            },
+            {
+              type: "paragraph",
+              text: "We looked at it seriously. It's the clean-room ideal. But Tailwind already provides a semantic utility layer, we'd been on it since day one, and migrating the entire app would cost weeks for gains that were mostly theoretical. The av- prefix was already working. We kept it.",
+              emphasis: ["av-"],
+            },
+            {
+              type: "callout",
+              accent: "neutral",
+              text: "The right tradeoff isn't always the architecturally pure one. Sometimes it's the one that closes the actual gap without blowing up what's already working.",
+            },
+          ],
+        },
+        {
+          id: "teaching-the-llm",
+          heading: "Teaching the Machine",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "With tokens aligned, we wrote the real version of that earlier .md file — docs/design-system.md. Token translation tables, component APIs, exact prop shapes, common pitfalls. Everything an LLM needs to generate correct UI without guessing.",
+              emphasis: ["docs/design-system.md"],
+            },
+            {
+              type: "paragraph",
+              text: "One detail that matters: this doc isn't loaded into every agent context. AGENTS.md references it conditionally — the agent pulls it in only when the task involves UI. For everything else, the doc stays out of context entirely. Rough estimate, we're spending 30-40% less tokens on corrections and re-runs compared to before.",
+            },
+          ],
+        },
+        {
+          id: "component-rollout",
+          heading: "Component by Component",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Fixing tokens solved the color problem. But there's a second failure mode: an LLM reaching for a custom one-off implementation when a shared component already exists. We started documenting the component library, most-used first.",
+            },
+            {
+              type: "list",
+              ordered: false,
+              items: [
+                {
+                  title: "AVButton",
+                  text: "Props, variants, loading states, accessibility requirements.",
+                },
+                {
+                  title: "Icons16 / Icons24",
+                  text: "Import paths, stroke-vs-fill distinction, sizing conventions.",
+                },
+                {
+                  title: "AVShimmer",
+                  text: "When to use it, the parent-dimensions gotcha.",
+                },
+                {
+                  title: "AVTooltip",
+                  text: "Hover vs click mode, portal flag for overflow parents.",
+                },
+                {
+                  title: "AVTablePaginated",
+                  text: "Full table API including collapsible rows and progressive loading.",
+                },
+              ],
+            },
+            {
+              type: "paragraph",
+              text: "For the core ones — buttons, icons, shimmer, tooltip, metric cards — Storybook previews went up too. Locally hosted, so design can verify a component without running the full app.",
+            },
+            {
+              type: "paragraph",
+              text: "Still in progress. Every component that gets documented is one less thing the LLM has to invent.",
+            },
+          ],
+        },
+        {
           id: "impact",
-          heading: "Impact",
+          heading: "Where It Stands",
           blocks: [
             {
               type: "metrics",
               items: [
                 { value: "<1 wk", label: "UI delivery (was 2–3 wk)" },
-                { value: "40+", label: "Shared components" },
-                { value: "3", label: "Apps on one token set" },
+                { value: "~35%", label: "Less LLM context on corrections" },
+                { value: "10+", label: "Components documented" },
               ],
             },
             {
               type: "paragraph",
-              text: "Teams stopped debating hex values in PRs. New engineers onboarded through Storybook instead of hunting through legacy CSS. The system became the default path — not an optional upgrade.",
+              text: "There are still edge cases. An agent will occasionally reach for a raw Tailwind class when an av- token is the right call. But the floor is higher now, and the drift is much smaller.",
+              emphasis: ["the floor is higher"],
+            },
+            {
+              type: "paragraph",
+              text: "The bigger shift is that design and engineering are finally working from the same source of truth. That wasn't the original goal — it was a side effect of trying to fix an AI hallucination problem.",
+              emphasis: [
+                "side effect of trying to fix an AI hallucination problem.",
+              ],
             },
           ],
         },
@@ -356,9 +475,7 @@ export function getProjectBySlug(slug: string): Project | undefined {
 }
 
 export function getCaseStudySlugs(): string[] {
-  return projects
-    .filter((p) => p.caseStudy && !p.external)
-    .map((p) => p.slug);
+  return projects.filter((p) => p.caseStudy && !p.external).map((p) => p.slug);
 }
 
 export function getIndexProjects(): Project[] {

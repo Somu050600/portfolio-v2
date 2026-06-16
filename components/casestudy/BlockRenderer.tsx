@@ -3,6 +3,42 @@ import type { Block } from "@/lib/projects.config";
 import { accentCalloutStyles } from "@/lib/projects.config";
 import { cn } from "@/lib/utils";
 
+function TokenMismatchDiagram() {
+  return (
+    <figure className="not-prose">
+      <div className="rounded-xl border border-border-color bg-surface overflow-hidden">
+        <p className="px-4 pt-3 pb-2 font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
+          How tokens got lost in translation
+        </p>
+        <div className="flex flex-col md:flex-row items-stretch gap-px bg-border-color px-0 pb-0">
+          <div className="flex-1 bg-surface px-4 py-3">
+            <p className="mb-1.5 font-mono text-[9px] tracking-[0.14em] text-ink-faint uppercase">Figma variable</p>
+            <code className="font-mono text-sm text-ink">color/Blue</code>
+          </div>
+          <div className="flex items-center justify-center bg-surface px-3 py-1 text-ink-faint text-sm font-mono md:py-3">
+            →
+          </div>
+          <div className="flex-1 bg-surface px-4 py-3">
+            <p className="mb-1.5 font-mono text-[9px] tracking-[0.14em] text-ink-faint uppercase">LLM assumes</p>
+            <code className="font-mono text-sm text-ink">Tailwind blue-500</code>
+          </div>
+          <div className="flex items-center justify-center bg-surface px-3 py-1 text-ink-faint text-sm font-mono md:py-3">
+            →
+          </div>
+          <div className="flex-1 bg-surface px-4 py-3">
+            <p className="mb-1.5 font-mono text-[9px] tracking-[0.14em] text-ink-faint uppercase">Generated code</p>
+            <code className="block font-mono text-sm text-red-500 line-through opacity-70">bg-blue-500</code>
+            <code className="block font-mono text-sm text-green-600 dark:text-green-400">bg-av-blue-500</code>
+          </div>
+        </div>
+        <p className="px-4 py-2.5 font-mono text-[9px] tracking-wide text-ink-faint">
+          Same name, different hex — no error thrown, wrong color rendered.
+        </p>
+      </div>
+    </figure>
+  );
+}
+
 function ParagraphBlock({
   text,
   emphasis = [],
@@ -136,6 +172,10 @@ function BlockItem({ block }: { block: Block }) {
           ))}
         </dl>
       );
+
+    case "diagram":
+      if (block.kind === "token-mismatch") return <TokenMismatchDiagram />;
+      return null;
 
     default:
       return null;

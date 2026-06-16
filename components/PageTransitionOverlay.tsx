@@ -108,6 +108,15 @@ export default function PageTransitionOverlay() {
 
   useEffect(() => _register(handleCover), [_register, handleCover]);
 
+  // Fire on initial mount for direct URL loads — no VT animation runs, so
+  // subscribeTransitionComplete would never fire without this.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!activeRef.current) {
+      requestAnimationFrame(() => _notifyTransitionComplete(pathname));
+    }
+  }, []);
+
   // usePathname() changes when Next.js commits the new page to the DOM.
   // Resolving here hands the "new" snapshot timing back to startViewTransition.
   useEffect(() => {

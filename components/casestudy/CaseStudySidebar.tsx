@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
-import { usePageTransition } from "@/lib/page-transition-context";
+import { PageTransitionContext, usePageTransition } from "@/lib/page-transition-context";
 import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
 import { tagEl } from "@/lib/morph";
@@ -22,8 +22,10 @@ export default function CaseStudySidebar({
   projectTitle,
 }: CaseStudySidebarProps) {
   const cover = usePageTransition();
+  const { subscribeTransitionComplete } = useContext(PageTransitionContext);
   const lenis = useLenis();
   const homeRef = useRef<HTMLAnchorElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState(sections[0]?.id ?? "");
   const listRef = useRef<HTMLUListElement>(null);
@@ -141,6 +143,24 @@ export default function CaseStudySidebar({
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
+  // Assign cs-sidebar view-transition-name so the VT can animate it:
+  //  - forward nav: new-page snapshot captures sidebar → ::view-transition-new(cs-sidebar) slides in
+  //  - back nav: home click re-applies the name before cover() → ::view-transition-old(cs-sidebar) slides out
+  // Cleared after each transition so theme-toggle/other VTs don't capture it separately.
+  useLayoutEffect(() => {
+    const aside = sidebarRef.current;
+    if (!aside || !document.startViewTransition) return;
+    aside.style.viewTransitionName = "cs-sidebar";
+    const unsub = subscribeTransitionComplete(() => {
+      aside.style.viewTransitionName = "";
+      unsub();
+    });
+    return () => {
+      aside.style.viewTransitionName = "";
+      unsub();
+    };
+  }, [subscribeTransitionComplete]);
+
   const scrollToSection = (id: string) => {
     const target = document.getElementById(id);
     if (!target) return;
@@ -210,6 +230,7 @@ export default function CaseStudySidebar({
       />
 
       <aside
+        ref={sidebarRef}
         data-cs-sidebar
         data-open={open ? "" : undefined}
         data-lenis-prevent
@@ -218,8 +239,10 @@ export default function CaseStudySidebar({
           "Scroll-spy case study TOC — replaces home sidebar on /work/*.",
         )}
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-bg px-6 py-8 transition-transform duration-300 ease-(--ease-out-soft) motion-reduce:transition-none lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[300px] lg:translate-x-0",
-          open ? "translate-x-0 shadow-xl" : "-translate-x-full lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-bg px-6 py-8 motion-reduce:transition-none",
+          "transition-transform duration-300 ease-(--ease-out-soft)",
+          open ? "translate-x-0 shadow-xl" : "-translate-x-full",
+          "lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[300px] lg:translate-x-0",
         )}
       >
         <button
@@ -244,6 +267,10 @@ export default function CaseStudySidebar({
               !!document.startViewTransition &&
               !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
             if (willMorph) {
+              // Re-apply cs-sidebar name (was cleared after forward VT)
+              // so the back VT snapshot captures it for the slide-out animation.
+              const aside = sidebarRef.current;
+              if (aside) aside.style.viewTransitionName = "cs-sidebar";
               tagEl(document.querySelector<HTMLElement>("[data-cs-main]"));
             }
             cover({
