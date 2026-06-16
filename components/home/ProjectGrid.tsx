@@ -14,21 +14,12 @@ export default function ProjectGrid() {
 
   return (
     <div
-      className="px-6 py-10 md:px-12 md:py-14 lg:px-16"
+      className="px-6 pb-10 md:px-12 md:pb-14 lg:px-16"
       {...componentAttrs(
         "ProjectGrid",
         "Two-column masonry grouped by Pro / Creative, plus compact More list.",
       )}
     >
-      <header className="mb-12 max-w-2xl">
-        <h1 className="font-serif text-4xl font-light tracking-tight text-ink md:text-5xl">
-          Work
-        </h1>
-        <p className="mt-4 text-sm leading-relaxed text-ink-dim md:text-base">
-          Selected projects — professional systems work and creative experiments.
-        </p>
-      </header>
-
       {(["pro", "creative"] as const).map((category) => {
         const items =
           category === "pro" ? proProjects : creativeProjects;
