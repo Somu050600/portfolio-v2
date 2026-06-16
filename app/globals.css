@@ -276,6 +276,69 @@ html[data-intro-seen] [data-intro-overlay] {
 }
 
 /* ==========================================================================
+   HOME SECTION SLIDE — directional vertical push between the four sections.
+   The content pane is only named while [data-slide-active] is set, so this
+   never disturbs the root circle-reveal or the cs-* morph. The sidebar stays
+   unnamed → it rides in root (animation: none) and sits still.
+   Both snapshots are clipped to one viewport from the top so the push reads
+   as a clean screen swap rather than a fast scroll on tall pages.
+   ========================================================================== */
+html[data-slide-active] .home-content {
+  view-transition-name: home-content;
+  overflow: clip;
+  max-height: 100svh;
+}
+
+html[data-slide-active]::view-transition-old(home-content),
+html[data-slide-active]::view-transition-new(home-content) {
+  animation-duration: 480ms;
+  animation-timing-function: var(--ease-out-soft);
+  mix-blend-mode: normal;
+}
+html[data-slide-active]::view-transition-new(home-content) {
+  z-index: 1;
+}
+html[data-slide-active]::view-transition-old(home-content) {
+  z-index: 0;
+}
+
+/* Down the list → content slides up (new enters from below). */
+html[data-slide-dir="up"]::view-transition-old(home-content) {
+  animation-name: home-slide-old-up;
+}
+html[data-slide-dir="up"]::view-transition-new(home-content) {
+  animation-name: home-slide-new-up;
+}
+/* Up the list → content slides down (new enters from above). */
+html[data-slide-dir="down"]::view-transition-old(home-content) {
+  animation-name: home-slide-old-down;
+}
+html[data-slide-dir="down"]::view-transition-new(home-content) {
+  animation-name: home-slide-new-down;
+}
+
+@keyframes home-slide-old-up {
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes home-slide-new-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes home-slide-old-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes home-slide-new-down {
+  from {
+    transform: translateY(-100%);
+  }
+}
+
+/* ==========================================================================
    LANDING SCENE  (/  — always dark, isolated from global theme)
    ========================================================================== */
 html[data-landing-cursor] *,

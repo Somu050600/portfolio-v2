@@ -7,6 +7,7 @@ import {
   type CoverOptions,
 } from "@/lib/page-transition-context";
 import { setMorphPending } from "@/lib/morph";
+import { homeSectionIndex } from "@/lib/home.config";
 
 /**
  * Handles all page transitions via the View Transitions API — same pattern as
@@ -37,7 +38,7 @@ export default function PageTransitionOverlay() {
   const activeRef = useRef(false);
 
   const handleCover = useCallback(
-    async ({ href, originEl, morph }: CoverOptions) => {
+    async ({ href, originEl, morph, slide }: CoverOptions) => {
       if (activeRef.current) {
         setMorphPending(null);
         return;
@@ -53,6 +54,24 @@ export default function PageTransitionOverlay() {
       }
 
       activeRef.current = true;
+
+      // Directional vertical push between home sections. Tag <html> so the
+      // scoped CSS (app/globals.css) names the content pane and picks keyframes;
+      // the name is applied only while sliding so it never disturbs the
+      // circle-reveal (root) or cs-* morph transitions.
+      const root = document.documentElement;
+      let slideActive = false;
+      if (slide) {
+        const from = homeSectionIndex(prevPathRef.current);
+        const to = homeSectionIndex(href);
+        const dir = from === -1 || to === -1 || to >= from ? "up" : "down";
+        // Both snapshots are clipped to one viewport from the element's top;
+        // resetting scroll first keeps the old snapshot top-aligned like the new.
+        window.scrollTo(0, 0);
+        root.dataset.slideDir = dir;
+        root.setAttribute("data-slide-active", "");
+        slideActive = true;
+      }
 
       const rect = originEl?.getBoundingClientRect();
       const ox = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
@@ -79,7 +98,7 @@ export default function PageTransitionOverlay() {
 
       await transition.ready;
 
-      if (!morph) {
+      if (!morph && !slide) {
         document.documentElement.animate(
           {
             clipPath: [
@@ -100,6 +119,10 @@ export default function PageTransitionOverlay() {
       } finally {
         activeRef.current = false;
         resolveNavRef.current = null;
+        if (slideActive) {
+          root.removeAttribute("data-slide-active");
+          delete root.dataset.slideDir;
+        }
         _notifyTransitionComplete(prevPathRef.current);
       }
     },

@@ -25,6 +25,12 @@ export type CoverOptions = {
    * the card ↔ case-study transition; tagging is done by the caller.
    */
   morph?: boolean;
+  /**
+   * When true, run a directional vertical push between home sections instead
+   * of the circle clip-path. Direction is derived from section order by the
+   * handler. Used by the sidebar nav and ⌘K section jumps.
+   */
+  slide?: boolean;
 };
 
 type TransitionCompleteListener = (pathname: string) => void;

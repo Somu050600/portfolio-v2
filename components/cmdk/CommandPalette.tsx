@@ -14,7 +14,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { useSettings } from "@/components/settings/SettingsProvider";
-import { homeNavItems } from "@/lib/home.config";
+import { homeNavItems, isHomeSectionRoute } from "@/lib/home.config";
 import { profile } from "@/lib/profile.config";
 import { projects } from "@/lib/projects.config";
 import { usePageTransition } from "@/lib/page-transition-context";
@@ -72,6 +72,8 @@ export default function CommandPalette() {
     cover({
       href,
       originEl: document.activeElement as HTMLElement | null,
+      // Section jumps slide; case studies / external keep their own transition.
+      slide: isHomeSectionRoute(href),
     });
   };
 

@@ -2,10 +2,12 @@
 
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { componentAttrs, UI_EVENTS } from "@/lib/build-mode";
+import { usePageTransition } from "@/lib/page-transition-context";
 import { profile } from "@/lib/profile.config";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import TableOfContents from "./TableOfContents";
 
 type SidebarProps = {
@@ -14,6 +16,20 @@ type SidebarProps = {
 
 export default function Sidebar({ children }: SidebarProps) {
   const [open, setOpen] = useState(false);
+  const cover = usePageTransition();
+  const pathname = usePathname();
+
+  // The handle is the "/home" (Work) entry — slide to it like a TOC item.
+  const onHandleClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      setOpen(false);
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      if (pathname === "/home") return;
+      cover({ href: "/home", slide: true });
+    },
+    [cover, pathname],
+  );
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -97,7 +113,7 @@ export default function Sidebar({ children }: SidebarProps) {
           <Link
             href="/home"
             className="font-serif text-3xl font-light tracking-tight text-ink"
-            onClick={() => setOpen(false)}
+            onClick={onHandleClick}
           >
             {profile.handle}
           </Link>

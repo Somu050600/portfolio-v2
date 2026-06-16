@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 import { homeNavItems, type HomeNavKey } from "@/lib/home.config";
+import { usePageTransition } from "@/lib/page-transition-context";
 import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +19,20 @@ function resolveActiveKey(pathname: string): HomeNavKey {
 export default function TableOfContents() {
   const pathname = usePathname();
   const active = resolveActiveKey(pathname);
+  const cover = usePageTransition();
   const listRef = useRef<HTMLUListElement>(null);
   const pillRef = useRef<HTMLSpanElement>(null);
+
+  const onNavClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      // Let modified clicks (new tab, etc.) behave natively.
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      if (href === pathname) return;
+      cover({ href, slide: true });
+    },
+    [cover, pathname],
+  );
 
   const movePillTo = useCallback((item: HTMLElement | null) => {
     const pill = pillRef.current;
@@ -110,6 +123,7 @@ export default function TableOfContents() {
               <li key={item.key} className="relative">
                 <Link
                   href={item.href}
+                  onClick={(e) => onNavClick(e, item.href)}
                   data-toc-item
                   data-key={item.key}
                   aria-current={isActive ? "page" : undefined}
