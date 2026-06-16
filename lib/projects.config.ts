@@ -20,7 +20,14 @@ export type Block =
       items: { num?: string; title?: string; text: string }[];
     }
   | { type: "metrics"; items: { value: string; label: string }[] }
-  | { type: "diagram"; kind: "token-mismatch" };
+  | {
+      type: "diagram";
+      kind:
+        | "token-mismatch"
+        | "compliance-pipeline"
+        | "dual-render"
+        | "memory-blowup";
+    };
 
 export interface CaseStudySection {
   id: string;
@@ -304,14 +311,171 @@ export const projects: Project[] = [
     number: 2,
     title: "Compliance Reporting Platform",
     description:
-      "SSR dashboards with config-driven forms — 40% faster feature delivery.",
+      "PDF compliance reports rendered as web pages — designed to look right, ended up blowing up a prod.",
     category: "pro",
     role: "Frontend Engineer",
     team: "Compliance Engineering",
     shipped: "2024",
     status: "SHIPPED",
-    tech: ["Next.js", "TypeScript", "Zod", "SSR"],
+    tech: ["Next.js", "TypeScript", "Puppeteer", "SSR"],
     tilt: 0.8,
+    thumbnail: {
+      kind: "ascii",
+      alt: "ASCII render of the compliance reporting pipeline",
+      accent: "blue",
+    },
+    caseStudy: {
+      tagline:
+        "The report looked perfect. Then we deployed it to a client with real data and watched the pod ceiling disappear.",
+      tags: ["PDF", "Puppeteer", "SSR", "Print CSS"],
+      hero: { accent: "blue" },
+      sections: [
+        {
+          id: "the-problem",
+          heading: "The Brief",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Compliance reports needed to go out to customers — formatted, branded, printable PDFs. The backend is Go. The obvious path was a Go PDF library or a template renderer. We looked at it and quickly ruled it out.",
+            },
+            {
+              type: "paragraph",
+              text: "The design team had built detailed Figma layouts — multi-page reports with section headers, severity badges, data tables, coverage charts. Replicating that fidelity in a Go PDF template would've meant hand-coding every pixel of layout in a library that doesn't do CSS. That wasn't a week of work, it was a month, and it would break every time the design changed.",
+            },
+            {
+              type: "callout",
+              accent: "blue",
+              text: "The question wasn't how to generate a PDF. It was how to turn a Figma design into a PDF without rebuilding it from scratch every sprint.",
+            },
+          ],
+        },
+        {
+          id: "the-approach",
+          heading: "The Approach",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "We built it as a web page instead. The Go backend generates the report data, serializes it to JSON, creates a short-lived auth token, and hands both to Puppeteer. Puppeteer opens the Next.js report page — an unauthenticated route that accepts the token as a query param — and triggers a print.",
+            },
+            {
+              type: "list",
+              ordered: false,
+              items: [
+                {
+                  title: "Unauth route with short-lived token",
+                  text: "The report page is public but useless without the token. Token expires fast — just long enough for Puppeteer to load the page.",
+                },
+                {
+                  title: "data.json via SSR",
+                  text: "getServerSideProps fetches the report JSON from the backend using the token, parses it, and passes the full typed structure to the page.",
+                },
+                {
+                  title: "5 template types",
+                  text: "Owner-wise, cloud-wise, individual owner, individual cloud, and a default framework view — same page, different render path based on TemplateType in the data.",
+                },
+                {
+                  title: "Ctrl+P simulation",
+                  text: "Puppeteer calls page.pdf() which triggers the browser's print pipeline — @page margins, page-break rules, everything.",
+                },
+              ],
+            },
+            {
+              type: "diagram",
+              kind: "compliance-pipeline",
+            },
+            {
+              type: "paragraph",
+              text: "For the preview experience — when a user opens the report in a browser before downloading — we used @media print to make it feel like a document viewer, not a raw web page. The report header is hidden on screen and only appears in print. A4 dimensions, box shadows stripped, table rows protected from page breaks.",
+              emphasis: ["@media print"],
+            },
+          ],
+        },
+        {
+          id: "dual-render",
+          heading: "Two Views, One Page",
+          blocks: [
+            {
+              type: "diagram",
+              kind: "dual-render",
+            },
+            {
+              type: "paragraph",
+              text: "One detail that's easy to miss: the same page serves two different audiences. A user previewing the report in their browser sees a clean document viewer — scrollable, white background, subtle card shadow. Puppeteer generating the PDF sees the print stylesheet — no shadow, exact A4 margins, auto section counters via CSS, page numbers injected via @page bottom-right.",
+              emphasis: ["@page bottom-right"],
+            },
+            {
+              type: "paragraph",
+              text: "The generated timestamp in the PDF footer — 'Generated on Jun 12, 2024, 02:30 PM IST' — is injected as an inline <style> tag from the server with the actual time baked in. No client-side JS, no hydration gap. It's there when Puppeteer takes the snapshot.",
+              emphasis: ["Generated on Jun 12, 2024, 02:30 PM IST"],
+            },
+            {
+              type: "callout",
+              accent: "teal",
+              text: "@media print did a lot of heavy lifting here — it's not just 'hide the navbar.' It's the thing that makes the same HTML file work as both a browser preview and a pixel-accurate PDF.",
+            },
+          ],
+        },
+        {
+          id: "what-went-wrong",
+          heading: "Then It Hit Prod",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "In development and early testing, it worked well. Report generation was fast, output looked exactly like the Figma designs, and the UX of previewing before downloading was noticeably better than anything we'd shipped before.",
+            },
+            {
+              type: "paragraph",
+              text: "Before this feature, the report-generation pod sat comfortably at around 250MB. After the first prod deploy — even with normal-sized reports — it jumped to 700–900MB. That was concerning, but the pod held.",
+            },
+            {
+              type: "metrics",
+              items: [
+                { value: "~250MB", label: "Pod baseline (CSV reports)" },
+                { value: "700–900MB", label: "After PDF feature deploy" },
+                { value: "~1GB", label: "Pod memory ceiling" },
+              ],
+            },
+            {
+              type: "diagram",
+              kind: "memory-blowup",
+            },
+            {
+              type: "paragraph",
+              text: "Then we deployed to a customer environment with a large dataset. Puppeteer spun up, loaded the report page, started rendering — and the pod ran out of memory mid-generation. The process died, the pod restarted, and every metrics dashboard turned red. We reverted the build the same day.",
+              emphasis: ["every metrics dashboard turned red"],
+            },
+            {
+              type: "callout",
+              accent: "orange",
+              text: "Puppeteer isn't just a HTTP call. It's a full Chromium instance. Every concurrent report is a browser tab eating memory — and with large compliance datasets, each tab was enormous.",
+            },
+            {
+              type: "paragraph",
+              text: "The fix wasn't complicated in hindsight: headless rendering at scale belongs on the client, not inside a backend pod with a 1GB ceiling. When the user's browser renders the page and triggers print, the memory cost is theirs. When the server does it, the memory cost is yours — multiplied by every concurrent request.",
+            },
+          ],
+        },
+        {
+          id: "where-it-landed",
+          heading: "Where It Landed",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Server-side PDF generation is off. The compliance report page still exists and still works — users can open it in a browser, preview it, and print to PDF themselves. The Figma designs, the dual-render pattern, the five template types — all of that is intact.",
+            },
+            {
+              type: "paragraph",
+              text: "Server-side report generation now handles only CSV exports, the same as before. A proper fix — either a dedicated PDF microservice with tighter resource controls, or moving to a client-triggered download — is on the backlog.",
+            },
+            {
+              type: "callout",
+              accent: "neutral",
+              text: "It shipped, it looked great, it blew up a pod. That's a real outcome. The architecture wasn't wrong for the problem — it was wrong for the deployment context.",
+            },
+          ],
+        },
+      ],
+    },
   },
   {
     slug: "sso-alert-pipelines",

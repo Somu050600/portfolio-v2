@@ -1,11 +1,11 @@
 "use client";
 
+import ThemeToggle from "@/components/theme/ThemeToggle";
+import { componentAttrs, UI_EVENTS } from "@/lib/build-mode";
+import { profile } from "@/lib/profile.config";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
-import { profile } from "@/lib/profile.config";
-import { componentAttrs, UI_EVENTS } from "@/lib/build-mode";
-import { cn } from "@/lib/utils";
-import ThemeToggle from "@/components/theme/ThemeToggle";
 import TableOfContents from "./TableOfContents";
 
 type SidebarProps = {
@@ -64,7 +64,9 @@ export default function Sidebar({ children }: SidebarProps) {
         onClick={() => setOpen(false)}
         className={cn(
           "fixed inset-0 z-40 bg-ink/35 transition-opacity lg:hidden",
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
+          open
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
         )}
       />
 
@@ -77,7 +79,9 @@ export default function Sidebar({ children }: SidebarProps) {
         )}
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-bg px-6 py-8 transition-transform duration-300 ease-(--ease-out-soft) motion-reduce:transition-none lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[300px] lg:translate-x-0 lg:shadow-none",
-          open ? "translate-x-0 shadow-xl" : "-translate-x-full lg:translate-x-0",
+          open
+            ? "translate-x-0 shadow-xl"
+            : "-translate-x-full lg:translate-x-0",
         )}
       >
         <button
@@ -100,7 +104,9 @@ export default function Sidebar({ children }: SidebarProps) {
           <p className="mt-1 font-mono text-xs tracking-wide text-ink-dim uppercase">
             {profile.tagline}
           </p>
-          <p className="mt-4 text-sm leading-relaxed text-ink-dim">{profile.bio}</p>
+          <p className="mt-4 text-sm leading-relaxed text-ink-dim">
+            {profile.bio}
+          </p>
         </div>
 
         <TableOfContents />
@@ -119,14 +125,30 @@ export default function Sidebar({ children }: SidebarProps) {
               </a>
             </li>
             <li>
-              <span className="text-ink-faint">
-                GitHub <span className="font-mono text-[10px]">(TODO)</span>
-              </span>
+              <a
+                href={profile.contact.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-ink-faint"
+              >
+                GitHub{" "}
+                <span className="font-mono text-[10px]">
+                  <span aria-hidden>→</span>
+                </span>
+              </a>
             </li>
             <li>
-              <span className="text-ink-faint">
-                LinkedIn <span className="font-mono text-[10px]">(TODO)</span>
-              </span>
+              <a
+                href={profile.contact.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-ink-faint"
+              >
+                LinkedIn{" "}
+                <span className="font-mono text-[10px]">
+                  <span aria-hidden>→</span>
+                </span>
+              </a>
             </li>
             <li>
               <a
@@ -135,7 +157,10 @@ export default function Sidebar({ children }: SidebarProps) {
                 rel="noopener noreferrer"
                 className="text-ink-dim underline-offset-2 hover:text-ink hover:underline"
               >
-                Résumé
+                Résumé{" "}
+                <span aria-hidden className="underline-offset-0">
+                  ↓
+                </span>
               </a>
             </li>
           </ul>

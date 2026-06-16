@@ -17,7 +17,7 @@ import StatusClock from "./StatusClock";
  */
 export default function WelcomeScene() {
   return (
-    <main className="dark relative min-h-dvh overflow-hidden bg-(--landing-bg) text-ink">
+    <main className="dark relative min-h-dvh overflow-hidden bg-(--landing-bg) text-ink select-none">
       <SceneCanvas />
       <Hero />
       <StatusClock />

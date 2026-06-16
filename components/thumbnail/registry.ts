@@ -16,6 +16,5 @@ export const registry: Partial<
   Record<ThumbnailKind, ComponentType<TreatmentProps>>
 > = {
   flip: dynamic(() => import("./treatments/FlipCard"), { ssr: false }),
-  // generative: dynamic(() => import("./treatments/Generative"), { ssr: false }),
-  // ...added one at a time
+  ascii: dynamic(() => import("./treatments/AsciiRender"), { ssr: false }),
 };

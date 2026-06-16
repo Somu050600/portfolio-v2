@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
 import HomeShell from "@/components/home/HomeShell";
 import ObfuscatedEmail, { ResumeLink } from "@/components/home/ObfuscatedEmail";
 import SkillsGrid from "@/components/home/SkillsGrid";
 import { careAbout } from "@/lib/about.config";
 import { profile } from "@/lib/profile.config";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About — Somu",
@@ -53,26 +53,22 @@ export default function AboutPage() {
           <ObfuscatedEmail />
           <div className="flex flex-wrap gap-3">
             <ResumeLink />
-            {profile.contact.github !== "TODO" && (
-              <a
-                href={profile.contact.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-xs text-ink-dim hover:text-ink"
-              >
-                GitHub
-              </a>
-            )}
-            {profile.contact.linkedin !== "TODO" && (
-              <a
-                href={profile.contact.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-xs text-ink-dim hover:text-ink"
-              >
-                LinkedIn
-              </a>
-            )}
+            <a
+              href={profile.contact.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-ink-dim hover:text-ink"
+            >
+              GitHub
+            </a>
+            <a
+              href={profile.contact.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-ink-dim hover:text-ink"
+            >
+              LinkedIn
+            </a>
           </div>
         </section>
       </main>

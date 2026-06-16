@@ -45,4 +45,5 @@ export const CHEAP_KINDS = new Set<ThumbnailKind>([
   "flip",
   "parallax",
   "glitch",
+  "ascii",
 ]);

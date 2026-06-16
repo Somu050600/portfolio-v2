@@ -24,10 +24,8 @@ import {
 } from "@/lib/theme-actions";
 
 const EMAIL = profile.contact.email;
-const GITHUB =
-  profile.contact.github !== "TODO" ? profile.contact.github : undefined;
-const LINKEDIN =
-  profile.contact.linkedin !== "TODO" ? profile.contact.linkedin : undefined;
+const GITHUB = profile.contact.github;
+const LINKEDIN = profile.contact.linkedin;
 
 export default function CommandPalette() {
   const { commandOpen, setCommandOpen, buildMode, toggleBuildMode } =
