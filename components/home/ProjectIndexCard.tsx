@@ -178,8 +178,10 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   const cardClass = cn(
     "group index-card flex flex-col gap-2 rounded-2xl bg-elevated p-4 text-ink shadow-[0_0_4px_0_#999079] motion-reduce:transition-none",
     "origin-[50%_40%] transition-[transform,box-shadow] duration-300 ease-(--ease-out-soft)",
-    // "hover:-translate-y-0.5 hover:rotate-0 hover:shadow-[0_12px_22px_-14px_rgba(36,36,36,0.35),0_0_4px_0_#999079] motion-reduce:hover:translate-y-0",
-    targetHref && "cursor-pointer",
+    // Accent ring + soft glow on hover. Transform is owned by the inline tilt,
+    // so we lift via box-shadow only (translate utils would clobber the rotate).
+    targetHref &&
+      "cursor-pointer hover:shadow-[0_0_0_1px_var(--accent),0_14px_30px_-16px_color-mix(in_oklab,var(--accent)_55%,transparent)]",
   );
 
   const cardStyle = {

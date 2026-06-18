@@ -94,7 +94,7 @@ export default function Sidebar({ children }: SidebarProps) {
           "Persistent home shell — nav, contact, theme controls, and ⌘K entry.",
         )}
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-bg px-6 py-8 transition-transform duration-300 ease-(--ease-out-soft) motion-reduce:transition-none lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[300px] lg:translate-x-0 lg:shadow-none",
+          "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-sidebar-bg px-6 py-8 transition-transform duration-300 ease-(--ease-out-soft) motion-reduce:transition-none lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[300px] lg:translate-x-0 lg:shadow-none",
           open
             ? "translate-x-0 shadow-xl"
             : "-translate-x-full lg:translate-x-0",
@@ -135,7 +135,7 @@ export default function Sidebar({ children }: SidebarProps) {
             <li>
               <a
                 href={`mailto:${profile.contact.email}`}
-                className="text-ink-dim underline-offset-2 hover:text-ink hover:underline"
+                className="text-ink-dim underline-offset-2 transition-colors hover:text-accent hover:underline"
               >
                 {profile.contact.email}
               </a>
@@ -145,11 +145,16 @@ export default function Sidebar({ children }: SidebarProps) {
                 href={profile.contact.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-ink-faint"
+                className="group text-ink-faint transition-colors hover:text-accent"
               >
                 GitHub{" "}
                 <span className="font-mono text-[10px]">
-                  <span aria-hidden>→</span>
+                  <span
+                    aria-hidden
+                    className="inline-block transition-transform group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
                 </span>
               </a>
             </li>
@@ -158,11 +163,16 @@ export default function Sidebar({ children }: SidebarProps) {
                 href={profile.contact.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-ink-faint"
+                className="group text-ink-faint transition-colors hover:text-accent"
               >
                 LinkedIn{" "}
                 <span className="font-mono text-[10px]">
-                  <span aria-hidden>→</span>
+                  <span
+                    aria-hidden
+                    className="inline-block transition-transform group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
                 </span>
               </a>
             </li>
@@ -171,10 +181,13 @@ export default function Sidebar({ children }: SidebarProps) {
                 href={profile.contact.resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-ink-dim underline-offset-2 hover:text-ink hover:underline"
+                className="group text-ink-dim underline-offset-2 transition-colors hover:text-accent hover:underline"
               >
                 Résumé{" "}
-                <span aria-hidden className="underline-offset-0">
+                <span
+                  aria-hidden
+                  className="inline-block underline-offset-0 transition-transform group-hover:translate-y-0.5"
+                >
                   ↓
                 </span>
               </a>
@@ -189,7 +202,7 @@ export default function Sidebar({ children }: SidebarProps) {
                   new CustomEvent(UI_EVENTS.commandPaletteOpen),
                 )
               }
-              className="flex w-full items-center justify-between rounded-lg border border-border-color bg-surface px-3 py-2 font-mono text-[11px] tracking-wide text-ink-dim transition-colors hover:border-ink-faint hover:text-ink"
+              className="flex w-full items-center justify-between rounded-lg border border-border-color bg-elevated px-3 py-2 font-mono text-[11px] tracking-wide text-ink-dim transition-colors hover:border-ink-faint hover:text-ink"
               {...componentAttrs(
                 "CommandPaletteTrigger",
                 "Fuzzy command menu — navigate, theme, build mode, links.",

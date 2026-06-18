@@ -8,6 +8,9 @@ import { usePageTransition } from "@/lib/page-transition-context";
 import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
 
+const PILL_TRANSITION =
+  "transform 280ms var(--ease-out-soft), height 280ms var(--ease-out-soft), opacity 200ms var(--ease-out-soft)";
+
 function resolveActiveKey(pathname: string): HomeNavKey {
   if (pathname.startsWith("/home/work")) return "work";
   if (pathname.startsWith("/home/experience")) return "experience";
@@ -67,7 +70,9 @@ export default function TableOfContents() {
     requestAnimationFrame(() => {
       movePillTo(activeItem());
       requestAnimationFrame(() => {
-        pill.style.transition = "";
+        // Restore the real transition (NOT "" — that wipes it and the pill
+        // would then jump instantly instead of sliding on hover).
+        pill.style.transition = PILL_TRANSITION;
       });
     });
   }, [active, movePillTo, activeItem]);
@@ -111,16 +116,29 @@ export default function TableOfContents() {
           data-toc-pill
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 rounded-lg bg-surface opacity-0 motion-reduce:transition-none"
-          style={{
-            transition:
-              "transform 280ms var(--ease-out-soft), height 280ms var(--ease-out-soft), opacity 200ms var(--ease-out-soft)",
-          }}
+          style={{ transition: PILL_TRANSITION }}
         />
-        <ul ref={listRef} data-toc-list className="relative flex flex-col gap-0.5">
+        <ul
+          ref={listRef}
+          data-toc-list
+          className="relative flex flex-col gap-0.5"
+        >
           {homeNavItems.map((item) => {
             const isActive = item.key === active;
             return (
               <li key={item.key} className="relative">
+                {/* Accent bar lives inside the active item, so its DOM position
+                    is correct in both the old and new view-transition snapshots.
+                    During a slide it carries view-transition-name: toc-active-bar
+                    (set in globals.css), so the browser tweens it old→new active
+                    concurrently with the page slide — no JS positioning. */}
+                {isActive && (
+                  <span
+                    data-toc-bar
+                    aria-hidden
+                    className="pointer-events-none absolute top-1/2 left-0 z-10 h-4 w-[2px] -translate-y-1/2 rounded-full bg-accent"
+                  />
+                )}
                 <Link
                   href={item.href}
                   onClick={(e) => onNavClick(e, item.href)}
@@ -129,13 +147,13 @@ export default function TableOfContents() {
                   aria-current={isActive ? "page" : undefined}
                   className={cn(
                     "group flex items-center justify-between rounded-lg px-3 py-2.5 font-mono text-[13px] tracking-wide transition-colors",
-                    isActive ? "text-ink" : "text-ink-dim hover:text-ink",
+                    isActive ? "text-accent" : "text-ink-dim hover:text-ink",
                   )}
                 >
                   <span>{item.label}</span>
                   <span
                     aria-hidden
-                    className="text-ink-faint opacity-0 transition-opacity group-hover:opacity-100 motion-reduce:opacity-100"
+                    className="text-accent opacity-0 transition-opacity group-hover:opacity-100 motion-reduce:opacity-100"
                   >
                     →
                   </span>

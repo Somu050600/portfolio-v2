@@ -17,11 +17,13 @@
   /* Landing page background color */
   --landing-bg: #242424;
 
-  /* --- Portfolio semantic tokens (LIGHT — cream paper) ------------------- */
-  --bg: #efe7d4;
-  --surface: #e5dcc4;
-  --elevated: #fbf6ea;
-  --border-color: #d7ccb0;
+  /* --- Portfolio semantic tokens (LIGHT — warm-grey paper) -------------- */
+  --bg: #ece8df;
+  --surface: #f6f3ec;
+  --elevated: #e1dbce;
+  --border-color: #d3ccbd;
+  /* Sidebar sits on its own darker, cooler greige tier for canvas/sidebar/card contrast */
+  --sidebar-bg: #dcd4c4;
   --ink: #2a2620;
   --ink-dim: #6e6553;
   --ink-faint: #9a917e;
@@ -78,6 +80,8 @@
   --surface: #141414;
   --elevated: #1c1c1c;
   --border-color: #2a2a2a;
+  /* Raised one step above the canvas so the sidebar reads as a distinct tier */
+  --sidebar-bg: #131313;
   --ink: #ededed;
   --ink-dim: #8f8f8f;
   --ink-faint: #5a5a5a;
@@ -145,6 +149,7 @@
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-elevated: var(--elevated);
+  --color-sidebar-bg: var(--sidebar-bg);
   --color-border-color: var(--border-color);
   --color-ink: var(--ink);
   --color-ink-dim: var(--ink-dim);
@@ -210,6 +215,11 @@
     background: var(--bg);
     color: var(--ink);
     font-family: var(--font-source-code-pro), ui-monospace, monospace;
+  }
+  /* Text selection picks up the live accent (orange light / blue dark / custom) */
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--ink);
   }
 }
 
@@ -287,6 +297,17 @@ html[data-slide-active] .home-content {
   view-transition-name: home-content;
   overflow: clip;
   max-height: 100svh;
+}
+
+/* Active-nav accent bar: named only while sliding, so the browser tweens its
+   position old→new concurrently with the content slide. Unnamed otherwise →
+   rides the sidebar group during the card↔case-study morph. */
+html[data-slide-active] [data-toc-bar] {
+  view-transition-name: toc-active-bar;
+}
+html[data-slide-active]::view-transition-group(toc-active-bar) {
+  animation-duration: 480ms;
+  animation-timing-function: var(--ease-out-soft);
 }
 
 html[data-slide-active]::view-transition-old(home-content),
