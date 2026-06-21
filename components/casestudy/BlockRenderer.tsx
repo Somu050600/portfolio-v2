@@ -2,6 +2,7 @@ import type { Block } from "@/lib/projects.config";
 import { accentCalloutStyles } from "@/lib/projects.config";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import DemoBlock from "./DemoBlock";
 
 function TokenMismatchDiagram() {
   return (
@@ -244,6 +245,67 @@ function MemoryBlowupDiagram() {
   );
 }
 
+function VtApproachesDiagram() {
+  const fightIt = [
+    "compute the new position in JS",
+    "run a CSS transition on the element",
+    "…but it fires during the View Transition",
+    "the live element isn't painted — only its snapshot is",
+  ];
+  const nameIt = [
+    "give the bar a view-transition-name",
+    "render it inside the active item",
+    "browser pairs old + new snapshots",
+    "interpolates position with the page slide",
+  ];
+  return (
+    <figure className="not-prose">
+      <div className="overflow-hidden rounded-xl border border-border-color bg-surface">
+        <p className="px-4 pt-3 pb-3 font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
+          Two ways to move a bar across a navigation
+        </p>
+        <div className="grid grid-cols-1 gap-px bg-border-color sm:grid-cols-2">
+          <div className="bg-surface px-4 py-4">
+            <p className="mb-2.5 font-mono text-[10px] tracking-[0.12em] text-ink-dim uppercase">
+              <span className="text-orange-500">Animate it yourself</span> · jumps
+            </p>
+            <ul className="flex flex-col gap-1.5">
+              {fightIt.map((r) => (
+                <li
+                  key={r}
+                  className="flex items-start gap-2 font-mono text-[11px] text-ink-dim"
+                >
+                  <span className="mt-px shrink-0 text-ink-faint">·</span>
+                  {r}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="bg-surface px-4 py-4">
+            <p className="mb-2.5 font-mono text-[10px] tracking-[0.12em] text-ink-dim uppercase">
+              <span className="text-ink">Name it, let the browser</span> · glides
+            </p>
+            <ul className="flex flex-col gap-1.5">
+              {nameIt.map((r) => (
+                <li
+                  key={r}
+                  className="flex items-start gap-2 font-mono text-[11px] text-ink-dim"
+                >
+                  <span className="mt-px shrink-0 text-ink-faint">·</span>
+                  {r}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p className="px-4 py-2.5 font-mono text-[9px] tracking-wide text-ink-faint">
+          Same goal. The left fights the transition; the right rides it.
+        </p>
+      </div>
+    </figure>
+  );
+}
+
 function ParagraphBlock({
   text,
   emphasis = [],
@@ -389,7 +451,11 @@ function BlockItem({ block }: { block: Block }) {
         return <CompliancePipelineDiagram />;
       if (block.kind === "dual-render") return <DualRenderDiagram />;
       if (block.kind === "memory-blowup") return <MemoryBlowupDiagram />;
+      if (block.kind === "vt-approaches") return <VtApproachesDiagram />;
       return null;
+
+    case "demo":
+      return <DemoBlock id={block.id} caption={block.caption} />;
 
     default:
       return null;

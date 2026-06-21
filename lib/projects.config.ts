@@ -26,8 +26,10 @@ export type Block =
         | "token-mismatch"
         | "compliance-pipeline"
         | "dual-render"
-        | "memory-blowup";
-    };
+        | "memory-blowup"
+        | "vt-approaches";
+    }
+  | { type: "demo"; id: string; caption?: string };
 
 export interface CaseStudySection {
   id: string;
@@ -581,7 +583,151 @@ export const projects: Project[] = [
     status: "IN PROGRESS",
     tech: ["Next.js", "Tailwind", "GSAP", "View Transitions"],
     tilt: 1.3,
-    note: "This portfolio — cmdk palette, build mode, and circle-reveal nav included.",
+    thumbnail: {
+      kind: "replay",
+      accent: "cyan",
+      alt: "Sliding active-bar nav — a cursor moves between items and the accent bar glides on hover",
+      params: { height: 240 },
+    },
+    note: "This portfolio — live sliding-bar preview on hover; full View Transitions write-up inside.",
+    caseStudy: {
+      tagline:
+        "I wanted a two-pixel bar to glide between nav items. It took five rewrites and a lesson in how browsers actually paint a page.",
+      tags: ["View Transitions", "GSAP", "Next.js", "Tailwind"],
+      hero: { accent: "teal" },
+      sections: [
+        {
+          id: "the-bar",
+          heading: "A Bar That Should Just Slide",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The section nav on this site has a sliding highlight on hover, and the page itself slides between sections using the View Transitions API. So when you move to a new section, the little accent bar marking the active item should glide from the old item to the new one — in the same motion as the page. A two-pixel sliver of color. Felt like a five-minute job.",
+            },
+            {
+              type: "paragraph",
+              text: "It was not a five-minute job. It was five rewrites, two wrong mental models, and one moment of realizing I'd been fighting the browser the whole time.",
+              emphasis: ["five rewrites"],
+            },
+          ],
+        },
+        {
+          id: "hover-vs-nav",
+          heading: "Works on Hover, Dead on Navigation",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The first version was the obvious one: a CSS transition on transform, and a bit of JS to move the bar to the active item. On hover it slid beautifully. On an actual section change, it teleported — no slide, just instantly there.",
+            },
+            {
+              type: "callout",
+              accent: "orange",
+              text: "The hover case and the navigation case looked identical in the code. They are not the same problem. Hovering happens on a live, painted page. Navigating happens inside a View Transition — and that changes everything about what the browser is willing to draw.",
+            },
+          ],
+        },
+        {
+          id: "snapshot-trap",
+          heading: "The Snapshot Trap",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Here's what a View Transition actually does. When you call startViewTransition, the browser freezes the current page into an image, swaps the DOM to the new page, freezes that into a second image, and animates between the two pictures. For the length of that animation, the real elements aren't what you're looking at — their snapshots are.",
+              emphasis: ["startViewTransition", "snapshots"],
+            },
+            {
+              type: "callout",
+              accent: "blue",
+              text: "A CSS transition running during a View Transition is a tree falling in an empty forest. The element does move — but the frame it moves on is never the frame on screen. You're animating a thing the browser has already replaced with a photo of itself.",
+            },
+          ],
+        },
+        {
+          id: "chasing-timers",
+          heading: "Chasing It With Timers",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "So I tried to outwait it. Subscribe to a 'transition finished' event, then move the bar once the DOM was live again. It still jumped. I added the position-tracking, restored the CSS transition by hand, sequenced the frames — and it still jumped.",
+            },
+            {
+              type: "paragraph",
+              text: "The deeper problem was structural, and I'd been ignoring it. The sidebar isn't persistent. Each section is its own page rendering its own shell, so the entire nav unmounts and remounts on every navigation. There was no surviving bar to animate from — the new one mounted already sitting at its destination.",
+              emphasis: ["no surviving bar to animate from"],
+            },
+          ],
+        },
+        {
+          id: "stop-fighting",
+          heading: "Stop Fighting the Platform",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The fix was to stop animating the bar myself and let the View Transition do it. The same machinery that slides the page can slide the bar — I just had to tell it the bar was worth tracking.",
+            },
+            {
+              type: "list",
+              ordered: true,
+              items: [
+                {
+                  num: "01",
+                  title: "Name it",
+                  text: "Give the bar a view-transition-name, so the browser treats it as its own element to pair across the old and new page. Scoped to the slide only, so it doesn't detach during the card → case-study morph where the whole sidebar moves as one piece.",
+                },
+                {
+                  num: "02",
+                  title: "Place it in the DOM",
+                  text: "Render the bar inside the active list item instead of positioning it with JS. Now its location is correct in both snapshots automatically — the old page captures it on the old item, the new page on the new one. Zero measurement.",
+                },
+                {
+                  num: "03",
+                  title: "Delete the rest",
+                  text: "The timers, the module-level position cache, the completion subscription, the manual transform math — all of it came out. The browser interpolates between the two captured positions for free.",
+                },
+              ],
+            },
+            {
+              type: "diagram",
+              kind: "vt-approaches",
+            },
+            {
+              type: "demo",
+              id: "sliding-bar",
+              caption: "Click an item — the bar slides to it. Open 'How it works' for the markup + CSS.",
+            },
+            {
+              type: "callout",
+              accent: "teal",
+              text: "DOM placement beat JS timing. The position I'd been computing by hand every navigation was already encoded in one fact: which list item the bar lived inside.",
+            },
+          ],
+        },
+        {
+          id: "where-it-landed",
+          heading: "Where It Landed",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Now the page slides and the accent bar glides to the new active item in the same gesture — same easing, same 480ms, one continuous motion. The only way to confirm it was the way that counts: watching it in a real browser, after the console logs showed the snapshot quietly doing the work I'd been trying to do by hand.",
+              emphasis: ["480ms"],
+            },
+            {
+              type: "metrics",
+              items: [
+                { value: "5", label: "Rewrites to get it right" },
+                { value: "0", label: "JS positioning, final version" },
+                { value: "480ms", label: "Shared with the page slide" },
+              ],
+            },
+            {
+              type: "callout",
+              accent: "neutral",
+              text: "The lesson wasn't really about View Transitions. It was about noticing when the platform already does the thing you're hand-rolling — and having the discipline to get out of its way.",
+            },
+          ],
+        },
+      ],
+    },
   },
 
   // ── More (compact list) ────────────────────────────────────────────────────

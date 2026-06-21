@@ -8,7 +8,8 @@ export type ThumbnailKind =
   | "glitch"
   | "parallax"
   | "flip"
-  | "video";
+  | "video"
+  | "replay";
 
 export interface Thumbnail {
   kind: ThumbnailKind;
@@ -46,4 +47,5 @@ export const CHEAP_KINDS = new Set<ThumbnailKind>([
   "parallax",
   "glitch",
   "ascii",
+  "replay",
 ]);
