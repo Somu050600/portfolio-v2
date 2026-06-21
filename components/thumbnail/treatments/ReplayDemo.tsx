@@ -10,7 +10,14 @@ import type { TreatmentProps } from "../registry";
  */
 export default function ReplayDemo({ active }: TreatmentProps) {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-surface p-4">
+    <div
+      className="absolute inset-0 flex items-center justify-center bg-bg p-4 border rounded-xl"
+      style={{
+        backgroundImage:
+          "radial-gradient(circle, var(--border-color) 1px, transparent 1px)",
+        backgroundSize: "15px 15px",
+      }}
+    >
       <div className="w-full max-w-[240px]">
         <SlidingBarDemo autoplay active={active} />
       </div>

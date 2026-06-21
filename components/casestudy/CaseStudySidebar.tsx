@@ -239,7 +239,7 @@ export default function CaseStudySidebar({
           "Scroll-spy case study TOC — replaces home sidebar on /work/*.",
         )}
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-bg px-6 py-8 motion-reduce:transition-none",
+          "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-sidebar-bg px-6 py-8 motion-reduce:transition-none",
           "transition-transform duration-300 ease-(--ease-out-soft)",
           open ? "translate-x-0 shadow-xl" : "-translate-x-full",
           "lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[300px] lg:translate-x-0",

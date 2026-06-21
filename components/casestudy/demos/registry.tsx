@@ -13,7 +13,9 @@ export type DemoEntry = {
 export const demoRegistry: Record<string, DemoEntry> = {
   "sliding-bar": {
     label: "Live — click an item",
-    Component: () => <SlidingBarDemo />,
+    Component: () => (
+      <SlidingBarDemo className="max-w-full w-fit min-w-3xs mx-auto" />
+    ),
     how: {
       note: "The bar lives inside the active list item and is named only during a slide. The browser pairs it across the old and new page and tweens its position — no JS positioning. (The demo above uses a plain CSS transition since it never remounts; the real nav rides the View Transition.)",
       lang: "tsx",
