@@ -3,7 +3,11 @@
 import { cn } from "@/lib/utils";
 import { useState, type ComponentType } from "react";
 import CodePeek from "./CodePeek";
+import Clip from "./vt-previews/Clip";
 import CrossFade from "./vt-previews/CrossFade";
+import ListReorder from "./vt-previews/ListReorder";
+import Morph from "./vt-previews/Morph";
+import Slide from "./vt-previews/Slide";
 
 type PreviewProps = { runToken: number };
 
@@ -14,14 +18,6 @@ type Variant = {
   note: string;
   code: string;
 };
-
-function Placeholder() {
-  return (
-    <div className="flex h-44 w-[260px] max-w-full items-center justify-center rounded-lg border border-dashed border-border-color font-mono text-[11px] text-ink-faint">
-      preview lands in the next pass
-    </div>
-  );
-}
 
 const VARIANTS: Variant[] = [
   {
@@ -38,7 +34,7 @@ document.startViewTransition(() => {
   {
     key: "morph",
     label: "Morph",
-    Preview: Placeholder,
+    Preview: Morph,
     note: "Shared-element transition — tag an element on both pages with the same view-transition-name and the browser interpolates its position and size between them.",
     code: `/* both pages */
 .card, .detail-hero { view-transition-name: hero; }`,
@@ -46,7 +42,7 @@ document.startViewTransition(() => {
   {
     key: "clip",
     label: "Clip reveal",
-    Preview: Placeholder,
+    Preview: Clip,
     note: "Animate the new snapshot's clip-path — e.g. a circle growing from the click point — for a reveal instead of a fade.",
     code: `::view-transition-new(root) {
   animation: reveal 0.5s ease;
@@ -58,18 +54,18 @@ document.startViewTransition(() => {
   {
     key: "slide",
     label: "Slide",
-    Preview: Placeholder,
+    Preview: Slide,
     note: "Give old and new their own keyframes — one slides out, the other in — for a directional push between views.",
-    code: `::view-transition-old(root) { animation: out 0.4s; }
-::view-transition-new(root) { animation: in 0.4s; }`,
+    code: `::view-transition-old(root) { animation: slide-out 0.4s; }
+::view-transition-new(root) { animation: slide-in 0.4s; }`,
   },
   {
     key: "reorder",
     label: "List reorder",
-    Preview: Placeholder,
+    Preview: ListReorder,
     note: "Give each list item a unique view-transition-name. When the order changes inside a transition, every item animates from its old slot to its new one.",
     code: `li { view-transition-name: var(--item-name); }
-// reorder inside a transition → items glide`,
+// reorder inside startViewTransition → items glide`,
   },
 ];
 
