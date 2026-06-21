@@ -13,6 +13,11 @@ import {
   PageTransitionContext,
   usePageTransition,
 } from "@/lib/page-transition-context";
+import {
+  GRID_SCROLL_KEY,
+  restoreScroll,
+  saveScroll,
+} from "@/lib/scroll-restore";
 import type { Project, Status } from "@/lib/projects.config";
 import { cn } from "@/lib/utils";
 import {
@@ -198,6 +203,9 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     if (willMorph) {
       tagEl(cardRef.current);
       setMorphPending("forward");
+      // Remember where the grid was scrolled, so back-navigation can restore it
+      // and the reverse morph lands on this card while it's on-screen.
+      saveScroll(GRID_SCROLL_KEY, window.scrollY);
     }
     cover({ href: targetHref, originEl: cardRef.current, morph: willMorph });
   };
@@ -207,6 +215,9 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   // the browser pairs it with the outgoing case study.
   useIsoLayoutEffect(() => {
     if (!hasCaseStudy || getBackMorphSlug() !== slug) return;
+    // Restore the grid scroll first (before the snapshot) so this card is in
+    // the viewport for the reverse morph instead of below the fold.
+    restoreScroll(GRID_SCROLL_KEY);
     const root = cardRef.current;
     tagEl(root);
     const unsub = subscribeTransitionComplete(() => {

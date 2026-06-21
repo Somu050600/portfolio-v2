@@ -5,6 +5,7 @@ import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PageTransitionContext } from "@/lib/page-transition-context";
+import { consumeRestorePending, setLenisInstance } from "@/lib/scroll-restore";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -33,11 +34,16 @@ function ScrollReset() {
 
   useEffect(() => {
     lenisRef.current = lenis;
+    setLenisInstance(lenis ?? null);
   }, [lenis]);
 
   useEffect(() => {
     return subscribeTransitionComplete(() => {
-      lenisRef.current?.scrollTo(0, { immediate: true });
+      // A back-navigation may have already restored scroll (so the reverse
+      // morph lands on an on-screen card). Don't reset to top in that case.
+      if (!consumeRestorePending()) {
+        lenisRef.current?.scrollTo(0, { immediate: true });
+      }
       requestAnimationFrame(() => {
         lenisRef.current?.resize();
         ScrollTrigger.refresh();
