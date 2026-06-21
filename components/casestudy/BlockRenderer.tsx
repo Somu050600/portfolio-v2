@@ -3,6 +3,7 @@ import { accentCalloutStyles } from "@/lib/projects.config";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import DemoBlock from "./DemoBlock";
+import VTLab from "./VTLab";
 
 function TokenMismatchDiagram() {
   return (
@@ -456,6 +457,9 @@ function BlockItem({ block }: { block: Block }) {
 
     case "demo":
       return <DemoBlock id={block.id} caption={block.caption} />;
+
+    case "vtlab":
+      return <VTLab />;
 
     default:
       return null;

@@ -29,7 +29,8 @@ export type Block =
         | "memory-blowup"
         | "vt-approaches";
     }
-  | { type: "demo"; id: string; caption?: string };
+  | { type: "demo"; id: string; caption?: string }
+  | { type: "vtlab" };
 
 export interface CaseStudySection {
   id: string;
@@ -515,6 +516,55 @@ export const projects: Project[] = [
   },
 
   // ── Creative ───────────────────────────────────────────────────────────────
+  {
+    slug: "view-transitions",
+    number: 12,
+    title: "View Transitions: A Field Guide",
+    description:
+      "What the View Transitions API actually does — window + React, five variants, a live lab.",
+    category: "creative",
+    role: "Design + Dev",
+    team: "Solo",
+    shipped: "2025",
+    status: "IN PROGRESS",
+    tech: ["View Transitions", "CSS", "React", "Web APIs"],
+    tilt: -0.8,
+    note: "Field guide to the VT API — interactive lab of five transition variants.",
+    caseStudy: {
+      tagline:
+        "You're already inside a View Transition — every navigation on this site is one. Here's the API behind it, the variants, and the traps, with a live lab to poke at.",
+      tags: ["View Transitions", "CSS", "React", "Web APIs"],
+      hero: { accent: "blue" },
+      sections: [
+        {
+          id: "already-in-one",
+          heading: "You're Already In One",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Every time you move between sections of this site, or open a case study, the browser isn't just swapping pages — it's running a View Transition. The slide, the circle reveal, the card that morphs into this page: all the same API.",
+            },
+            {
+              type: "callout",
+              accent: "blue",
+              text: "This is a field guide, not a war story — what I learned wiring up this site, distilled into the variants and gotchas, with a live lab. The previews below are simulated (plain CSS/JS) so they stay contained; the real API code sits beside each one.",
+            },
+          ],
+        },
+        {
+          id: "the-lab",
+          heading: "The Lab",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Pick a variant, hit Run, and watch it play. Each tab pairs a simulated preview with the real View Transitions code that produces it.",
+            },
+            { type: "vtlab" },
+          ],
+        },
+      ],
+    },
+  },
   {
     slug: "this-site",
     number: 8,
