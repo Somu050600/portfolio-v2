@@ -95,9 +95,16 @@ export default function PageTransitionOverlay() {
       const oy =
         originPoint?.y ??
         (rect ? rect.top + rect.height / 2 : window.innerHeight / 2);
-      const maxR =
-        Math.ceil(Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2)) +
-        50;
+      // window.innerHeight is the *dynamic* viewport (shrinks while the mobile
+      // address bar shows); the revealed page is min-h-screen (the *large*
+      // viewport). Size the radius from the larger of the dynamic and layout
+      // viewports so the circle always covers — no uncovered strip on mobile.
+      const vw = Math.max(window.innerWidth, document.documentElement.clientWidth);
+      const vh = Math.max(
+        window.innerHeight,
+        document.documentElement.clientHeight,
+      );
+      const maxR = Math.ceil(Math.hypot(vw, vh)) + 50;
 
       let resolveFn!: () => void;
       const navCommitted = new Promise<void>((res) => {
