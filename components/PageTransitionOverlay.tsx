@@ -38,21 +38,24 @@ export default function PageTransitionOverlay() {
   const activeRef = useRef(false);
 
   const handleCover = useCallback(
-    async ({ href, originEl, morph, slide }: CoverOptions) => {
+    async ({ href, originEl, morph, slide, direction }: CoverOptions) => {
       if (activeRef.current) {
         setMorphPending(null);
         return;
       }
+
+      // Only suppress Next's scroll-to-top on a back-navigation — there our
+      // scroll-restore re-applies the saved position and Next's reset would
+      // clobber it. Forward navs still scroll to top (e.g. a case study should
+      // open at the top, and its morph must snapshot the hero at the top).
+      const keepScroll = direction === "backward";
 
       const reducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
       if (!document.startViewTransition || reducedMotion) {
-        // scroll: false — our scroll system (ScrollReset / scroll-restore) owns
-        // scroll for these navs; Next's default scroll-to-top would clobber the
-        // back-nav restore one frame later.
-        router.push(href, { scroll: false });
+        router.push(href, { scroll: !keepScroll });
         return;
       }
 
@@ -90,9 +93,9 @@ export default function PageTransitionOverlay() {
       resolveNavRef.current = resolveFn;
 
       const update = async () => {
-        // scroll: false — see note above; our system controls scroll, so Next's
-        // default scroll-to-top must not run and reset the restored position.
-        router.push(href, { scroll: false });
+        // Back-nav keeps scroll (scroll-restore re-applies it); forward navs
+        // scroll to top so the destination — and its morph snapshot — is at top.
+        router.push(href, { scroll: !keepScroll });
         await navCommitted;
       };
 

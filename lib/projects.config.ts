@@ -529,6 +529,12 @@ export const projects: Project[] = [
     status: "IN PROGRESS",
     tech: ["View Transitions", "CSS", "React", "Web APIs"],
     tilt: -0.8,
+    thumbnail: {
+      kind: "vt-cycle",
+      accent: "cyan",
+      alt: "View Transitions lab — cross-fade, clip reveal, and slide variants cycling on hover",
+      params: { height: 240 },
+    },
     note: "Field guide to the VT API — interactive lab of five transition variants.",
     caseStudy: {
       tagline:

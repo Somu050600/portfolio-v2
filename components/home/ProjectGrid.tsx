@@ -39,26 +39,29 @@ export default function ProjectGrid() {
             <h2 className="mb-6 font-mono text-xs tracking-[0.2em] text-ink-dim uppercase">
               {categoryLabels[category]}
             </h2>
-            <div className="columns-1 gap-6 md:columns-2">
+            {/* Fixed 2-col grid (not CSS columns): a card's hover-reveal only
+                nudges content below it, instead of rebalancing the whole grid
+                and jumping cards between columns. items-start keeps cards
+                top-aligned per row. */}
+            <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
               {items.map((project) => (
-                <div key={project.slug} className="mb-6 break-inside-avoid">
-                  <ProjectIndexCard
-                    slug={project.slug}
-                    title={project.title}
-                    number={project.number}
-                    role={project.role}
-                    team={project.team}
-                    shipped={project.shipped}
-                    status={project.status}
-                    description={project.description}
-                    thumbnail={project.thumbnail}
-                    tilt={project.tilt}
-                    external={project.external}
-                    href={project.href}
-                    caseStudy={project.caseStudy}
-                    note={project.note}
-                  />
-                </div>
+                <ProjectIndexCard
+                  key={project.slug}
+                  slug={project.slug}
+                  title={project.title}
+                  number={project.number}
+                  role={project.role}
+                  team={project.team}
+                  shipped={project.shipped}
+                  status={project.status}
+                  description={project.description}
+                  thumbnail={project.thumbnail}
+                  tilt={project.tilt}
+                  external={project.external}
+                  href={project.href}
+                  caseStudy={project.caseStudy}
+                  note={project.note}
+                />
               ))}
             </div>
           </section>
