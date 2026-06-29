@@ -3,7 +3,7 @@ import HomeShell from "@/components/home/HomeShell";
 import ExperienceTimeline from "@/components/home/ExperienceTimeline";
 
 export const metadata: Metadata = {
-  title: "Experience — Somu",
+  title: "Experience",
   description: "Work history — Aurva, CloudSEK, MatBook.",
 };
 

@@ -19,11 +19,26 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const project = getProjectBySlug(slug);
-  if (!project?.caseStudy) return { title: "Case Study — Somu" };
+  if (!project?.caseStudy) return { title: "Case Study" };
+
+  const { caseStudy } = project;
+  const path = `/home/work/${slug}`;
 
   return {
-    title: `${project.title} — Somu`,
-    description: project.caseStudy.tagline,
+    title: project.title,
+    description: caseStudy.tagline,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "article",
+      url: path,
+      title: project.title,
+      description: caseStudy.tagline,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: caseStudy.tagline,
+    },
   };
 }
 

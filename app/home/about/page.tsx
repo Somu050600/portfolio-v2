@@ -6,7 +6,7 @@ import { profile } from "@/lib/profile.config";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About — Somu",
+  title: "About",
   description: profile.narrative,
 };
 

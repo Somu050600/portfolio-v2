@@ -4,7 +4,7 @@ import ProjectGrid from "@/components/home/ProjectGrid";
 import WorkHero from "@/components/home/WorkHero";
 
 export const metadata: Metadata = {
-  title: "Work — Somu",
+  title: "Work",
   description: "Selected professional and creative projects.",
 };
 

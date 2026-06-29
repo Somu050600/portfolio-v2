@@ -3,7 +3,7 @@ import HomeShell from "@/components/home/HomeShell";
 import PlaygroundGrid from "@/components/playground/PlaygroundGrid";
 
 export const metadata: Metadata = {
-  title: "Playground — Somu",
+  title: "Playground",
   description: "Interactive experiments — type, fluid, shaders, and motion.",
 };
 

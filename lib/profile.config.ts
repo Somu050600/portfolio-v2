@@ -1,6 +1,8 @@
 export const profile = {
   name: "Eega Somasekhara Reddy",
   handle: "Somu",
+  /** Canonical production origin — drives metadataBase, OG, sitemap, JSON-LD. */
+  url: "https://eega.dev",
   tagline: "Frontend developer — I ship things that survive real data.",
   bio: "Building fast, tactile interfaces for the web.",
   narrative:
