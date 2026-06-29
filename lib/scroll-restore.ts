@@ -6,6 +6,7 @@
 
 type LenisLike = {
   scrollTo: (target: number, opts?: { immediate?: boolean }) => void;
+  resize: () => void;
 };
 
 let lenis: LenisLike | null = null;
@@ -27,8 +28,12 @@ export function restoreScroll(key: string) {
   const y = positions[key];
   if (y == null) return;
   // Set the document scroll synchronously so the VT snapshot captures the
-  // restored position, then sync Lenis so it doesn't animate away afterward.
+  // restored position. Then resize Lenis (its limit is stale on a fresh mount,
+  // so scrollTo would otherwise clamp to 0) and sync it to y so its next rAF
+  // tick doesn't yank the page back to the top. (Next's own scroll-to-top is
+  // disabled for these navs via router.push({ scroll: false }).)
   window.scrollTo(0, y);
+  lenis?.resize();
   lenis?.scrollTo(y, { immediate: true });
   restorePending = true;
 }

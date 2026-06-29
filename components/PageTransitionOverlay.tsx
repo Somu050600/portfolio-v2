@@ -49,7 +49,10 @@ export default function PageTransitionOverlay() {
       ).matches;
 
       if (!document.startViewTransition || reducedMotion) {
-        router.push(href);
+        // scroll: false — our scroll system (ScrollReset / scroll-restore) owns
+        // scroll for these navs; Next's default scroll-to-top would clobber the
+        // back-nav restore one frame later.
+        router.push(href, { scroll: false });
         return;
       }
 
@@ -87,7 +90,9 @@ export default function PageTransitionOverlay() {
       resolveNavRef.current = resolveFn;
 
       const update = async () => {
-        router.push(href);
+        // scroll: false — see note above; our system controls scroll, so Next's
+        // default scroll-to-top must not run and reset the restored position.
+        router.push(href, { scroll: false });
         await navCommitted;
       };
 
