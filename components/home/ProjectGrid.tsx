@@ -25,6 +25,13 @@ export default function ProjectGrid() {
           category === "pro" ? proProjects : creativeProjects;
         if (items.length === 0) return null;
 
+        // Split into two independent columns (sequential halves). Each column
+        // stacks on its own, so a card's hover-reveal only nudges cards below
+        // it in the SAME column — the other column never moves (no row-height
+        // coupling, no column rebalance). On mobile the columns stack in order.
+        const mid = Math.ceil(items.length / 2);
+        const columns = [items.slice(0, mid), items.slice(mid)];
+
         return (
           <section
             key={category}
@@ -39,29 +46,29 @@ export default function ProjectGrid() {
             <h2 className="mb-6 font-mono text-xs tracking-[0.2em] text-ink-dim uppercase">
               {categoryLabels[category]}
             </h2>
-            {/* Fixed 2-col grid (not CSS columns): a card's hover-reveal only
-                nudges content below it, instead of rebalancing the whole grid
-                and jumping cards between columns. items-start keeps cards
-                top-aligned per row. */}
-            <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
-              {items.map((project) => (
-                <ProjectIndexCard
-                  key={project.slug}
-                  slug={project.slug}
-                  title={project.title}
-                  number={project.number}
-                  role={project.role}
-                  team={project.team}
-                  shipped={project.shipped}
-                  status={project.status}
-                  description={project.description}
-                  thumbnail={project.thumbnail}
-                  tilt={project.tilt}
-                  external={project.external}
-                  href={project.href}
-                  caseStudy={project.caseStudy}
-                  note={project.note}
-                />
+            <div className="flex flex-col gap-6 md:flex-row md:items-start">
+              {columns.map((col, ci) => (
+                <div key={ci} className="flex flex-1 flex-col gap-6">
+                  {col.map((project) => (
+                    <ProjectIndexCard
+                      key={project.slug}
+                      slug={project.slug}
+                      title={project.title}
+                      number={project.number}
+                      role={project.role}
+                      team={project.team}
+                      shipped={project.shipped}
+                      status={project.status}
+                      description={project.description}
+                      thumbnail={project.thumbnail}
+                      tilt={project.tilt}
+                      external={project.external}
+                      href={project.href}
+                      caseStudy={project.caseStudy}
+                      note={project.note}
+                    />
+                  ))}
+                </div>
               ))}
             </div>
           </section>

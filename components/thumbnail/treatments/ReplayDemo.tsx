@@ -11,7 +11,7 @@ import type { TreatmentProps } from "../registry";
 export default function ReplayDemo({ active }: TreatmentProps) {
   return (
     <div
-      className="absolute inset-0 flex items-center justify-center bg-bg p-4 border rounded-xl"
+      className="absolute inset-0 flex items-center justify-center bg-bg p-4"
       style={{
         backgroundImage:
           "radial-gradient(circle, var(--border-color) 1px, transparent 1px)",

@@ -167,7 +167,16 @@ export default function Hero() {
         <button
           ref={ctaRef}
           type="button"
-          onClick={() => cover({ href: hero.skipTarget, originEl: ctaRef.current })}
+          onClick={(e) =>
+            cover({
+              href: hero.skipTarget,
+              // e.detail === 0 => keyboard-activated click (no real point);
+              // fall back to the button center via originEl.
+              originPoint:
+                e.detail > 0 ? { x: e.clientX, y: e.clientY } : undefined,
+              originEl: ctaRef.current,
+            })
+          }
           className="group inline-flex items-center gap-3 bg-[#F3F1EB] text-[#0C0C10] rounded-xl  px-3 py-1.5 font-mono text-xs sm:text-sm uppercase tracking-wide transition-colors hover:scale-105"
         >
           {hero.ctaLabel}

@@ -38,7 +38,14 @@ export default function PageTransitionOverlay() {
   const activeRef = useRef(false);
 
   const handleCover = useCallback(
-    async ({ href, originEl, morph, slide, direction }: CoverOptions) => {
+    async ({
+      href,
+      originEl,
+      originPoint,
+      morph,
+      slide,
+      direction,
+    }: CoverOptions) => {
       if (activeRef.current) {
         setMorphPending(null);
         return;
@@ -80,8 +87,14 @@ export default function PageTransitionOverlay() {
       }
 
       const rect = originEl?.getBoundingClientRect();
-      const ox = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
-      const oy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+      // Prefer the exact press point (originPoint), then the origin element's
+      // center, then the viewport center.
+      const ox =
+        originPoint?.x ??
+        (rect ? rect.left + rect.width / 2 : window.innerWidth / 2);
+      const oy =
+        originPoint?.y ??
+        (rect ? rect.top + rect.height / 2 : window.innerHeight / 2);
       const maxR =
         Math.ceil(Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2)) +
         50;

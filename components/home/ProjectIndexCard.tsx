@@ -20,6 +20,7 @@ import {
 } from "@/lib/scroll-restore";
 import type { Project, Status } from "@/lib/projects.config";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import {
   useContext,
   useEffect,
@@ -166,8 +167,10 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   } = props;
 
   const cover = usePageTransition();
+  const router = useRouter();
   const { subscribeTransitionComplete } = useContext(PageTransitionContext);
   const cardRef = useRef<HTMLAnchorElement>(null);
+  const prefetched = useRef(false);
   const hasCaseStudy = !!caseStudy;
   const targetHref = external
     ? href
@@ -210,6 +213,15 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     cover({ href: targetHref, originEl: cardRef.current, morph: willMorph });
   };
 
+  // These cards aren't <Link>, so Next never prefetches them — the first morph
+  // pays the route fetch (visible delay). Warm the case-study route on hover /
+  // focus so it's cached by click time. External links can't be prefetched.
+  const prefetch = () => {
+    if (external || !targetHref || prefetched.current) return;
+    prefetched.current = true;
+    router.prefetch(targetHref);
+  };
+
   // Backward morph: if a back-navigation targeted this card's slug, tag it on
   // mount (before the overlay resolves the nav → before the new snapshot) so
   // the browser pairs it with the outgoing case study.
@@ -234,6 +246,8 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
         ref={cardRef}
         href={targetHref}
         onClick={handleClick}
+        onPointerEnter={prefetch}
+        onFocus={prefetch}
         className={cardClass}
         style={cardStyle}
         {...inspect}

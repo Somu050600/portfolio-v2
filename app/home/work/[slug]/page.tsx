@@ -4,10 +4,7 @@ import BlockRenderer from "@/components/casestudy/BlockRenderer";
 import CaseStudyMorph from "@/components/casestudy/CaseStudyMorph";
 import CaseStudySidebar from "@/components/casestudy/CaseStudySidebar";
 import Thumbnail from "@/components/thumbnail/Thumbnail";
-import {
-  getCaseStudySlugs,
-  getProjectBySlug,
-} from "@/lib/projects.config";
+import { getCaseStudySlugs, getProjectBySlug } from "@/lib/projects.config";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -17,7 +14,9 @@ export async function generateStaticParams() {
   return getCaseStudySlugs().map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const project = getProjectBySlug(slug);
   if (!project?.caseStudy) return { title: "Case Study — Somu" };
@@ -43,10 +42,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
   return (
     <div className="flex min-h-screen bg-bg text-ink">
       <CaseStudyMorph slug={slug} />
-      <CaseStudySidebar
-        sections={sectionLinks}
-        projectTitle={project.title}
-      />
+      <CaseStudySidebar sections={sectionLinks} projectTitle={project.title} />
       <main
         data-cs-main
         className="min-w-0 flex-1 px-6 py-10 md:px-12 md:py-14 lg:px-16"
@@ -79,11 +75,15 @@ export default async function CaseStudyPage({ params }: PageProps) {
           </ul>
           <dl className="mt-8 grid gap-4 sm:grid-cols-3">
             <div>
-              <dt className="font-mono text-xs text-ink-faint uppercase">Role</dt>
+              <dt className="font-mono text-xs text-ink-faint uppercase">
+                Role
+              </dt>
               <dd className="mt-1 text-sm text-ink-dim">{project.role}</dd>
             </div>
             <div>
-              <dt className="font-mono text-xs text-ink-faint uppercase">Team</dt>
+              <dt className="font-mono text-xs text-ink-faint uppercase">
+                Team
+              </dt>
               <dd className="mt-1 text-sm text-ink-dim">{project.team}</dd>
             </div>
             <div>
@@ -94,7 +94,13 @@ export default async function CaseStudyPage({ params }: PageProps) {
             </div>
           </dl>
           {project.thumbnail && (
-            <div data-morph="thumb" className="mt-8 max-w-xl">
+            // Framed on the detail page: the thumbnail's dotted bg-bg stage
+            // matches the canvas, so a border + lift shadow separates it as an
+            // embedded media panel instead of dissolving into the page.
+            <div
+              data-morph="thumb"
+              className="mt-8 max-w-xl overflow-hidden rounded-xl shadow-sm"
+            >
               <Thumbnail thumbnail={project.thumbnail} />
             </div>
           )}

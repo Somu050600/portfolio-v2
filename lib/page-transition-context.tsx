@@ -11,8 +11,14 @@ import {
 export type CoverOptions = {
   /** Route to navigate to */
   href: string;
-  /** Element the transition originates from */
+  /** Element the transition originates from (its center seeds the circle). */
   originEl?: HTMLElement | null;
+  /**
+   * Exact viewport point the circle reveal should grow from (e.g. a tap/click
+   * position). Takes precedence over originEl — use it so the reveal blooms
+   * from where the user actually pressed, not the element's center.
+   */
+  originPoint?: { x: number; y: number };
   /**
    * 'forward' (default): new page grows IN as a circle from origin.
    * 'backward': old page shrinks AWAY as a circle back to origin,
