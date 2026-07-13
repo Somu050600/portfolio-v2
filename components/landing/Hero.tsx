@@ -13,14 +13,8 @@ import {
 } from "./use-media-query";
 
 /**
- * Centered welcome hero: mono eyebrow → serif display title → EXPLORE CTA →
- * skip link → quote line.
- *
- * Interaction (fine pointers only): every [data-shove] word is pushed away
- * from the cursor within a radius and springs back (lerped); [data-parallax]
- * blocks drift by a fraction of the pointer offset from viewport center.
- * Both read the single LandingCursor pointer broadcast in one rAF loop,
- * paused on visibilitychange.
+ * Professional landing hero: concise positioning, product-focused proof points,
+ * and one primary interaction leading into the work index.
  */
 export default function Hero() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -33,12 +27,10 @@ export default function Hero() {
   const cover = usePageTransition();
   const router = useRouter();
 
-  // Prefetch /home so it's ready before the transition cover completes.
   useEffect(() => {
     router.prefetch(hero.skipTarget);
   }, [router, hero.skipTarget]);
 
-  // Enter key triggers the same flow as clicking the CTA.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Enter") return;
@@ -51,7 +43,6 @@ export default function Hero() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [cover, hero.skipTarget]);
 
-  // Cursor shove + parallax, one rAF loop off the single pointer source.
   useEffect(() => {
     if (!interactive) return;
     const root = rootRef.current;
@@ -110,7 +101,7 @@ export default function Hero() {
 
       const cx0 = window.innerWidth / 2;
       const cy0 = window.innerHeight / 2;
-      const ox = (mx - cx0) / cx0; // -1 .. 1
+      const ox = (mx - cx0) / cx0;
       const oy = (my - cy0) / cy0;
       for (const el of parallax) {
         const depth = Number(el.dataset.parallax ?? "1");
@@ -145,76 +136,70 @@ export default function Hero() {
   return (
     <div
       ref={rootRef}
-      className="relative z-20 flex min-h-dvh flex-col items-center justify-center gap-2 px-6 text-center"
+      className="landing-hero relative z-20 flex min-h-dvh flex-col select-none"
     >
-      {/* Eyebrow: mono caps, wide tracking, dim */}
-      <div data-parallax="0" className="will-change-transform">
-        <p className="font-mono text-xxs md:text-xs lg:text-base uppercase text-white/45">
-          {hero.eyebrow}
-        </p>
-      </div>
+      <div className="landing-hero__inner">
+        <div data-parallax="0.2" className="will-change-transform">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/60 md:text-xs">
+            {hero.eyebrow}
+          </p>
+        </div>
 
-      {/* Title: Glass Antiqua display serif — per-character spotlight */}
-      <div data-parallax="0" className="will-change-transform">
-        <SpotlightTitle
-          text={hero.title.join(" ")}
-          className="font-serif text-5xl tracking-wide leading-none text-white"
-        />
-      </div>
+        <div data-parallax="0.35" className="mt-5 will-change-transform">
+          <SpotlightTitle
+            text={hero.title.join(" ")}
+            className="landing-hero__title font-sans text-[clamp(2.65rem,7vw,6.8rem)] font-medium leading-[0.98] tracking-[-0.045em] text-white"
+          />
+        </div>
 
-      {/* CTA + skip */}
-      <div className="my-6 flex flex-col items-center gap-3">
-        <button
-          ref={ctaRef}
-          type="button"
-          onClick={(e) =>
-            cover({
-              href: hero.skipTarget,
-              // e.detail === 0 => keyboard-activated click (no real point);
-              // fall back to the button center via originEl.
-              originPoint:
-                e.detail > 0 ? { x: e.clientX, y: e.clientY } : undefined,
-              originEl: ctaRef.current,
-            })
-          }
-          className="group inline-flex items-center gap-3 bg-[#F3F1EB] text-[#0C0C10] rounded-xl  px-3 py-1.5 font-mono text-xs sm:text-sm uppercase tracking-wide transition-colors hover:scale-105"
-        >
-          {hero.ctaLabel}
-          <span
-            aria-hidden="true"
-            className="transition-transform group-hover:translate-x-1 text-xs"
-          >
-            →
-          </span>
-        </button>
-
-        {hero.showSkip && (
-          <Link
-            href={hero.skipTarget}
-            className="font-mono text-xs uppercase tracking-wide text-white/25 transition-colors hover:text-white/55"
-          >
-            {hero.skipLabel}
-          </Link>
-        )}
-      </div>
-
-      {/* Quote: mono uppercase tracked, like Megan's — emphasis words brighter */}
-      <div data-parallax="0" className="mt-4 max-w-md will-change-transform">
-        <p className="font-mono text-xxs md:text-xs lg:text-base uppercase leading-relaxed text-white/30">
-          {hero.quote.map((w, i) => (
-            <span key={i}>
-              <span
-                data-shove
-                className={`inline-block will-change-transform ${
-                  w.emphasis ? "text-white/80" : ""
-                }`}
-              >
-                {w.text}
+        <div data-parallax="0.16" className="landing-hero__meta mt-7 max-w-3xl will-change-transform">
+          <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.14em] md:text-xs">
+            {hero.quote.map((word, index) => (
+              <span key={`${word.text}-${index}`}>
+                <span
+                  data-shove
+                  className={word.emphasis ? "text-[var(--scene-green)]" : ""}
+                >
+                  {word.text}
+                </span>
+                {index < hero.quote.length - 1 ? " " : ""}
               </span>
-              {i < hero.quote.length - 1 ? " " : ""}
+            ))}
+          </p>
+        </div>
+
+        <div className="mt-9 flex flex-wrap items-center gap-4">
+          <button
+            ref={ctaRef}
+            type="button"
+            onClick={(e) =>
+              cover({
+                href: hero.skipTarget,
+                originPoint:
+                  e.detail > 0 ? { x: e.clientX, y: e.clientY } : undefined,
+                originEl: ctaRef.current,
+              })
+            }
+            className="landing-hero__cta group inline-flex items-center gap-3 rounded-lg px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.12em] transition-[background-color,border-color,transform] hover:-translate-y-0.5"
+          >
+            {hero.ctaLabel}
+            <span
+              aria-hidden="true"
+              className="transition-transform group-hover:translate-x-1"
+            >
+              ↗
             </span>
-          ))}
-        </p>
+          </button>
+
+          {hero.showSkip && (
+            <Link
+              href={hero.skipTarget}
+              className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/55 transition-colors hover:text-white"
+            >
+              {hero.skipLabel}
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,95 @@
+/* Graphite + Eucalyptus brand layer.
+   Loaded after globals.css so it can refine the visual identity without
+   disturbing the existing semantic token and View Transition architecture. */
+
+:root {
+  --landing-bg: #0b0f0e;
+
+  --bg: #f4f5f2;
+  --surface: #fafbf8;
+  --elevated: #e9ece7;
+  --border-color: #d7dcd7;
+  --sidebar-bg: #eef0eb;
+  --ink: #18201d;
+  --ink-dim: #5d6863;
+  --ink-faint: #7d8983;
+  --status: #2f6f62;
+  --punch: #dfe5e0;
+
+  --accent: #2f6f62;
+  --accent-fg: #ffffff;
+  --accent-soft: rgba(47, 111, 98, 0.14);
+
+  --scene-ink: #e8eeea;
+  --scene-surface: #0b0f0e;
+  --scene-green: #7fc3b1;
+}
+
+.dark {
+  --bg: #0b0f0e;
+  --surface: #111614;
+  --elevated: #18201d;
+  --border-color: #26302c;
+  --sidebar-bg: #0f1412;
+  --ink: #e8eeea;
+  --ink-dim: #9aa7a1;
+  --ink-faint: #6d7a74;
+  --status: #7fc3b1;
+  --punch: #1d2824;
+
+  --accent: #7fc3b1;
+  --accent-fg: #0b0f0e;
+  --accent-soft: rgba(127, 195, 177, 0.14);
+}
+
+/* Quieter product-card treatment: surface and motion carry the personality,
+   while the existing shared-element transition remains the hero interaction. */
+.index-card {
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px -22px color-mix(in oklab, var(--ink) 30%, transparent) !important;
+  transform: none !important;
+}
+
+.index-card:hover {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--accent) 68%, transparent),
+    0 18px 38px -30px color-mix(in oklab, var(--accent) 52%, transparent) !important;
+}
+
+/* Dark landing remains a separate scene, but now shares the same graphite and
+   eucalyptus identity as /home. */
+.landing-hero {
+  align-items: flex-start;
+  justify-content: center;
+  text-align: left;
+  padding-inline: clamp(1.5rem, 6vw, 6rem);
+  background:
+    radial-gradient(circle at 72% 58%, rgba(127, 195, 177, 0.08), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.018), transparent 42%);
+}
+
+.landing-hero__inner {
+  width: min(100%, 74rem);
+}
+
+.landing-hero__title {
+  max-width: 13ch;
+  text-wrap: balance;
+}
+
+.landing-hero__meta {
+  color: rgba(232, 238, 234, 0.62);
+}
+
+.landing-hero__cta {
+  border: 1px solid color-mix(in oklab, var(--scene-green) 58%, transparent);
+  background: rgba(127, 195, 177, 0.08);
+  color: var(--scene-ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.landing-hero__cta:hover {
+  background: rgba(127, 195, 177, 0.14);
+  border-color: var(--scene-green);
+}

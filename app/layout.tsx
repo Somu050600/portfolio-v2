@@ -7,6 +7,7 @@ import { PageTransitionProvider } from "@/lib/page-transition-context";
 import { profile } from "@/lib/profile.config";
 import { ACCENT_PREPAINT_SCRIPT } from "@/lib/theme.config";
 import "./globals.css";
+import "./brand-theme.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,8 +75,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   colorScheme: "light dark",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ece8df" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f5f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f0e" },
   ],
 };
 
