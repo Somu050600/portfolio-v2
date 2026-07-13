@@ -51,7 +51,7 @@ export type LandingConfig = {
   };
   hero: {
     eyebrow: string;
-    /** serif display title, one entry per word (each word gets cursor shove) */
+    /** display title, one entry per word */
     title: string[];
     ctaLabel: string;
     showSkip: boolean;
@@ -115,105 +115,94 @@ export const landingConfig: LandingConfig = {
   },
 
   hero: {
-    eyebrow: "WELCOME TO",
-    // TODO: replace with your final title phrase
-    title: ["Somu's", "World"],
-    ctaLabel: "EXPLORE",
+    eyebrow: "SOMU / FRONTEND ENGINEER",
+    title: ["I build interfaces that stay simple as products get complicated."],
+    ctaLabel: "VIEW SELECTED WORK",
     showSkip: true,
     skipLabel: "skip intro",
     skipTarget: "/home",
-    // TODO: replace with your final dev-flavored quote
     quote: [
-      { text: "great" },
-      { text: "interfaces", emphasis: true },
-      { text: "feel" },
-      { text: "obvious" },
-      { text: "—" },
-      { text: "the" },
-      { text: "craft", emphasis: true },
-      { text: "is" },
-      { text: "everything" },
-      { text: "you" },
-      { text: "don't" },
-      { text: "notice.", emphasis: true },
+      { text: "React" },
+      { text: "·" },
+      { text: "Next.js" },
+      { text: "·" },
+      { text: "Design systems", emphasis: true },
+      { text: "·" },
+      { text: "Performance" },
     ],
   },
 
   scenery: {
     starfield: {
       layers: [
-        // Far: sparse tiny dim stars, slowest rotation
         {
           seed: 17,
-          grid: 20,
-          maxRadius: 45,
-          skipChance: 0.22,
-          size: [0.8, 1, 1.5],
-          opacity: [0.25, 0.5],
-          rotationS: 360,
+          grid: 16,
+          maxRadius: 48,
+          skipChance: 0.52,
+          size: [0.86, 0.8, 1.2],
+          opacity: [0.12, 0.3],
+          rotationS: 560,
           reverse: true,
         },
-        // Mid: a handful of mid-brightness stars
         {
           seed: 53,
-          grid: 15,
-          maxRadius: 38,
-          skipChance: 0.28,
-          size: [0.65, 1.5, 2],
-          opacity: [0.45, 0.7],
-          rotationS: 260,
+          grid: 12,
+          maxRadius: 43,
+          skipChance: 0.62,
+          size: [0.78, 1, 1.5],
+          opacity: [0.18, 0.38],
+          rotationS: 440,
         },
-        // Near: few brighter stars clustered near center
         {
           seed: 91,
-          grid: 15,
-          maxRadius: 50,
-          skipChance: 0.32,
-          size: [0.5, 2, 2.5],
-          opacity: [0.8, 1],
-          rotationS: 190,
+          grid: 10,
+          maxRadius: 52,
+          skipChance: 0.7,
+          size: [0.68, 1.2, 1.8],
+          opacity: [0.28, 0.52],
+          rotationS: 360,
           reverse: true,
         },
       ],
     },
     shootingStars: {
-      firstDelayMs: 800,
-      minDelayMs: 4000,
-      maxDelayMs: 7000,
-      // Trail FIRST, star LAST — after rotation the star leads the trajectory.
-      shapes: ["──────✦", "──────✦", "──────✦", "·─────✦", "──────✦"],
+      firstDelayMs: 120000,
+      minDelayMs: 120000,
+      maxDelayMs: 180000,
+      shapes: ["──────✦"],
     },
     sparkles: {
-      countMin: 10,
-      countMax: 16,
-      speedMin: 120,
-      speedMax: 320,
-      lifeMin: 450,
-      lifeMax: 750,
-      rMin: 1,
-      rMax: 2.5,
+      countMin: 0,
+      countMax: 0,
+      speedMin: 0,
+      speedMax: 0,
+      lifeMin: 0,
+      lifeMax: 0,
+      rMin: 0,
+      rMax: 0,
     },
   },
 
   statusClock: {
     enabled: true,
-    statusLabel: "ALL SYSTEMS OPERATIONAL",
+    statusLabel: "FRONTEND ENGINEER AT AURVA",
   },
 
   interaction: {
     shoveRadius: 95,
-    shoveStrength: 26,
+    shoveStrength: 0,
     shoveLerp: 0.18,
-    parallaxMax: 18,
+    parallaxMax: 10,
     cursorLerp: 0.35,
   },
 
   spotlight: {
-    radius: 175,
-    dimFloor: 0.24,
-    ease: 0.16,
-    glowCorePx: 11,
-    glowBloomPx: 24,
+    radius: 190,
+    dimFloor: 0.5,
+    ease: 0.14,
+    glowCorePx: 8,
+    glowBloomPx: 18,
   },
 
   enterTransition: {
