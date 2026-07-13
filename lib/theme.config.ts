@@ -59,10 +59,10 @@ export const ACCENTS: Record<AccentKey, Accent> = {
     fgLight: "#fff",
   },
   emerald: {
-    name: "Emerald",
-    dark: "#34D399",
-    light: "#059669",
-    fgDark: "#022C22",
+    name: "Eucalyptus",
+    dark: "#7FC3B1",
+    light: "#2F6F62",
+    fgDark: "#08251F",
     fgLight: "#fff",
   },
   terracotta: {
@@ -96,8 +96,8 @@ export type ThemeDraft = {
 
 export const THEME_DEFAULTS: ThemeDraft = {
   mode: "light",
-  darkAccent: "blue",
-  lightAccent: "terracotta",
+  darkAccent: "emerald",
+  lightAccent: "emerald",
 };
 
 /** Hex → rgba string at `alpha` opacity (0–1). */
@@ -146,8 +146,8 @@ export function resolveMode(mode: Mode): "light" | "dark" {
 export const ACCENT_PREPAINT_SCRIPT = `(function(){try{
   var LS=localStorage;
   var stored=JSON.parse(LS.getItem('theme-accents')||'{}');
-  var da=stored.darkAccent||'blue';
-  var la=stored.lightAccent||'terracotta';
+  var da=stored.darkAccent||'emerald';
+  var la=stored.lightAccent||'emerald';
   var tm=LS.getItem('theme')||'light';
   var dark=tm==='dark'||(tm==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);
   var A={
@@ -156,13 +156,13 @@ export const ACCENT_PREPAINT_SCRIPT = `(function(){try{
     cyan:{d:'#22D3EE',l:'#0891B2',fd:'#083344',fl:'#fff'},
     indigo:{d:'#6366F1',l:'#4F46E5',fd:'#fff',fl:'#fff'},
     violet:{d:'#A78BFA',l:'#7C3AED',fd:'#2E1065',fl:'#fff'},
-    emerald:{d:'#34D399',l:'#059669',fd:'#022C22',fl:'#fff'},
+    emerald:{d:'#7FC3B1',l:'#2F6F62',fd:'#08251F',fl:'#fff'},
     terracotta:{d:'#E08A5F',l:'#B85423',fd:'#3A1506',fl:'#fff'},
     coral:{d:'#FB8470',l:'#D14A3A',fd:'#3A1009',fl:'#fff'},
     amber:{d:'#F2B441',l:'#A8741A',fd:'#3A2702',fl:'#fff'}
   };
   var key=dark?da:la;
-  var a=A[key]||A[dark?'blue':'terracotta'];
+  var a=A[key]||A.emerald;
   var c=dark?a.d:a.l;
   var fg=dark?a.fd:a.fl;
   var r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);
