@@ -36,6 +36,7 @@ export default function PageTransitionOverlay() {
   const prevPathRef = useRef(pathname);
   const resolveNavRef = useRef<(() => void) | null>(null);
   const activeRef = useRef(false);
+  const initialNotifyRef = useRef(false);
 
   const handleCover = useCallback(
     async ({
@@ -161,12 +162,16 @@ export default function PageTransitionOverlay() {
 
   // Fire on initial mount for direct URL loads — no VT animation runs, so
   // subscribeTransitionComplete would never fire without this.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!activeRef.current) {
-      requestAnimationFrame(() => _notifyTransitionComplete(pathname));
-    }
-  }, []);
+    if (initialNotifyRef.current || activeRef.current) return;
+    initialNotifyRef.current = true;
+
+    const rafId = requestAnimationFrame(() =>
+      _notifyTransitionComplete(pathname),
+    );
+
+    return () => cancelAnimationFrame(rafId);
+  }, [pathname, _notifyTransitionComplete]);
 
   // usePathname() changes when Next.js commits the new page to the DOM.
   // Resolving here hands the "new" snapshot timing back to startViewTransition.

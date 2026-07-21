@@ -1,17 +1,11 @@
 "use client";
 
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type CSSProperties,
-} from "react";
+import { componentAttrs } from "@/lib/build-mode";
 import type { Thumbnail as ThumbnailData } from "@/lib/thumbnail";
 import { CHEAP_KINDS } from "@/lib/thumbnail";
-import { componentAttrs } from "@/lib/build-mode";
 import { useFinePointer, useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { registry } from "./registry";
 import { claimSlot, releaseSlot } from "./slots";
 
@@ -43,7 +37,9 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
       ? thumbnail.params.objectPosition
       : undefined) ?? "center";
   const videoSrc =
-    typeof thumbnail.params?.src === "string" ? thumbnail.params.src : undefined;
+    typeof thumbnail.params?.src === "string"
+      ? thumbnail.params.src
+      : undefined;
 
   const motionOK = !reducedMotion;
   const baseActive = motionOK && finePointer && inView && hovered && !hidden;
@@ -58,7 +54,7 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
 
     const io = new IntersectionObserver(
       ([entry]) => setInView(!!entry?.isIntersecting),
-      { threshold: 0.2 },
+      { threshold: 0 },
     );
     io.observe(el);
     return () => io.disconnect();
