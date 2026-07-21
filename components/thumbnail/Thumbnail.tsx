@@ -54,7 +54,7 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
 
     const io = new IntersectionObserver(
       ([entry]) => setInView(!!entry?.isIntersecting),
-      { threshold: 0 },
+      { threshold: 0, rootMargin: "100px 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
