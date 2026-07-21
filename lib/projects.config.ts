@@ -772,6 +772,126 @@ export const projects: Project[] = [
       params: { sketch: "fluid-dye", height: 228 },
     },
     note: "Shader distortion WIP — card uses shared fluid-dye sketch as preview.",
+    caseStudy: {
+      tagline:
+        "A liquid effect that does not simulate water so much as it borrows the one thing water makes visible: momentum.",
+      tags: ["Three.js", "GLSL", "Shader Pass", "WebGL"],
+      hero: { accent: "teal" },
+      sections: [
+        {
+          id: "the-brief",
+          heading: "The Brief",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "I wanted a cursor effect that felt wet without turning into a full fluid solver. Something that could sit behind type, bend the image, and make fast movement feel different from slow movement.",
+            },
+            {
+              type: "paragraph",
+              text: "The first versions were too literal: circles following the cursor, displacement tied directly to pointer position, a ripple that looked the same no matter how you moved. It reacted, but it had no memory.",
+              emphasis: ["no memory"],
+            },
+            {
+              type: "callout",
+              accent: "blue",
+              text: "The effect started working when I stopped asking where the cursor is and started asking how hard it moved this frame.",
+            },
+          ],
+        },
+        {
+          id: "momentum-not-position",
+          heading: "Momentum, Not Position",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The simulation field stores velocity in a texture. Every frame, the pointer's displacement from its last position becomes the force injected into that field. A quick flick writes a stronger vector; a slow drag writes a softer one.",
+              emphasis: ["velocity in a texture"],
+            },
+            {
+              type: "list",
+              ordered: true,
+              items: [
+                {
+                  num: "01",
+                  title: "Measure movement",
+                  text: "Mouse velocity is just current UV minus last UV, scaled and clamped so fast swipes stay expressive without blowing up the field.",
+                },
+                {
+                  num: "02",
+                  title: "Splat into the field",
+                  text: "A radial falloff injects that vector around the cursor. Aspect correction keeps the ripple circular inside any frame.",
+                },
+                {
+                  num: "03",
+                  title: "Let it settle",
+                  text: "Dissipation and a small diffusion step make the vectors smear and fade instead of snapping back to zero.",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: "shader-pipeline",
+          heading: "The Shader Pipeline",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "There are two passes. The simulation pass evolves the velocity field in a pair of ping-pong render targets. The display pass samples that field and uses it to offset a procedural canvas texture.",
+            },
+            {
+              type: "paragraph",
+              text: "The content being distorted is intentionally simple: a gradient, a few color blooms, a dot grid, and large type. The dot grid makes small refractions legible, while the color blooms give the chromatic split something to bite into.",
+              emphasis: ["dot grid", "chromatic split"],
+            },
+            {
+              type: "callout",
+              accent: "teal",
+              text: "The field is not the image. The field is a map of motion. The image only becomes liquid when the display shader reads that map and bends the pixels through it.",
+            },
+          ],
+        },
+        {
+          id: "playground",
+          heading: "The Playground",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Swipe through the canvas, then change the controls. Trail controls how long the velocity field survives, distortion controls how far the texture bends, and ripple size controls how wide each pointer splat is.",
+            },
+            {
+              type: "demo",
+              id: "liquid-distortion",
+              caption:
+                "Move fast, move slow, then pull the controls apart. The force comes from cursor speed, not cursor position.",
+            },
+          ],
+        },
+        {
+          id: "where-it-landed",
+          heading: "Where It Landed",
+          blocks: [
+            {
+              type: "metrics",
+              items: [
+                { value: "2", label: "Shader passes" },
+                { value: "0.5x", label: "Simulation resolution" },
+                { value: "3", label: "Live controls" },
+              ],
+            },
+            {
+              type: "paragraph",
+              text: "The final version is deliberately not a physically complete fluid sim. It is a smaller illusion: advect a velocity texture, let it decay, and use that texture as a lens. That made it cheap enough for an article embed while still feeling responsive.",
+              emphasis: ["a smaller illusion"],
+            },
+            {
+              type: "callout",
+              accent: "neutral",
+              text: "The lesson was that believable interaction often comes from preserving the right state. Here, one frame of cursor history was the difference between a hover effect and something that felt like liquid.",
+            },
+          ],
+        },
+      ],
+    },
   },
   {
     slug: "brush-reveal",
