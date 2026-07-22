@@ -39,6 +39,54 @@ type SceneRefs = {
   group: THREE.Group;
 };
 
+function disposeMaterialResources(
+  material: THREE.Material,
+  disposedMaterials: Set<THREE.Material>,
+  disposedTextures: Set<THREE.Texture>,
+) {
+  if (disposedMaterials.has(material)) return;
+
+  for (const value of Object.values(
+    material as THREE.Material & Record<string, unknown>,
+  )) {
+    if (value instanceof THREE.Texture && !disposedTextures.has(value)) {
+      value.dispose();
+      disposedTextures.add(value);
+    }
+  }
+
+  material.dispose();
+  disposedMaterials.add(material);
+}
+
+function disposeSceneResources(scene: THREE.Scene) {
+  const disposedGeometries = new Set<THREE.BufferGeometry>();
+  const disposedMaterials = new Set<THREE.Material>();
+  const disposedTextures = new Set<THREE.Texture>();
+
+  scene.traverse((object) => {
+    if ("geometry" in object && object.geometry instanceof THREE.BufferGeometry) {
+      if (!disposedGeometries.has(object.geometry)) {
+        object.geometry.dispose();
+        disposedGeometries.add(object.geometry);
+      }
+    }
+
+    if ("material" in object) {
+      const { material } = object;
+      if (Array.isArray(material)) {
+        material.forEach((item) => {
+          if (item instanceof THREE.Material) {
+            disposeMaterialResources(item, disposedMaterials, disposedTextures);
+          }
+        });
+      } else if (material instanceof THREE.Material) {
+        disposeMaterialResources(material, disposedMaterials, disposedTextures);
+      }
+    }
+  });
+}
+
 /**
  * "Somu Hero 3D" — a full-viewport hero rendering a warm plaster room in
  * Three.js: a stone boulder and a stylised eucalyptus sprig lit by a single
@@ -501,6 +549,8 @@ export default function SomuHero3D({
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(raf);
       ro.disconnect();
+      disposeSceneResources(scene);
+      renderer.renderLists.dispose();
       renderer.dispose();
       three.current = null;
     };
