@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Gauge, SlidersHorizontal } from "lucide-react";
 import * as THREE from "three";
+import { createBrowserMetricsSource } from "@/lib/performance/browserMetrics";
+import { PerformanceMonitor } from "@/lib/performance/PerformanceMonitor";
+import { createThreeMetricsSource } from "@/lib/performance/threeMetrics";
+import ResourceUsagePanel from "./ResourceUsagePanel";
 import TweaksPanel from "./TweaksPanel";
 import { DEFAULTS, type HeroProps } from "./somuHero3dConfig";
 
@@ -129,6 +134,10 @@ export default function SomuHero3D({
   // Live tweakable scene props + the panel open state.
   const [props, setProps] = useState<HeroProps>(DEFAULTS);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [resourceOpen, setResourceOpen] = useState(false);
+  const [resourceExpanded, setResourceExpanded] = useState(false);
+  const [resourceMonitor, setResourceMonitor] =
+    useState<PerformanceMonitor | null>(null);
   const propsRef = useRef(props);
   useEffect(() => {
     propsRef.current = props;
@@ -138,6 +147,19 @@ export default function SomuHero3D({
 
   const setProp = <K extends keyof HeroProps>(key: K, value: HeroProps[K]) =>
     setProps((prev) => ({ ...prev, [key]: value }));
+
+  const isNarrow = () => window.matchMedia("(max-width: 720px)").matches;
+  const toggleTweaks = () => {
+    setPanelOpen((open) => {
+      const next = !open;
+      if (next && isNarrow()) setResourceExpanded(false);
+      return next;
+    });
+  };
+  const setResourcesExpanded = (next: boolean) => {
+    setResourceExpanded(next);
+    if (next && isNarrow()) setPanelOpen(false);
+  };
 
   // Apply the current props to the live scene (skips X of spot/camera, which
   // the rAF loop owns for parallax).
@@ -299,7 +321,7 @@ export default function SomuHero3D({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(w, h, false);
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = P.exposure;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -307,6 +329,7 @@ export default function SomuHero3D({
     if (fallbackRef.current) fallbackRef.current.style.opacity = "0";
 
     const scene = new THREE.Scene();
+    scene.name = "Somu room";
     const bg = new THREE.Color(P.bgColor);
     scene.background = bg;
 
@@ -317,6 +340,8 @@ export default function SomuHero3D({
 
     // ---------- room (texture tint fixed; material.color carries tweaks) ----
     const wallTex = plaster("#c9c2b0", 0.32, [2, 1.25]);
+    wallTex.map.name = "Wall plaster albedo";
+    wallTex.bump.name = "Wall plaster bump";
     const wallMat = new THREE.MeshStandardMaterial({
       map: wallTex.map,
       bumpMap: wallTex.bump,
@@ -324,12 +349,17 @@ export default function SomuHero3D({
       roughness: 0.97,
       metalness: 0,
     });
+    wallMat.name = "Wall plaster material";
     const wall = new THREE.Mesh(new THREE.PlaneGeometry(30, 16), wallMat);
+    wall.name = "Back wall";
+    wall.geometry.name = "Back wall geometry";
     wall.position.set(0, 6, -2.6);
     wall.receiveShadow = true;
     scene.add(wall);
 
     const floorTex = plaster("#c2baa6", 0.18, [4, 4]);
+    floorTex.map.name = "Floor plaster albedo";
+    floorTex.bump.name = "Floor plaster bump";
     const floorMat = new THREE.MeshStandardMaterial({
       map: floorTex.map,
       bumpMap: floorTex.bump,
@@ -337,7 +367,10 @@ export default function SomuHero3D({
       roughness: 0.85,
       metalness: 0,
     });
+    floorMat.name = "Floor plaster material";
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 30), floorMat);
+    floor.name = "Floor";
+    floor.geometry.name = "Floor geometry";
     floor.rotation.x = -Math.PI / 2;
     floor.position.set(0, 0, 1);
     floor.receiveShadow = true;
@@ -358,6 +391,7 @@ export default function SomuHero3D({
       P.spotPenumbra,
       P.spotDecay,
     );
+    spot.name = "Main spotlight shadow";
     spot.position.set(P.spotX, P.spotY, P.spotZ);
     spot.castShadow = true;
     spot.shadow.mapSize.set(2048, 2048);
@@ -370,6 +404,7 @@ export default function SomuHero3D({
 
     // Soft top-down key for grounded contact shadows on the floor.
     const top = new THREE.DirectionalLight("#f2ecdd", P.topIntensity);
+    top.name = "Top key shadow";
     top.position.set(-1.5, 9, 2.5);
     top.target.position.set(-2.4, 0, 0.8);
     top.castShadow = true;
@@ -398,6 +433,7 @@ export default function SomuHero3D({
 
     // ---------- objects, bottom-left, resting on the floor ----------
     const group = new THREE.Group();
+    group.name = "Boulder and eucalyptus";
     group.position.set(-2.35, 0, 0.9);
     group.scale.setScalar(P.objScale);
     scene.add(group);
@@ -409,7 +445,11 @@ export default function SomuHero3D({
       depthWrite: false,
       opacity: 0.85,
     });
+    blobMat.name = "Contact shadow material";
+    if (blobMat.map) blobMat.map.name = "Contact shadow alpha";
     const blob = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 3.2), blobMat);
+    blob.name = "Contact shadow decal";
+    blob.geometry.name = "Contact shadow geometry";
     blob.rotation.x = -Math.PI / 2;
     blob.position.set(-2.15, 0.015, 1.0);
     blob.renderOrder = 1;
@@ -417,6 +457,7 @@ export default function SomuHero3D({
 
     // 1) Boulder — smooth noisy icosahedron flattened into a low slab.
     const rockGeo = new THREE.IcosahedronGeometry(1.0, 5);
+    rockGeo.name = "Boulder geometry";
     const rpos = rockGeo.attributes.position;
     const rv = new THREE.Vector3();
     for (let i = 0; i < rpos.count; i++) {
@@ -434,7 +475,9 @@ export default function SomuHero3D({
       roughness: 1.0,
       metalness: 0,
     });
+    rockMat.name = "Boulder material";
     const rock = new THREE.Mesh(rockGeo, rockMat);
+    rock.name = "Boulder";
     rock.scale.set(1.35, 0.8, 1.05);
     rock.position.set(0, 0.6, 0);
     rock.rotation.set(0.04, 0.5, -0.06);
@@ -447,12 +490,15 @@ export default function SomuHero3D({
       color: "#5c6647",
       roughness: 0.85,
     });
+    stemMat.name = "Eucalyptus stem material";
     const leafMat = new THREE.MeshStandardMaterial({
       color: P.leafColor,
       roughness: 0.66,
       metalness: 0,
     });
+    leafMat.name = "Eucalyptus leaf material";
     const plant = new THREE.Group();
+    plant.name = "Eucalyptus";
     plant.position.set(0.2, 0.85, -0.4);
     plant.rotation.z = 0.18;
     const segs = 7;
@@ -464,6 +510,7 @@ export default function SomuHero3D({
         new THREE.CylinderGeometry(0.014, 0.02, segLen, 8),
         stemMat,
       );
+      seg.geometry.name ||= "Eucalyptus stem geometry";
       curl += 0.055;
       const sx = Math.sin(curl) * 0.16;
       seg.position.set(sx, cy + segLen / 2, 0);
@@ -476,6 +523,7 @@ export default function SomuHero3D({
             new THREE.SphereGeometry(0.13, 14, 12),
             leafMat,
           );
+          leaf.geometry.name ||= "Eucalyptus leaf geometry";
           leaf.scale.set(1.0, 1.45, 0.12);
           leaf.position.set(sx + side * 0.2, cy + segLen * 0.35, 0.02 * side);
           leaf.rotation.set(0.15, side * 0.3, side * 1.05 - curl);
@@ -486,6 +534,16 @@ export default function SomuHero3D({
       cy += segLen * 0.82;
     }
     group.add(plant);
+
+    const monitor = new PerformanceMonitor({
+      sources: [
+        createBrowserMetricsSource(canvas),
+        createThreeMetricsSource(renderer, scene),
+      ],
+    });
+    const monitorReadyRaf = requestAnimationFrame(() => {
+      setResourceMonitor(monitor);
+    });
 
     three.current = {
       renderer,
@@ -540,6 +598,7 @@ export default function SomuHero3D({
       spotTarget.updateMatrixWorld();
 
       renderer.render(scene, camera);
+      monitor.recordFrame(performance.now());
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -548,7 +607,9 @@ export default function SomuHero3D({
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(monitorReadyRaf);
       ro.disconnect();
+      monitor.dispose();
       disposeSceneResources(scene);
       renderer.renderLists.dispose();
       renderer.dispose();
@@ -573,6 +634,19 @@ export default function SomuHero3D({
     borderRadius: "50%",
     background: "#f4efe3",
     boxShadow: "0 1px 2px rgba(0,0,0,.25)",
+  };
+  const sceneToolButtonStyle: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 7,
+    border: 0,
+    background: "transparent",
+    cursor: "pointer",
+    fontFamily: monoFont,
+    fontSize: 11,
+    letterSpacing: 0,
+    color: "#5c574b",
+    padding: 0,
   };
 
   return (
@@ -857,32 +931,37 @@ export default function SomuHero3D({
         }}
       />
 
-      {/* Tweaks toggle */}
-      <button
-        type="button"
-        onClick={() => setPanelOpen((o) => !o)}
-        aria-expanded={panelOpen}
-        data-tweaks
+      {/* Scene tools */}
+      <div
         style={{
           position: "absolute",
           left: "clamp(20px,3.4vw,48px)",
           bottom: "clamp(18px,3vh,34px)",
           zIndex: 10,
-          display: "inline-flex",
+          display: "flex",
           alignItems: "center",
-          gap: 8,
-          border: 0,
-          background: "transparent",
-          cursor: "pointer",
-          fontFamily: monoFont,
-          fontSize: 11,
-          letterSpacing: ".18em",
-          color: "#5c574b",
-          padding: 0,
+          gap: 18,
         }}
       >
-        <span aria-hidden="true">✦</span> TWEAKS
-      </button>
+        <button
+          type="button"
+          onClick={toggleTweaks}
+          aria-expanded={panelOpen}
+          data-tweaks
+          style={sceneToolButtonStyle}
+        >
+          <SlidersHorizontal size={13} aria-hidden="true" /> TWEAKS
+        </button>
+        <button
+          type="button"
+          onClick={() => setResourceOpen((open) => !open)}
+          aria-expanded={resourceOpen}
+          data-tweaks
+          style={sceneToolButtonStyle}
+        >
+          <Gauge size={13} aria-hidden="true" /> RESOURCES
+        </button>
+      </div>
 
       {/* Reduced motion toggle */}
       <button
@@ -913,6 +992,16 @@ export default function SomuHero3D({
           <span style={knobStyle} />
         </span>
       </button>
+
+      {resourceOpen && resourceMonitor && (
+        <ResourceUsagePanel
+          monitor={resourceMonitor}
+          expanded={resourceExpanded}
+          monoFont={monoFont}
+          onExpandedChange={setResourcesExpanded}
+          onClose={() => setResourceOpen(false)}
+        />
+      )}
 
       {panelOpen && (
         <TweaksPanel
