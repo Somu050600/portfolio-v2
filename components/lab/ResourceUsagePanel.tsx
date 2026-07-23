@@ -88,7 +88,7 @@ export default function ResourceUsagePanel({
   return (
     <aside
       className={cn(
-        "absolute top-[88px] left-[clamp(12px,2.4vw,32px)] z-20 max-h-[calc(100vh-132px)] overflow-hidden rounded-lg border border-white/10 bg-[rgba(38,33,26,0.82)] text-[#ece7dd] shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur-[16px] backdrop-saturate-[1.08] max-[720px]:top-[72px] max-[720px]:max-h-[calc(100vh-124px)]",
+        "absolute top-22 left-[clamp(12px,2.4vw,32px)] z-20 max-h-[calc(100vh-132px)] overflow-hidden rounded-lg border border-white/10 bg-[rgba(38,33,26,0.82)] text-[#ece7dd] shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur-lg backdrop-saturate-[1.08] max-[720px]:top-18 max-[720px]:max-h-[calc(100vh-124px)]",
         expanded
           ? "w-[min(340px,calc(100vw-24px))]"
           : "w-[min(292px,calc(100vw-24px))]",
@@ -157,10 +157,10 @@ export default function ResourceUsagePanel({
         </div>
       </header>
 
-      <div className="grid grid-cols-2 border-t border-white/[0.08]">
+      <div className="grid grid-cols-2 border-t border-white/8">
         {summary.map(([label, value]) => (
           <div
-            className="min-h-[54px] min-w-0 border-r border-b border-white/[0.06] px-3 py-[9px] even:border-r-0"
+            className="min-h-13.5 min-w-0 border-r border-b border-white/6 px-3 py-2.25 even:border-r-0"
             key={label}
           >
             <span className="block overflow-hidden text-[9px] text-ellipsis whitespace-nowrap text-[rgba(236,231,221,0.52)]">
@@ -176,7 +176,7 @@ export default function ResourceUsagePanel({
       {expanded && (
         <div className="max-h-[calc(100vh-310px)] overflow-auto pt-1 pr-3 pb-3.5 pl-3 max-[720px]:max-h-[calc(100vh-292px)]">
           <section className="mt-3.5">
-            <h3 className="m-0 mb-[7px] text-[9px] font-medium tracking-normal text-[rgba(236,231,221,0.48)] uppercase">
+            <h3 className="m-0 mb-1.75 text-[9px] font-medium tracking-normal text-[rgba(236,231,221,0.48)] uppercase">
               Memory
             </h3>
             <dl>
@@ -214,7 +214,7 @@ export default function ResourceUsagePanel({
           </section>
 
           <section className="mt-3.5">
-            <h3 className="m-0 mb-[7px] text-[9px] font-medium tracking-normal text-[rgba(236,231,221,0.48)] uppercase">
+            <h3 className="m-0 mb-1.75 text-[9px] font-medium tracking-normal text-[rgba(236,231,221,0.48)] uppercase">
               Renderer
             </h3>
             <dl>
@@ -246,7 +246,7 @@ export default function ResourceUsagePanel({
           </section>
 
           <section className="mt-3.5">
-            <h3 className="m-0 mb-[7px] text-[9px] font-medium tracking-normal text-[rgba(236,231,221,0.48)] uppercase">
+            <h3 className="m-0 mb-1.75 text-[9px] font-medium tracking-normal text-[rgba(236,231,221,0.48)] uppercase">
               Top consumers
             </h3>
             {snapshot.consumers.length === 0 ? (
@@ -256,7 +256,7 @@ export default function ResourceUsagePanel({
             ) : (
               snapshot.consumers.slice(0, 8).map((consumer) => (
                 <div
-                  className="grid min-h-8 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-white/[0.05]"
+                  className="grid min-h-8 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-white/5"
                   key={consumer.id}
                 >
                   <span className="overflow-hidden text-[10px] text-ellipsis whitespace-nowrap">
@@ -274,7 +274,7 @@ export default function ResourceUsagePanel({
           </section>
 
           <section className="mt-3.5">
-            <h3 className="m-0 mb-[7px] text-[9px] font-medium tracking-normal text-[rgba(236,231,221,0.48)] uppercase">
+            <h3 className="m-0 mb-1.75 text-[9px] font-medium tracking-normal text-[rgba(236,231,221,0.48)] uppercase">
               Device &amp; canvas
             </h3>
             <dl>
