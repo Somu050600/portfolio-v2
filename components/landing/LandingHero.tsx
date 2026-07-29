@@ -14,12 +14,15 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
+import ExploreCta from "./ExploreCta";
 import FocusFrame from "./FocusFrame";
+import SplitChars from "./SplitChars";
 import {
   captureElementCenter,
   resolveFocusStatus,
   splitFinalWord,
 } from "./landing-interactions";
+import { useHeadlineMagnetics } from "./use-headline-magnetics";
 import { useLandingEasterEggs } from "./use-landing-easter-eggs";
 import { useMediaQuery } from "./use-media-query";
 import { useSpotlightTracking } from "./use-spotlight-tracking";
@@ -44,6 +47,14 @@ const quadrantLabels = [
   ["bl", "PHOTOGRAPHY", "bottom-[17%] left-[9%] opacity-(--quadrant-3)"],
   ["br", "VIEW TRANSITIONS", "right-[9%] bottom-[17%] opacity-(--quadrant-4)"],
 ] as const;
+
+/**
+ * Final word of the headline. DotGothic16 has no italic cut, so the <em>'s
+ * inherited italic is dropped rather than synthesised as a slant; per-glyph
+ * tightening for its monospace advance lives in globals.css.
+ */
+const FINAL_WORD_CLASS =
+  "landing-final-word font-dot text-[0.92em] tracking-[-0.02em] not-italic";
 
 /** [key to press, what it does] — see use-landing-easter-eggs.ts */
 const easterEggHints = [
@@ -78,21 +89,21 @@ const navLinkClass = [
 export default function LandingHero({ background }: LandingHeroProps) {
   const rootRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLButtonElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
   const router = useRouter();
   const cover = usePageTransition();
   const systemReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const finePointer = useMediaQuery("(hover: hover) and (pointer: fine)");
   const [motionOverride, setMotionOverride] = useState<boolean | null>(null);
   const [hoveredLine, setHoveredLine] = useState<number | null>(null);
-  const [focusedLine, setFocusedLine] = useState<number | null>(null);
   const [ctaActive, setCtaActive] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
   const [returnedToCentre, setReturnedToCentre] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [hintIndex, setHintIndex] = useState(0);
   const [hintsPaused, setHintsPaused] = useState(false);
-
   const motionDisabled = motionOverride ?? systemReducedMotion;
-  const interactiveLine = focusedLine ?? hoveredLine;
+  const interactiveLine = hoveredLine;
   const {
     lockedLine,
     technicalVisible,
@@ -102,11 +113,16 @@ export default function LandingHero({ background }: LandingHeroProps) {
   } = useLandingEasterEggs(interactiveLine);
   const displayedLine = lockedLine ?? interactiveLine;
 
+  // Character-level repulsion runs only where a fine pointer can drive it.
+  const pointerInteractive = finePointer && !motionDisabled;
+
+  useHeadlineMagnetics({ headlineRef, enabled: pointerInteractive });
+
   useSpotlightTracking({
     rootRef,
     motionDisabled,
     activeLine: displayedLine,
-    anchoredLine: lockedLine ?? focusedLine,
+    anchoredLine: lockedLine,
     ctaActive,
     transitioning,
   });
@@ -272,10 +288,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
           >
             About
           </Link>
-          <a
-            className={navLinkClass}
-            href={`mailto:${profile.contact.email}`}
-          >
+          <a className={navLinkClass} href={`mailto:${profile.contact.email}`}>
             Contact
           </a>
         </nav>
@@ -336,8 +349,18 @@ export default function LandingHero({ background }: LandingHeroProps) {
       >
         <div className="mx-auto w-full max-w-280 text-center">
           <h1
+            ref={headlineRef}
             id="landing-headline"
-            className="font-landing text-balance text-[clamp(2.7rem,6.25vw,6.7rem)] leading-[1.16] font-normal tracking-[-0.015em] max-md:text-[clamp(2.55rem,11vw,4rem)]"
+            // Every character span is aria-hidden, so the heading carries the
+            // text itself — this is also what names the section via
+            // aria-labelledby.
+            aria-label={headline.join(" ")}
+            // Inspectable gate state: absent means the magnet is switched off
+            // (coarse pointer, no hover, or reduced motion).
+            data-magnetic={pointerInteractive ? "" : undefined}
+            // Three-layer depth: hairline for definition, soft mid, broad low
+            // opacity. All drawn from --landing-ink so it follows temperature.
+            className="font-landing cursor-default text-balance text-[clamp(2.7rem,6.25vw,6.7rem)] leading-[1.16] font-normal tracking-[-0.015em] [text-shadow:0_1px_0_color-mix(in_oklab,var(--landing-ink)_12%,transparent),0_2px_6px_color-mix(in_oklab,var(--landing-ink)_10%,transparent),0_10px_30px_color-mix(in_oklab,var(--landing-ink)_8%,transparent)] max-md:text-[clamp(2.55rem,11vw,4rem)]"
             data-active-line={displayedLine ?? undefined}
             data-semantic-label="<h1>"
           >
@@ -345,41 +368,34 @@ export default function LandingHero({ background }: LandingHeroProps) {
               const lineNumber = index + 1;
               const isFinalLine = index === headline.length - 1;
               const finalLineParts = isFinalLine ? splitFinalWord(line) : null;
-              const active = displayedLine === lineNumber;
-              const muted = displayedLine !== null && !active;
 
               return (
+                // No per-line hover, focus or dim treatment: the character field
+                // is the only headline interaction. Pointer enter/leave stays
+                // because the spotlight, status readout and F-lock read it.
                 <span
                   key={line}
-                  tabIndex={0}
-                  aria-label={`Focus line ${lineNumber}: ${line}`}
-                  className={`mx-auto block w-fit text-(--landing-ink) outline-none transition-[opacity,transform,text-shadow] duration-300 ease-(--ease-out-soft) focus-visible:outline-1 focus-visible:outline-offset-8 focus-visible:outline-(--landing-accent) ${
-                    // Letterpress: highlight above the glyphs, shadow below, so
-                    // the line reads as relief in the paper. Highlight uses the
-                    // spotlight tint so it holds up in all three temperatures.
-                    active
-                      ? "-translate-y-px opacity-100 [text-shadow:0_-1px_0_rgb(var(--landing-light-rgb)),0_1px_1px_color-mix(in_oklab,var(--landing-ink)_22%,transparent)]"
-                      : muted
-                        ? "translate-y-0 opacity-50"
-                        : "translate-y-0 opacity-100"
-                  }`}
+                  className="mx-auto block w-fit"
                   data-headline-line={lineNumber}
                   onPointerEnter={() => setHoveredLine(lineNumber)}
                   onPointerLeave={() => setHoveredLine(null)}
-                  onFocus={() => setFocusedLine(lineNumber)}
-                  onBlur={() => setFocusedLine(null)}
                 >
                   {finalLineParts ? (
                     <>
-                      {finalLineParts.leadingText
-                        ? `${finalLineParts.leadingText} `
-                        : null}
-                      <em className="font-serif text-(--landing-accent) italic">
-                        {finalLineParts.finalWord}
+                      {finalLineParts.leadingText ? (
+                        <>
+                          <SplitChars text={finalLineParts.leadingText} />{" "}
+                        </>
+                      ) : null}
+                      <em className={FINAL_WORD_CLASS}>
+                        <SplitChars
+                          text={finalLineParts.finalWord}
+                          variant="accent"
+                        />
                       </em>
                     </>
                   ) : (
-                    line
+                    <SplitChars text={line} />
                   )}
                 </span>
               );
@@ -393,42 +409,16 @@ export default function LandingHero({ background }: LandingHeroProps) {
             <p className="text-[10px] tracking-[0.08em] text-(--landing-muted) sm:text-xs">
               {landingConfig.hero.specialties}
             </p>
-            {/* Primary CTA. Label is the spotlight tint rather than paper:
-                paper-on-accent is 4.35:1 in the warm preset, under AA at this
-                size; the tint clears 5.3:1 in all three presets. */}
-            <button
-              ref={ctaRef}
-              type="button"
-              data-landing-cta
-              onPointerEnter={() => setCtaActive(true)}
-              onPointerLeave={() => {
-                if (!transitioning) setCtaActive(false);
+            <ExploreCta
+              label={landingConfig.hero.ctaLabel}
+              buttonRef={ctaRef}
+              interactive={pointerInteractive}
+              onActivate={activateExplore}
+              onActiveChange={(active) => {
+                // Stay lit through the transition once it has started.
+                if (active || !transitioning) setCtaActive(active);
               }}
-              onFocus={() => setCtaActive(true)}
-              onBlur={() => {
-                if (!transitioning) setCtaActive(false);
-              }}
-              onClick={activateExplore}
-              className="group mt-6 inline-flex items-center gap-2.5 bg-(--landing-accent) px-6 py-3 text-[11px] tracking-[0.2em] text-[rgb(var(--landing-light-rgb))] uppercase shadow-[0_10px_30px_-18px_color-mix(in_oklab,var(--landing-accent)_85%,transparent)] outline-offset-4 transition-[background-color,box-shadow,transform] duration-220 ease-(--ease-out-soft) hover:-translate-y-px hover:bg-[color-mix(in_oklab,var(--landing-accent)_86%,var(--landing-ink))] hover:shadow-[0_16px_38px_-18px_color-mix(in_oklab,var(--landing-accent)_75%,transparent)] focus-visible:outline-1 focus-visible:outline-(--landing-ink) active:translate-y-0 sm:text-xs"
-            >
-              {landingConfig.hero.ctaLabel}
-              {/* Two identical arrows on one track inside a 16px window: the
-                  visible one exits right as its twin enters from the left, so it
-                  reads as continuous forward travel rather than a nudge. */}
-              <span
-                aria-hidden="true"
-                className="relative block h-4 w-4 overflow-hidden"
-              >
-                <span className="flex w-8 -translate-x-4 transition-transform duration-320 ease-(--ease-out-soft) group-hover:translate-x-0 group-focus-visible:translate-x-0">
-                  <span className="grid h-4 w-4 shrink-0 place-items-center leading-none">
-                    →
-                  </span>
-                  <span className="grid h-4 w-4 shrink-0 place-items-center leading-none">
-                    →
-                  </span>
-                </span>
-              </span>
-            </button>
+            />
           </div>
         </div>
       </section>
@@ -451,10 +441,13 @@ export default function LandingHero({ background }: LandingHeroProps) {
           aria-label="Hidden interactions"
           onPointerEnter={() => setHintsPaused(true)}
           onPointerLeave={() => setHintsPaused(false)}
-          className={`hidden shrink-0 text-[10px] tracking-[0.14em] text-(--landing-muted) uppercase ${
+          // Absolutely centred in the footer rather than sitting in the flex
+          // flow: as a flex child, justify-between re-distributed it every time
+          // the status text or the Motion label changed width.
+          className={`absolute bottom-6 left-1/2 hidden -translate-x-1/2 text-[10px] tracking-[0.14em] text-(--landing-muted) uppercase sm:bottom-8 ${
             motionDisabled
               ? "lg:flex lg:items-center lg:gap-4"
-              : "relative h-4 w-56 lg:block"
+              : "h-4 w-56 lg:block"
           }`}
         >
           {easterEggHints.map(([key, label], index) => (

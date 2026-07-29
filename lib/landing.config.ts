@@ -10,11 +10,7 @@ export const landingConfig = {
     slideUpEase: "power4.inOut",
   },
   hero: {
-    headline: [
-      "Clarity in interface.",
-      "Depth in systems.",
-      "Beautifully.",
-    ],
+    headline: ["Clarity in interface.", "Depth in systems.", "Beautifully"],
     role: "Frontend Engineer",
     specialties: "React · Next.js · Design Systems · Performance",
     ctaLabel: "EXPLORE",

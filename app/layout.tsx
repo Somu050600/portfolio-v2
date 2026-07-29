@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Glass_Antiqua, Source_Code_Pro } from "next/font/google";
+import {
+  DotGothic16,
+  Geist,
+  Glass_Antiqua,
+  Source_Code_Pro,
+} from "next/font/google";
 import ConsoleSignature from "@/components/ConsoleSignature";
 import PageTransitionOverlay from "@/components/PageTransitionOverlay";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
@@ -22,6 +27,14 @@ const sourceCodePro = Source_Code_Pro({
 
 const glassAntiqua = Glass_Antiqua({
   variable: "--font-glass-antiqua",
+  weight: "400",
+  subsets: ["latin"],
+});
+
+/* Dot-matrix face for the headline's final word — reads as printed artefact
+   against the engraved guilloché. */
+const dotGothic = DotGothic16({
+  variable: "--font-dot-gothic",
   weight: "400",
   subsets: ["latin"],
 });
@@ -115,7 +128,7 @@ export default function RootLayout({
       lang="en"
       // next-themes + AccentProvider both mutate <html> before hydration.
       suppressHydrationWarning
-      className={`${geistSans.variable} ${sourceCodePro.variable} ${glassAntiqua.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${sourceCodePro.variable} ${glassAntiqua.variable} ${dotGothic.variable} h-full antialiased`}
     >
       <head>
         {/* Intro overlay pre-paint gate */}

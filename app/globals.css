@@ -195,6 +195,10 @@
   /* Landing headline — system serif, deliberately not the display face */
   --font-landing: Georgia, "Times New Roman", serif;
 
+  /* Headline final word. Named for the effect, not the family, so it cannot
+     collide with the next/font variable it points at. */
+  --font-dot: var(--font-dot-gothic), monospace;
+
   /* Radii */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -438,6 +442,56 @@ html[data-slide-dir="down"]::view-transition-new(home-content) {
     rgba(var(--landing-light-rgb), 0.19) 62%,
     transparent 80%
   );
+}
+
+/* Per-character headline state. use-headline-magnetics writes --char-x/y and
+   --char-mix from one rAF loop; the defaults here mean an un-hydrated or
+   non-interactive headline renders identically to plain text. inline-block is
+   required for `translate` to apply at all. */
+.landing-char {
+  display: inline-block;
+  translate: var(--char-x, 0) var(--char-y, 0);
+  color: color-mix(
+    in oklab,
+    var(--landing-ink),
+    var(--landing-accent) calc(var(--char-mix, 0) * 100%)
+  );
+}
+
+/* The hook adds this only while the field is live, so ~60 spans are not
+   layer-promoted for the lifetime of the page. */
+.landing-headline-magnetic .landing-char {
+  will-change: translate;
+}
+
+/* Accent characters (the final word) keep their own colour. */
+.landing-char--accent {
+  color: var(--landing-accent);
+}
+
+/* DotGothic16 is monospaced, so narrow Latin glyphs sit in a full-width advance
+   and leave gaps — "Beaut i ful ly." Pull them in per glyph; negative tracking
+   across the whole word would collide the wide letters instead. Two tiers by
+   how much slack the glyph actually has. */
+.landing-final-word .landing-char[data-char="i"],
+.landing-final-word .landing-char[data-char="l"],
+.landing-final-word .landing-char[data-char="j"],
+.landing-final-word .landing-char[data-char="."],
+.landing-final-word .landing-char[data-char="'"] {
+  margin-inline: -0.13em;
+}
+
+.landing-final-word .landing-char[data-char="f"],
+.landing-final-word .landing-char[data-char="t"],
+.landing-final-word .landing-char[data-char="r"],
+.landing-final-word .landing-char[data-char="y"] {
+  margin-inline: -0.06em;
+}
+
+/* Magnetic drift for the CTA, written by ExploreCta. Kept here so the fallback
+   value applies before the first frame and after cleanup. */
+.landing-cta {
+  translate: var(--cta-x, 0) var(--cta-y, 0);
 }
 
 /* Semantic-layer easter egg: labels every landmark with its tag name. Needs
