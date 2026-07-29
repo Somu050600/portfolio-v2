@@ -360,7 +360,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
             data-magnetic={pointerInteractive ? "" : undefined}
             // Three-layer depth: hairline for definition, soft mid, broad low
             // opacity. All drawn from --landing-ink so it follows temperature.
-            className="font-landing cursor-default text-balance text-[clamp(2.7rem,6.25vw,6.7rem)] leading-[1.16] font-normal tracking-[-0.015em] [text-shadow:0_1px_0_color-mix(in_oklab,var(--landing-ink)_12%,transparent),0_2px_6px_color-mix(in_oklab,var(--landing-ink)_10%,transparent),0_10px_30px_color-mix(in_oklab,var(--landing-ink)_8%,transparent)] max-md:text-[clamp(2.55rem,11vw,4rem)]"
+            className="font-landing cursor-default text-balance text-[clamp(2.7rem,6.25vw,6.7rem)] leading-[1.16] font-normal tracking-[-0.015em] [text-shadow:0_1px_0_color-mix(in_oklab,var(--landing-ink)_12%,transparent),0_2px_6px_color-mix(in_oklab,var(--landing-ink)_10%,transparent),0_10px_30px_color-mix(in_oklab,var(--landing-ink)_8%,transparent)] max-md:text-[clamp(1.25rem,10vw,3.75rem)]"
             data-active-line={displayedLine ?? undefined}
             data-semantic-label="<h1>"
           >
