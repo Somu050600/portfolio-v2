@@ -22,11 +22,3 @@ export function useMediaQuery(query: string): boolean {
     () => false,
   );
 }
-
-/**
- * Single pointer source contract: LandingCursor broadcasts smoothed pointer
- * coords on this event each frame; hero shove + parallax subscribe to it.
- */
-export const LANDING_POINTER_EVENT = "landing:pointer";
-
-export type LandingPointerDetail = { x: number; y: number };

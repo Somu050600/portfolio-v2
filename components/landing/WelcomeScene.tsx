@@ -1,27 +1,24 @@
-import Hero from "./Hero";
-import LandingCursor from "./LandingCursor";
-import SceneCanvas from "./SceneCanvas";
-import StatusClock from "./StatusClock";
+import GuillocheBackground from "./GuillocheBackground";
+import LandingHero from "./LandingHero";
 
 /**
  * Layer B: the welcome scene.
  *
- * Always dark, self-contained — the `.dark` class pins the dark CSS vars
- * (--bg → #0A0A0A, --ink → #EDEDED, etc.) regardless of the global theme
- * toggle. The AccentProvider's dark-accent vars are also in effect here since
- * they're on <html>, not scoped to `.dark`.
- *
- * The canvas uses hardcoded colours (white stars, etc.) and is independent
- * of the token system; the scene-surface/scene-ink tokens cover any text
- * or chrome that appears here.
+ * The interactive client shell accepts the guilloché as a server-rendered
+ * slot, keeping its 113 SVG paths out of the client module graph.
  */
 export default function WelcomeScene() {
   return (
-    <main className="dark relative min-h-dvh overflow-hidden bg-(--landing-bg) text-ink select-none">
-      <SceneCanvas />
-      <Hero />
-      <StatusClock />
-      <LandingCursor />
-    </main>
+    <LandingHero
+      background={
+        <GuillocheBackground
+          amplitude={40}
+          density={11}
+          lightness={0.26}
+          centreRelief
+          className="z-0 text-(--landing-pattern)"
+        />
+      }
+    />
   );
 }
