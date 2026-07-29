@@ -45,9 +45,35 @@ const quadrantLabels = [
   ["br", "VIEW TRANSITIONS", "right-[9%] bottom-[17%] opacity-(--quadrant-4)"],
 ] as const;
 
-/** Used by four nav items — one string beats four copies of the same 16 classes. */
-const navLinkClass =
-  "relative text-(--landing-ink) outline-none transition-colors duration-180 hover:text-(--landing-accent) focus-visible:text-(--landing-accent) after:absolute after:inset-x-0 after:-bottom-1.25 after:h-px after:origin-center after:translate-y-0.5 after:scale-x-[0.7] after:bg-(--landing-accent) after:opacity-0 after:transition-[opacity,transform] after:duration-180 hover:after:translate-y-0 hover:after:scale-x-100 hover:after:opacity-100 focus-visible:after:translate-y-0 focus-visible:after:scale-x-100 focus-visible:after:opacity-100";
+/** [key to press, what it does] — see use-landing-easter-eggs.ts */
+const easterEggHints = [
+  ["⌥", "Technical"],
+  ["F", "Lock focus"],
+  ["develop", "Semantic"],
+  ["dbl-click", "Temperature"],
+] as const;
+
+/**
+ * Used by four nav items — one string beats four copies of the same classes.
+ * Bracket ticks flick in either side on hover/focus, echoing the focus-frame
+ * corners: each is a 4px-wide box with three borders, so it reads as [ and ].
+ */
+const navLinkClass = [
+  "relative text-(--landing-ink) outline-none transition-colors duration-180",
+  "hover:text-(--landing-accent) focus-visible:text-(--landing-accent)",
+  // left tick
+  "before:absolute before:top-1/2 before:-left-2.5 before:h-[1.35em] before:w-1",
+  "before:-translate-x-1 before:-translate-y-1/2 before:border-y before:border-l before:border-(--landing-accent)",
+  "before:opacity-0 before:transition-[opacity,transform] before:duration-180",
+  "hover:before:translate-x-0 hover:before:opacity-100",
+  "focus-visible:before:translate-x-0 focus-visible:before:opacity-100",
+  // right tick
+  "after:absolute after:top-1/2 after:-right-2.5 after:h-[1.35em] after:w-1",
+  "after:translate-x-1 after:-translate-y-1/2 after:border-y after:border-r after:border-(--landing-accent)",
+  "after:opacity-0 after:transition-[opacity,transform] after:duration-180",
+  "hover:after:translate-x-0 hover:after:opacity-100",
+  "focus-visible:after:translate-x-0 focus-visible:after:opacity-100",
+].join(" ");
 
 export default function LandingHero({ background }: LandingHeroProps) {
   const rootRef = useRef<HTMLElement>(null);
@@ -62,6 +88,8 @@ export default function LandingHero({ background }: LandingHeroProps) {
   const [transitioning, setTransitioning] = useState(false);
   const [returnedToCentre, setReturnedToCentre] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [hintIndex, setHintIndex] = useState(0);
+  const [hintsPaused, setHintsPaused] = useState(false);
 
   const motionDisabled = motionOverride ?? systemReducedMotion;
   const interactiveLine = focusedLine ?? hoveredLine;
@@ -84,8 +112,23 @@ export default function LandingHero({ background }: LandingHeroProps) {
   });
 
   useEffect(() => {
+    // Both nav targets too: the transition holds the old frame until the route
+    // commits, so an unprefetched route shows as a stall before the shade moves.
     router.prefetch(landingConfig.hero.ctaTarget);
+    router.prefetch("/home/about");
   }, [router]);
+
+  // Hints cycle one at a time. All four stay in the DOM so assistive tech reads
+  // the full set; only the active one is visible. Reduced motion shows them all
+  // inline instead — rotating text is movement too.
+  useEffect(() => {
+    if (motionDisabled || hintsPaused) return;
+    const id = window.setInterval(
+      () => setHintIndex((index) => (index + 1) % easterEggHints.length),
+      3800,
+    );
+    return () => window.clearInterval(id);
+  }, [motionDisabled, hintsPaused]);
 
   useEffect(() => {
     if (!mobileNavOpen) return;
@@ -125,6 +168,23 @@ export default function LandingHero({ background }: LandingHeroProps) {
       reducedMotion: motionDisabled,
     });
   }, [cover, motionDisabled, transitioning]);
+
+  /**
+   * Header nav gets the shade pull, not the circle — the circle stays the CTA's
+   * gesture. No origin needed, so Enter on a focused link looks like a click.
+   */
+  const onNavClick = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+      // Let modified clicks (new tab, etc.) behave natively.
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+      event.preventDefault();
+      setMobileNavOpen(false);
+      cover({ href, shade: true, reducedMotion: motionDisabled });
+    },
+    [cover, motionDisabled],
+  );
 
   const onDoubleClick = (event: MouseEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
@@ -171,17 +231,22 @@ export default function LandingHero({ background }: LandingHeroProps) {
       >
         <Link
           href="/home"
-          className="font-mono text-sm font-medium tracking-[0.3em] text-(--landing-ink) uppercase outline-offset-6 transition-colors hover:text-(--landing-accent) focus-visible:outline-1 focus-visible:outline-(--landing-accent)"
+          onClick={(event) => onNavClick(event, "/home")}
+          className="font-mono text-base font-medium tracking-[0.3em] text-(--landing-ink) uppercase outline-offset-6 transition-colors hover:text-(--landing-accent) focus-visible:outline-1 focus-visible:outline-(--landing-accent)"
         >
           SOMU
         </Link>
 
         <nav
           aria-label="Primary navigation"
-          className="hidden items-center gap-7 font-mono text-xs tracking-[0.08em] md:flex lg:gap-9"
+          className="hidden items-center gap-8 font-mono text-[15px] font-medium tracking-[0.02em] md:flex lg:gap-10"
           data-semantic-label="<nav>"
         >
-          <Link className={navLinkClass} href="/home">
+          <Link
+            className={navLinkClass}
+            href="/home"
+            onClick={(event) => onNavClick(event, "/home")}
+          >
             Work
           </Link>
           <span className="group relative">
@@ -200,7 +265,11 @@ export default function LandingHero({ background }: LandingHeroProps) {
               Coming soon
             </span>
           </span>
-          <Link className={navLinkClass} href="/home/about">
+          <Link
+            className={navLinkClass}
+            href="/home/about"
+            onClick={(event) => onNavClick(event, "/home/about")}
+          >
             About
           </Link>
           <a
@@ -230,7 +299,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
         >
           <Link
             href="/home"
-            onClick={() => setMobileNavOpen(false)}
+            onClick={(event) => onNavClick(event, "/home")}
             className="outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
           >
             Work
@@ -246,7 +315,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
           </span>
           <Link
             href="/home/about"
-            onClick={() => setMobileNavOpen(false)}
+            onClick={(event) => onNavClick(event, "/home/about")}
             className="outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
           >
             About
@@ -284,9 +353,16 @@ export default function LandingHero({ background }: LandingHeroProps) {
                   key={line}
                   tabIndex={0}
                   aria-label={`Focus line ${lineNumber}: ${line}`}
-                  className={`block w-fit mx-auto text-(--landing-ink) outline-none transition-[opacity,transform,color] duration-300 focus-visible:outline-1 focus-visible:outline-offset-8 focus-visible:outline-(--landing-accent) ${
-                    muted ? "opacity-50" : "opacity-100"
-                  } ${active ? "-translate-y-0.5" : "translate-y-0"}`}
+                  className={`mx-auto block w-fit text-(--landing-ink) outline-none transition-[opacity,transform,text-shadow] duration-300 ease-(--ease-out-soft) focus-visible:outline-1 focus-visible:outline-offset-8 focus-visible:outline-(--landing-accent) ${
+                    // Letterpress: highlight above the glyphs, shadow below, so
+                    // the line reads as relief in the paper. Highlight uses the
+                    // spotlight tint so it holds up in all three temperatures.
+                    active
+                      ? "-translate-y-px opacity-100 [text-shadow:0_-1px_0_rgb(var(--landing-light-rgb)),0_1px_1px_color-mix(in_oklab,var(--landing-ink)_22%,transparent)]"
+                      : muted
+                        ? "translate-y-0 opacity-50"
+                        : "translate-y-0 opacity-100"
+                  }`}
                   data-headline-line={lineNumber}
                   onPointerEnter={() => setHoveredLine(lineNumber)}
                   onPointerLeave={() => setHoveredLine(null)}
@@ -317,6 +393,9 @@ export default function LandingHero({ background }: LandingHeroProps) {
             <p className="text-[10px] tracking-[0.08em] text-(--landing-muted) sm:text-xs">
               {landingConfig.hero.specialties}
             </p>
+            {/* Primary CTA. Label is the spotlight tint rather than paper:
+                paper-on-accent is 4.35:1 in the warm preset, under AA at this
+                size; the tint clears 5.3:1 in all three presets. */}
             <button
               ref={ctaRef}
               type="button"
@@ -330,14 +409,24 @@ export default function LandingHero({ background }: LandingHeroProps) {
                 if (!transitioning) setCtaActive(false);
               }}
               onClick={activateExplore}
-              className="group relative mt-4 inline-flex items-center gap-2 text-xs tracking-[0.2em] text-(--landing-accent) uppercase outline-offset-6 after:absolute after:inset-x-0 after:-bottom-1.25 after:h-px after:origin-left after:scale-x-[0.34] after:bg-current after:opacity-45 after:transition-[opacity,transform] after:duration-220 hover:after:scale-x-100 hover:after:opacity-100 focus-visible:after:scale-x-100 focus-visible:after:opacity-100 sm:text-sm"
+              className="group mt-6 inline-flex items-center gap-2.5 bg-(--landing-accent) px-6 py-3 text-[11px] tracking-[0.2em] text-[rgb(var(--landing-light-rgb))] uppercase shadow-[0_10px_30px_-18px_color-mix(in_oklab,var(--landing-accent)_85%,transparent)] outline-offset-4 transition-[background-color,box-shadow,transform] duration-220 ease-(--ease-out-soft) hover:-translate-y-px hover:bg-[color-mix(in_oklab,var(--landing-accent)_86%,var(--landing-ink))] hover:shadow-[0_16px_38px_-18px_color-mix(in_oklab,var(--landing-accent)_75%,transparent)] focus-visible:outline-1 focus-visible:outline-(--landing-ink) active:translate-y-0 sm:text-xs"
             >
               {landingConfig.hero.ctaLabel}
+              {/* Two identical arrows on one track inside a 16px window: the
+                  visible one exits right as its twin enters from the left, so it
+                  reads as continuous forward travel rather than a nudge. */}
               <span
                 aria-hidden="true"
-                className="transition-transform duration-300 group-hover:translate-x-1"
+                className="relative block h-4 w-4 overflow-hidden"
               >
-                →
+                <span className="flex w-8 -translate-x-4 transition-transform duration-320 ease-(--ease-out-soft) group-hover:translate-x-0 group-focus-visible:translate-x-0">
+                  <span className="grid h-4 w-4 shrink-0 place-items-center leading-none">
+                    →
+                  </span>
+                  <span className="grid h-4 w-4 shrink-0 place-items-center leading-none">
+                    →
+                  </span>
+                </span>
               </span>
             </button>
           </div>
@@ -355,6 +444,39 @@ export default function LandingHero({ background }: LandingHeroProps) {
         >
           {focusStatus}
         </p>
+
+        {/* The four easter eggs are otherwise undiscoverable — this is the only
+            on-page pointer to them. One at a time, looping; hover to hold. */}
+        <ul
+          aria-label="Hidden interactions"
+          onPointerEnter={() => setHintsPaused(true)}
+          onPointerLeave={() => setHintsPaused(false)}
+          className={`hidden shrink-0 text-[10px] tracking-[0.14em] text-(--landing-muted) uppercase ${
+            motionDisabled
+              ? "lg:flex lg:items-center lg:gap-4"
+              : "relative h-4 w-56 lg:block"
+          }`}
+        >
+          {easterEggHints.map(([key, label], index) => (
+            <li
+              key={label}
+              className={`flex items-center gap-1.5 ${
+                motionDisabled
+                  ? ""
+                  : `absolute inset-0 justify-center transition-[opacity,transform] duration-500 ease-(--ease-out-soft) ${
+                      index === hintIndex
+                        ? "translate-y-0 opacity-100"
+                        : "translate-y-1 opacity-0"
+                    }`
+              }`}
+            >
+              <kbd className="border border-(--landing-line) px-1.5 py-0.5 font-mono text-(--landing-accent) not-italic">
+                {key}
+              </kbd>
+              {label}
+            </li>
+          ))}
+        </ul>
 
         <button
           type="button"
