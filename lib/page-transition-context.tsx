@@ -11,6 +11,8 @@ import {
 export type CoverOptions = {
   /** Route to navigate to */
   href: string;
+  /** Explicit motion override from a local control. Undefined uses the OS query. */
+  reducedMotion?: boolean;
   /** Element the transition originates from (its center seeds the circle). */
   originEl?: HTMLElement | null;
   /**
