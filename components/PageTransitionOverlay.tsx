@@ -63,6 +63,7 @@ export default function PageTransitionOverlay() {
       originPoint,
       morph,
       slide,
+      shade,
       direction,
       reducedMotion: reducedMotionOverride,
     }: CoverOptions) => {
@@ -200,11 +201,18 @@ export default function PageTransitionOverlay() {
 
       if (!morph && !slide) {
         const reveal = document.documentElement.animate(
-          { clipPath: [clipFrom, clipTo] },
+          shade
+            ? // Shade pull: the new page descends from the top edge. Percentages
+              // for the same reason the circle uses them.
+              { clipPath: ["inset(0 0 100% 0)", "inset(0 0 0 0)"] }
+            : { clipPath: [clipFrom, clipTo] },
           {
             // revealDuration() is a no-op unless localStorage vtSlow=1 (debug).
-            duration: revealDuration(1500),
-            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+            // The shade runs shorter: it is utility navigation, not the CTA.
+            duration: revealDuration(shade ? 700 : 1500),
+            easing: shade
+              ? "cubic-bezier(0.22, 1, 0.36, 1)"
+              : "cubic-bezier(0.4, 0, 0.2, 1)",
             pseudoElement: "::view-transition-new(root)",
           },
         );

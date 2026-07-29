@@ -9,7 +9,13 @@ export default function ConsoleSignature() {
     if (hasLogged) return;
     hasLogged = true;
     console.log(
-      "You found the technical layer. Try holding Option or pressing F on the landing page.",
+      [
+        "Landing page interactions:",
+        "  ⌥ (hold)   technical layer",
+        "  F          lock focus on a headline line",
+        "  develop    semantic layer (2s)",
+        "  dbl-click  cycle paper temperature",
+      ].join("\n"),
     );
   }, []);
 

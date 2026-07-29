@@ -39,6 +39,13 @@ export type CoverOptions = {
    * handler. Used by the sidebar nav and ⌘K section jumps.
    */
   slide?: boolean;
+  /**
+   * When true, the new page descends from the top edge like a shade being
+   * pulled down — no origin needed, so keyboard activation looks identical to
+   * a click. Used by the landing header nav, which sits at that top edge; the
+   * circle reveal stays exclusive to the EXPLORE CTA.
+   */
+  shade?: boolean;
 };
 
 type TransitionCompleteListener = (pathname: string) => void;
