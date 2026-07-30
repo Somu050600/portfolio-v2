@@ -95,7 +95,7 @@ export type ThemeDraft = {
 };
 
 export const THEME_DEFAULTS: ThemeDraft = {
-  mode: "light",
+  mode: "dark",
   darkAccent: "emerald",
   lightAccent: "emerald",
 };
@@ -148,7 +148,7 @@ export const ACCENT_PREPAINT_SCRIPT = `(function(){try{
   var stored=JSON.parse(LS.getItem('theme-accents')||'{}');
   var da=stored.darkAccent||'emerald';
   var la=stored.lightAccent||'emerald';
-  var tm=LS.getItem('theme')||'light';
+  var tm=LS.getItem('theme')||'${THEME_DEFAULTS.mode}';
   var dark=tm==='dark'||(tm==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);
   var A={
     blue:{d:'#3B82F6',l:'#2563EB',fd:'#fff',fl:'#fff'},
