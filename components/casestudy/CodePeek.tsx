@@ -3,6 +3,14 @@
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
+import {
+  caseStudyArtifact,
+  caseStudyCodeBody,
+  caseStudyCodeHeader,
+  caseStudyCodeNote,
+  caseStudyCodeToggle,
+  caseStudyDarkSurface,
+} from "./case-study-classes";
 
 const COLLAPSED = 96; // 6rem peek
 const EXPANDED_MAX = 384; // 24rem
@@ -54,18 +62,26 @@ export default function CodePeek({
   }, [expanded]);
 
   return (
-    <div className="relative border-t border-border-color">
+    <div
+      className={cn(
+        "relative",
+        caseStudyDarkSurface,
+        caseStudyArtifact,
+      )}
+    >
+      <div className={caseStudyCodeHeader}>
+        <span>implementation.tsx</span>
+        <span>{expanded ? "open" : "preview"}</span>
+      </div>
       <div
         ref={divRef}
         data-lenis-prevent
-        className="overflow-hidden px-4 py-4"
+        className="overflow-hidden"
         style={{ maxHeight: COLLAPSED }}
       >
-        {note && (
-          <p className="mb-3 text-sm leading-relaxed text-ink-dim">{note}</p>
-        )}
-        <pre className="overflow-x-auto rounded-lg border border-border-color bg-bg p-3">
-          <code className="font-mono text-[12px] leading-relaxed whitespace-pre text-ink-dim">
+        {note && <p className={caseStudyCodeNote}>{note}</p>}
+        <pre className={caseStudyCodeBody}>
+          <code className="whitespace-pre">
             {code}
           </code>
         </pre>
@@ -73,7 +89,8 @@ export default function CodePeek({
 
       <div
         className={cn(
-          "pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-surface to-transparent transition-opacity duration-200",
+          "pointer-events-none absolute inset-x-0 bottom-0 h-20 transition-opacity duration-200",
+          "bg-linear-to-t from-thumb-bg to-transparent",
           expanded && "opacity-0",
         )}
       />
@@ -82,7 +99,7 @@ export default function CodePeek({
         type="button"
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
-        className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-border-color bg-surface px-3 py-1 font-mono text-[11px] text-ink-dim shadow-sm transition-colors hover:border-ink-faint hover:text-accent"
+        className={caseStudyCodeToggle}
       >
         {expanded ? "Collapse ↑" : "Show code ↓"}
       </button>

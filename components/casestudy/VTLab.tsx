@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useState, type ComponentType } from "react";
+import { caseStudyArtifact } from "./case-study-classes";
 import CodePeek from "./CodePeek";
 import Clip from "./vt-previews/Clip";
 import CrossFade from "./vt-previews/CrossFade";
@@ -82,7 +83,13 @@ export default function VTLab() {
   };
 
   return (
-    <figure className="not-prose overflow-hidden rounded-xl border border-border-color bg-surface">
+    <figure
+      data-cs-artifact
+      className={cn(
+        "not-prose overflow-hidden rounded-xl border border-border-color bg-surface",
+        caseStudyArtifact,
+      )}
+    >
       {/* tabs */}
       <div
         role="tablist"
@@ -113,7 +120,7 @@ export default function VTLab() {
 
       {/* preview stage */}
       <div
-        className="relative flex min-h-[224px] items-center justify-center bg-bg p-6"
+        className="relative flex min-h-56 items-center justify-center bg-bg p-6"
         style={{
           backgroundImage:
             "radial-gradient(circle, var(--border-color) 1px, transparent 1px)",

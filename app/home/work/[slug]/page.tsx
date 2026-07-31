@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import BlockRenderer from "@/components/casestudy/BlockRenderer";
 import CaseStudyMorph from "@/components/casestudy/CaseStudyMorph";
 import CaseStudySidebar from "@/components/casestudy/CaseStudySidebar";
+import {
+  caseStudyArtifact,
+  caseStudyCaption,
+  caseStudyDarkSurface,
+  caseStudyMetaKey,
+  caseStudyMono,
+} from "@/components/casestudy/case-study-classes";
 import Thumbnail from "@/components/thumbnail/Thumbnail";
 import { getCaseStudySlugs, getProjectBySlug } from "@/lib/projects.config";
+import { cn } from "@/lib/utils";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -53,90 +62,179 @@ export default async function CaseStudyPage({ params }: PageProps) {
     id: s.id,
     label: s.heading,
   }));
+  const meta = [
+    { key: "Role", value: project.role },
+    { key: "Team", value: project.team },
+    { key: "Timeframe", value: project.shipped },
+  ].filter((item) => item.value);
+  const heroCaption = project.thumbnail?.alt ?? project.title;
 
   return (
-    <div className="flex min-h-screen bg-bg text-ink">
+    <div className="min-h-screen overflow-x-clip bg-bg text-ink">
       <CaseStudyMorph slug={slug} />
-      <CaseStudySidebar sections={sectionLinks} projectTitle={project.title} />
-      <main
-        data-cs-main
-        className="min-w-0 flex-1 px-6 py-10 md:px-12 md:py-14 lg:px-16"
-      >
-        <header className="mb-12 max-w-3xl border-b border-border-color pb-10">
-          <p
-            data-morph="no"
-            className="mb-2 w-fit font-mono text-xs tracking-[0.2em] text-ink-faint uppercase"
-          >
-            No. {String(project.number).padStart(2, "0")}
-          </p>
-          <h1
-            data-morph="title"
-            className="font-serif text-4xl font-light tracking-tight text-ink md:text-5xl"
-          >
-            {project.title}
-          </h1>
-          <p className="mt-4 text-lg leading-relaxed text-ink-dim">
-            {caseStudy.tagline}
-          </p>
-          <ul className="mt-6 flex flex-wrap gap-2">
-            {caseStudy.tags.map((tag) => (
-              <li
-                key={tag}
-                className="rounded-full border border-border-color bg-surface px-3 py-1 font-mono text-[11px] tracking-wide text-ink-dim uppercase"
+      <div className="grid min-h-screen w-full grid-cols-[264px_minmax(0,1fr)] max-lg:block">
+        <CaseStudySidebar
+          sections={sectionLinks}
+          projectTitle={project.title}
+          externalHref={project.href}
+        />
+        <main
+          data-cs-main
+          className="min-w-0 pt-16 pb-18 max-lg:pt-12 max-[480px]:pt-9 max-[480px]:pb-14"
+        >
+          <article className="relative mx-auto flex w-[min(calc(100%-112px),700px)] flex-col gap-9.5 max-[480px]:w-[min(calc(100%-40px),700px)]">
+            <p
+              data-morph="no"
+              className={cn(
+                caseStudyMono,
+                "w-fit text-[10px] leading-none font-medium tracking-[0.2em] text-ink-faint uppercase",
+              )}
+            >
+              No. {String(project.number).padStart(2, "0")}
+            </p>
+            <h1
+              data-morph="title"
+              className="max-w-[16ch] text-[clamp(34px,3.15vw,44px)] leading-[1.1] font-semibold tracking-[-0.035em] text-ink text-balance"
+            >
+              {project.title}
+            </h1>
+            <p className="text-[clamp(17px,1.35vw,18px)] leading-[1.6] font-normal tracking-[-0.01em] text-ink-dim text-pretty">
+              {caseStudy.tagline}
+            </p>
+            {caseStudy.tags.length > 0 && (
+              <ul className="flex flex-wrap gap-2">
+                {caseStudy.tags.map((tag) => (
+                  <li
+                    key={tag}
+                    className={cn(
+                      caseStudyMono,
+                      "rounded-full border border-border-color bg-surface px-2.5 py-1.75 text-[10px] leading-none font-medium tracking-widest text-ink-faint uppercase",
+                    )}
+                  >
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {meta.length > 0 && (
+              <dl className="grid grid-cols-3 gap-6 border-t border-border-color py-4.25 max-[480px]:grid-cols-1 max-[480px]:gap-3.5">
+                {meta.map((item) => (
+                  <div key={item.key} className="flex min-w-0 flex-col gap-2">
+                    <dt className={caseStudyMetaKey}>{item.key}</dt>
+                    <dd className="text-[14.5px] leading-[1.3] font-medium text-ink">
+                      {item.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            {project.thumbnail ? (
+              <figure
+                data-morph="thumb"
+                className={cn(caseStudyArtifact, "flex flex-col gap-2.5")}
               >
-                {tag}
-              </li>
+                <div
+                  className={cn(
+                    caseStudyDarkSurface,
+                    "shadow-[0_18px_50px_-38px_rgb(0_0_0/0.7)]",
+                  )}
+                >
+                  <Thumbnail
+                    thumbnail={project.thumbnail}
+                    className="rounded-none"
+                  />
+                </div>
+                <figcaption
+                  className={cn(caseStudyCaption, "max-[480px]:px-5")}
+                >
+                  {heroCaption}
+                </figcaption>
+              </figure>
+            ) : caseStudy.hero.image ? (
+              <figure
+                data-morph="thumb"
+                className={cn(caseStudyArtifact, "flex flex-col gap-2.5")}
+              >
+                <div
+                  className={cn(
+                    caseStudyDarkSurface,
+                    "shadow-[0_18px_50px_-38px_rgb(0_0_0/0.7)]",
+                  )}
+                >
+                  <Image
+                    src={caseStudy.hero.image}
+                    alt={project.title}
+                    width={1400}
+                    height={800}
+                    sizes="(max-width: 1023px) 100vw, 700px"
+                    className="block h-auto w-full object-cover"
+                  />
+                </div>
+                <figcaption
+                  className={cn(caseStudyCaption, "max-[480px]:px-5")}
+                >
+                  {heroCaption}
+                </figcaption>
+              </figure>
+            ) : null}
+            {caseStudy.sections.map((section, index) => (
+              <section
+                key={section.id}
+                id={section.id}
+                data-cs-section
+                className="scroll-mt-27 flex flex-col gap-5.5 pt-3"
+              >
+                <header
+                  data-cs-heading
+                  data-section-id={section.id}
+                  className="flex flex-col gap-3.75"
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={cn(
+                        caseStudyMono,
+                        "shrink-0 text-[10px] leading-none font-semibold tracking-[0.16em] text-accent tabular-nums",
+                      )}
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="h-px w-full bg-border-color" aria-hidden />
+                  </div>
+                  <h2 className="max-w-[24ch] text-[clamp(25px,2.3vw,29px)] leading-[1.2] font-semibold tracking-[-0.03em] text-ink text-balance">
+                    {section.heading}
+                  </h2>
+                </header>
+                <BlockRenderer blocks={section.blocks} />
+              </section>
             ))}
-          </ul>
-          <dl className="mt-8 grid gap-4 sm:grid-cols-3">
-            <div>
-              <dt className="font-mono text-xs text-ink-faint uppercase">
-                Role
-              </dt>
-              <dd className="mt-1 text-sm text-ink-dim">{project.role}</dd>
-            </div>
-            <div>
-              <dt className="font-mono text-xs text-ink-faint uppercase">
-                Team
-              </dt>
-              <dd className="mt-1 text-sm text-ink-dim">{project.team}</dd>
-            </div>
-            <div>
-              <dt className="font-mono text-xs text-ink-faint uppercase">
-                Timeframe
-              </dt>
-              <dd className="mt-1 text-sm text-ink-dim">{project.shipped}</dd>
-            </div>
-          </dl>
-          {project.thumbnail && (
-            // Framed on the detail page: the thumbnail's dotted bg-bg stage
-            // matches the canvas, so a border + lift shadow separates it as an
-            // embedded media panel instead of dissolving into the page.
-            <div
-              data-morph="thumb"
-              className="mt-8 max-w-xl overflow-hidden rounded-xl shadow-sm"
-            >
-              <Thumbnail thumbnail={project.thumbnail} />
-            </div>
-          )}
-        </header>
-
-        <div className="mx-auto max-w-3xl">
-          {caseStudy.sections.map((section) => (
-            <section
-              key={section.id}
-              id={section.id}
-              data-cs-section
-              className="scroll-mt-28 mb-16 last:mb-0"
-            >
-              <h2 className="mb-6 font-serif text-2xl font-light text-ink md:text-3xl">
-                {section.heading}
-              </h2>
-              <BlockRenderer blocks={section.blocks} />
-            </section>
-          ))}
-        </div>
-      </main>
+            {caseStudy.sections.length > 0 && (
+              <span
+                data-cs-end
+                className="pointer-events-none absolute bottom-0 left-0 h-px w-px"
+                aria-hidden
+              />
+            )}
+            {project.href && (
+              <footer className="hidden flex-col gap-2 border-t border-border-color pt-5.5 max-lg:flex">
+                <a
+                  href={project.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    caseStudyMono,
+                    "flex w-full items-center justify-between gap-3.5 rounded-[7px] border border-border-color bg-transparent px-2.75 py-2.5 text-[11px] font-medium text-ink",
+                  )}
+                >
+                  <span>Live site</span>
+                  <span className="text-accent" aria-hidden>
+                    ↗
+                  </span>
+                </a>
+              </footer>
+            )}
+          </article>
+        </main>
+      </div>
     </div>
   );
 }

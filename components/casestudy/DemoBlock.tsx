@@ -3,6 +3,15 @@
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
+import {
+  caseStudyArtifact,
+  caseStudyCaption,
+  caseStudyCodeBody,
+  caseStudyCodeHeader,
+  caseStudyCodeNote,
+  caseStudyCodeToggle,
+  caseStudyDarkSurface,
+} from "./case-study-classes";
 import { demoRegistry } from "./demos/registry";
 
 const COLLAPSED = 96; // 6rem peek
@@ -56,28 +65,31 @@ export default function DemoBlock({
   const { label, Component, how } = entry;
 
   return (
-    <figure className="not-prose overflow-hidden rounded-xl border border-border-color bg-surface">
-      <div className="border-b border-border-color px-4 py-2">
-        <span className="font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
-          {label}
-        </span>
+    <figure
+      className={cn(
+        "not-prose",
+        caseStudyDarkSurface,
+        caseStudyArtifact,
+      )}
+    >
+      <div className={caseStudyCodeHeader}>
+        <span>{label}</span>
+        <span>interactive</span>
       </div>
 
       {/* Demo stage — dotted grid on the base bg, so the component (its own
           elevated card) reads as sitting on a canvas, distinct from the frame. */}
-      <div
-        className="flex justify-center bg-bg p-6"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, var(--border-color) 1px, transparent 1px)",
-          backgroundSize: "15px 15px",
-        }}
-      >
+      <div className="flex justify-center bg-thumb-bg bg-[radial-gradient(circle,var(--thumb-border)_1px,transparent_1px)] bg-size-[15px_15px] p-6">
         <Component />
       </div>
 
       {caption && (
-        <figcaption className="border-t border-border-color px-4 py-3 font-mono text-[10px] tracking-wide text-ink-faint">
+        <figcaption
+          className={cn(
+            caseStudyCaption,
+            "border-t border-thumb-border px-3.5 py-2.5 text-thumb-ink-faint",
+          )}
+        >
           {caption}
         </figcaption>
       )}
@@ -85,18 +97,22 @@ export default function DemoBlock({
       {/* How it works — note + code, collapsed together (shadcn-style peek).
           Outer = positioning context (fade + button stay put); inner = the
           clamped/animated block that scrolls when expanded. */}
-      <div className="relative border-t border-border-color">
+      <div className="relative border-t border-thumb-border">
+        <div className={caseStudyCodeHeader}>
+          <span>implementation.tsx</span>
+          <span>{expanded ? "open" : "preview"}</span>
+        </div>
         <div
           ref={divRef}
           data-lenis-prevent
-          className="overflow-hidden px-4 py-4"
+          className="overflow-hidden"
           style={{ maxHeight: COLLAPSED }}
         >
-          <p className="mb-3 text-sm leading-relaxed text-ink-dim">
+          <p className={caseStudyCodeNote}>
             {how.note}
           </p>
-          <pre className="overflow-x-auto rounded-lg border border-border-color bg-bg p-3">
-            <code className="font-mono text-[12px] leading-relaxed whitespace-pre text-ink-dim">
+          <pre className={caseStudyCodeBody}>
+            <code className="whitespace-pre">
               {how.code}
             </code>
           </pre>
@@ -105,7 +121,8 @@ export default function DemoBlock({
         {/* fade mask — only while collapsed */}
         <div
           className={cn(
-            "pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-surface to-transparent transition-opacity duration-200",
+            "pointer-events-none absolute inset-x-0 bottom-0 h-20 transition-opacity duration-200",
+            "bg-linear-to-t from-thumb-bg to-transparent",
             expanded && "opacity-0",
           )}
         />
@@ -115,7 +132,7 @@ export default function DemoBlock({
           type="button"
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-border-color bg-surface px-3 py-1 font-mono text-[11px] text-ink-dim shadow-sm transition-colors hover:border-ink-faint hover:text-accent"
+          className={caseStudyCodeToggle}
         >
           {expanded ? "Collapse ↑" : "Show code ↓"}
         </button>

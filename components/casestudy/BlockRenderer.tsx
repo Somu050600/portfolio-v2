@@ -1,13 +1,20 @@
 import type { Block } from "@/lib/projects.config";
-import { accentCalloutStyles } from "@/lib/projects.config";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import {
+  caseStudyArtifact,
+  caseStudyCaption,
+  caseStudyDarkSurface,
+  caseStudyMetaKey,
+  caseStudyMono,
+  caseStudyProse,
+} from "./case-study-classes";
 import DemoBlock from "./DemoBlock";
 import VTLab from "./VTLab";
 
 function TokenMismatchDiagram() {
   return (
-    <figure className="not-prose">
+    <figure className={cn("not-prose", caseStudyArtifact)}>
       <div className="rounded-xl border border-border-color bg-surface overflow-hidden">
         <p className="px-4 pt-3 pb-2 font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
           How tokens got lost in translation
@@ -63,7 +70,7 @@ function CompliancePipelineDiagram() {
     { label: "PDF", sub: "pixel-accurate, matches Figma layout", note: "✓ output" },
   ];
   return (
-    <figure className="not-prose">
+    <figure className={cn("not-prose", caseStudyArtifact)}>
       <div className="rounded-xl border border-border-color bg-surface overflow-hidden px-5 py-4">
         <p className="mb-4 font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
           Report generation pipeline
@@ -126,7 +133,7 @@ function DualRenderDiagram() {
     "page-break-inside: avoid on rows",
   ];
   return (
-    <figure className="not-prose">
+    <figure className={cn("not-prose", caseStudyArtifact)}>
       <div className="rounded-xl border border-border-color bg-surface overflow-hidden">
         <p className="px-4 pt-3 pb-3 font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
           Same HTML — two stylesheets
@@ -199,7 +206,7 @@ function MemoryBlowupDiagram() {
     },
   ];
   return (
-    <figure className="not-prose">
+    <figure className={cn("not-prose", caseStudyArtifact)}>
       <div className="rounded-xl border border-border-color bg-surface overflow-hidden">
         <p className="px-4 pt-3 pb-4 font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
           Report-generation pod memory
@@ -260,7 +267,7 @@ function VtApproachesDiagram() {
     "interpolates position with the page slide",
   ];
   return (
-    <figure className="not-prose">
+    <figure className={cn("not-prose", caseStudyArtifact)}>
       <div className="overflow-hidden rounded-xl border border-border-color bg-surface">
         <p className="px-4 pt-3 pb-3 font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
           Two ways to move a bar across a navigation
@@ -315,11 +322,7 @@ function ParagraphBlock({
   emphasis?: string[];
 }) {
   if (emphasis.length === 0) {
-    return (
-      <p className="text-base leading-relaxed text-ink-dim md:text-lg">
-        {text}
-      </p>
-    );
+    return <p className={caseStudyProse}>{text}</p>;
   }
 
   const parts: React.ReactNode[] = [];
@@ -339,9 +342,7 @@ function ParagraphBlock({
   }
   if (remaining) parts.push(remaining);
 
-  return (
-    <p className="text-base leading-relaxed text-ink-dim md:text-lg">{parts}</p>
-  );
+  return <p className={caseStudyProse}>{parts}</p>;
 }
 
 function BlockItem({ block }: { block: Block }) {
@@ -351,9 +352,17 @@ function BlockItem({ block }: { block: Block }) {
 
     case "image":
       return (
-        <figure>
+        <figure
+          className={cn(
+            "flex min-w-0 flex-col gap-2.5",
+            caseStudyArtifact,
+          )}
+        >
           <div
-            className="relative w-full overflow-hidden rounded-xl border border-border-color"
+            className={cn(
+              "relative w-full shadow-[0_18px_50px_-38px_rgb(0_0_0/0.7)]",
+              caseStudyDarkSurface,
+            )}
             style={{ height: block.height ?? 360 }}
           >
             <Image
@@ -365,49 +374,46 @@ function BlockItem({ block }: { block: Block }) {
             />
           </div>
           {block.caption && (
-            <figcaption className="mt-2 font-mono text-xs text-ink-faint">
+            <figcaption
+              className={cn(caseStudyCaption, "max-[480px]:px-5")}
+            >
               {block.caption}
             </figcaption>
           )}
         </figure>
       );
 
-    case "callout": {
-      const styles = accentCalloutStyles[block.accent];
+    case "callout":
       return (
-        <aside
-          className={cn(
-            "rounded-xl border px-5 py-4 text-sm leading-relaxed md:text-base",
-            styles.bg,
-            styles.border,
-            styles.text,
-          )}
-        >
+        <blockquote className="border-l-2 border-accent py-0.5 pl-4.5 text-lg leading-[1.55] font-medium tracking-[-0.02em] text-ink text-pretty">
           {block.text}
-        </aside>
+        </blockquote>
       );
-    }
 
     case "list":
       if (block.ordered) {
         return (
-          <ol className="flex flex-col gap-6">
+          <ol className="flex flex-col gap-4 text-ink-dim">
             {block.items.map((item, i) => (
-              <li key={i} className="flex gap-4">
-                {item.num && (
-                  <span className="shrink-0 font-mono text-sm text-ink-faint">
-                    {item.num}
-                  </span>
-                )}
-                <div>
+              <li
+                key={i}
+                className="grid grid-cols-[32px_minmax(0,1fr)] gap-3"
+              >
+                <span
+                  className={cn(
+                    caseStudyMono,
+                    "text-[10.5px] leading-normal font-medium text-ink-faint tabular-nums",
+                  )}
+                >
+                  {item.num ?? String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="flex flex-col gap-1.25">
                   {item.title && (
-                    <p className="mb-1 font-serif text-lg text-ink">
+                    <p className="text-base leading-[1.35] font-semibold text-ink">
                       {item.title}
                     </p>
                   )}
-                  <p className="text-sm leading-relaxed text-ink-dim md:text-base">
-                    {item.text}
-                  </p>
+                  <p className={caseStudyProse}>{item.text}</p>
                 </div>
               </li>
             ))}
@@ -415,9 +421,9 @@ function BlockItem({ block }: { block: Block }) {
         );
       }
       return (
-        <ul className="flex list-disc flex-col gap-2 pl-5 text-ink-dim">
+        <ul className="flex list-disc flex-col gap-4 pl-5 text-ink-dim">
           {block.items.map((item, i) => (
-            <li key={i} className="leading-relaxed">
+            <li key={i} className={caseStudyProse}>
               {item.title && (
                 <span className="font-medium text-ink">{item.title}: </span>
               )}
@@ -429,16 +435,19 @@ function BlockItem({ block }: { block: Block }) {
 
     case "metrics":
       return (
-        <dl className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+        <dl
+          className={cn(
+            "grid grid-cols-3 gap-2.5 max-[480px]:grid-cols-1",
+            caseStudyArtifact,
+          )}
+        >
           {block.items.map((item) => (
             <div
               key={item.label}
-              className="rounded-xl border border-border-color bg-surface px-4 py-5"
+              className="flex flex-col-reverse gap-2 rounded-lg border border-border-color bg-surface p-4"
             >
-              <dt className="font-mono text-xs tracking-wide text-ink-faint uppercase">
-                {item.label}
-              </dt>
-              <dd className="mt-1 font-serif text-3xl font-light text-ink">
+              <dt className={caseStudyMetaKey}>{item.label}</dt>
+              <dd className="text-[25px] leading-[1.2] font-semibold tracking-[-0.03em] text-ink">
                 {item.value}
               </dd>
             </div>
@@ -468,7 +477,7 @@ function BlockItem({ block }: { block: Block }) {
 
 export default function BlockRenderer({ blocks }: { blocks: Block[] }) {
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
+    <div className="flex flex-col gap-5.5">
       {blocks.map((block, i) => (
         <BlockItem key={i} block={block} />
       ))}

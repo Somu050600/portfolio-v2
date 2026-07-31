@@ -159,6 +159,7 @@
   --color-thumb-ink: var(--thumb-ink);
   --color-thumb-ink-dim: var(--thumb-ink-dim);
   --color-thumb-ink-faint: var(--thumb-ink-faint);
+  --color-thumb-bg: var(--thumb-bg);
   --color-thumb-border: var(--thumb-border);
 
   /* shadcn utilities (keep working) */

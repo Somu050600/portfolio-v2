@@ -1,11 +1,27 @@
 "use client";
 
-import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useLenis } from "lenis/react";
-import { PageTransitionContext, usePageTransition } from "@/lib/page-transition-context";
 import { componentAttrs } from "@/lib/build-mode";
-import { cn } from "@/lib/utils";
 import { tagEl } from "@/lib/morph";
+import {
+  PageTransitionContext,
+  usePageTransition,
+} from "@/lib/page-transition-context";
+import { cn } from "@/lib/utils";
+import { caseStudyMono } from "./case-study-classes";
+import {
+  createSectionSelector,
+  getSectionProgress,
+  type ObservedSection,
+} from "./case-study-navigation";
 
 export type SectionLink = {
   id: string;
@@ -15,11 +31,13 @@ export type SectionLink = {
 type CaseStudySidebarProps = {
   sections: SectionLink[];
   projectTitle: string;
+  externalHref?: string;
 };
 
 export default function CaseStudySidebar({
   sections,
   projectTitle,
+  externalHref,
 }: CaseStudySidebarProps) {
   const cover = usePageTransition();
   const { subscribeTransitionComplete } = useContext(PageTransitionContext);
@@ -28,136 +46,85 @@ export default function CaseStudySidebar({
   const sidebarRef = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState(sections[0]?.id ?? "");
-  const listRef = useRef<HTMLUListElement>(null);
-  const pillRef = useRef<HTMLSpanElement>(null);
-  const tocRef = useRef<HTMLElement>(null);
-
-  const movePillTo = useCallback((item: HTMLElement | null) => {
-    const pill = pillRef.current;
-    const list = listRef.current;
-    if (!pill || !list) return;
-    if (!item) {
-      pill.style.opacity = "0";
-      return;
-    }
-    const itemRect = item.getBoundingClientRect();
-    const listRect = list.getBoundingClientRect();
-    pill.style.transform = `translateY(${itemRect.top - listRect.top}px)`;
-    pill.style.height = `${itemRect.height}px`;
-    pill.style.opacity = "1";
-  }, []);
-
-  const itemForId = useCallback(
-    (id: string) =>
-      listRef.current?.querySelector<HTMLElement>(
-        `[data-cs-toc-item][data-section="${id}"]`,
-      ) ?? null,
-    [],
+  const orderedIds = useMemo(
+    () => sections.map((section) => section.id),
+    [sections],
   );
+  const progress = getSectionProgress(activeId, orderedIds);
 
-  // Scroll-spy
   useEffect(() => {
-    const sectionEls = sections
-      .map((s) => document.getElementById(s.id))
-      .filter((el): el is HTMLElement => !!el);
+    const headings = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-cs-heading]"),
+    ).filter((heading) => {
+      const id = heading.dataset.sectionId;
+      return id ? orderedIds.includes(id) : false;
+    });
 
-    if (sectionEls.length === 0) return;
+    if (headings.length === 0) return;
+    const selector = createSectionSelector(orderedIds);
 
-    let scheduled = false;
-    const updateActive = () => {
-      scheduled = false;
-      const line = window.innerHeight * 0.28;
-      const nearBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 4;
+    const readActiveSection = () => {
+      const positions: ObservedSection[] = headings.map((heading) => ({
+        id: heading.dataset.sectionId ?? "",
+        top: heading.getBoundingClientRect().top,
+      }));
 
-      if (nearBottom) {
-        const last = sectionEls[sectionEls.length - 1];
-        if (last) setActiveId(last.id);
-        return;
-      }
-
-      let chosen: string | null = null;
-      for (const sec of sectionEls) {
-        if (sec.getBoundingClientRect().top <= line) {
-          chosen = sec.id;
-        } else {
-          break;
-        }
-      }
-      if (!chosen) chosen = sectionEls[0]?.id ?? null;
-      if (chosen) setActiveId(chosen);
+      setActiveId((current) =>
+        selector.select(
+          positions,
+          current,
+          window.innerHeight * 0.28,
+        ),
+      );
     };
 
-    const schedule = () => {
-      if (scheduled) return;
-      scheduled = true;
-      if (document.visibilityState === "visible") {
-        requestAnimationFrame(updateActive);
-      } else {
-        setTimeout(updateActive, 16);
-      }
-    };
+    const observer = new IntersectionObserver(
+      () => readActiveSection(),
+      {
+        rootMargin: "-24% 0px -66% 0px",
+        threshold: [0, 1],
+      },
+    );
 
-    window.addEventListener("scroll", schedule, { passive: true });
-    updateActive();
-    const t = setTimeout(updateActive, 60);
+    headings.forEach((heading) => observer.observe(heading));
+    const articleEnd = document.querySelector<HTMLElement>("[data-cs-end]");
+    const endObserver = articleEnd
+      ? new IntersectionObserver(
+          ([entry]) => {
+            selector.setArticleEndVisible(!!entry?.isIntersecting);
+            readActiveSection();
+          },
+          { threshold: 0 },
+        )
+      : null;
+    if (articleEnd) endObserver?.observe(articleEnd);
 
     return () => {
-      window.removeEventListener("scroll", schedule);
-      clearTimeout(t);
+      observer.disconnect();
+      endObserver?.disconnect();
     };
-  }, [sections]);
+  }, [orderedIds]);
 
   useEffect(() => {
-    movePillTo(itemForId(activeId));
-  }, [activeId, movePillTo, itemForId]);
-
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-
-    const onResize = () => movePillTo(itemForId(activeId));
-    window.addEventListener("resize", onResize);
-
-    const items = list.querySelectorAll<HTMLElement>("[data-cs-toc-item]");
-    const onEnter = (e: Event) => movePillTo(e.currentTarget as HTMLElement);
-    const onLeave = () => movePillTo(itemForId(activeId));
-
-    items.forEach((item) => item.addEventListener("mouseenter", onEnter));
-    list.addEventListener("mouseleave", onLeave);
-
-    return () => {
-      window.removeEventListener("resize", onResize);
-      items.forEach((item) => item.removeEventListener("mouseenter", onEnter));
-      list.removeEventListener("mouseleave", onLeave);
+    const media = window.matchMedia("(min-width: 1024px)");
+    const closeDisclosure = (event: MediaQueryListEvent) => {
+      if (event.matches) setOpen(false);
     };
-  }, [activeId, movePillTo, itemForId]);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const onChange = (e: MediaQueryListEvent) => {
-      if (e.matches) setOpen(false);
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+    media.addEventListener("change", closeDisclosure);
+    return () => media.removeEventListener("change", closeDisclosure);
   }, []);
 
-  // Assign cs-sidebar view-transition-name so the VT can animate it:
-  //  - forward nav: new-page snapshot captures sidebar → ::view-transition-new(cs-sidebar) slides in
-  //  - back nav: home click re-applies the name before cover() → ::view-transition-old(cs-sidebar) slides out
-  // Cleared after each transition so theme-toggle/other VTs don't capture it separately.
   useLayoutEffect(() => {
     const aside = sidebarRef.current;
     if (!aside || !document.startViewTransition) return;
     aside.style.viewTransitionName = "cs-sidebar";
-    const unsub = subscribeTransitionComplete(() => {
+    const unsubscribe = subscribeTransitionComplete(() => {
       aside.style.viewTransitionName = "";
-      unsub();
+      unsubscribe();
     });
     return () => {
       aside.style.viewTransitionName = "";
-      unsub();
+      unsubscribe();
     };
   }, [subscribeTransitionComplete]);
 
@@ -169,7 +136,7 @@ export default function CaseStudySidebar({
     ).matches;
 
     if (lenis && !reduced) {
-      lenis.scrollTo(target, { offset: -112, immediate: reduced });
+      lenis.scrollTo(target, { offset: -96 });
     } else {
       target.scrollIntoView({
         behavior: reduced ? "auto" : "smooth",
@@ -178,6 +145,7 @@ export default function CaseStudySidebar({
     }
 
     history.replaceState(null, "", `#${id}`);
+    setActiveId(id);
     setOpen(false);
   };
 
@@ -187,164 +155,188 @@ export default function CaseStudySidebar({
     ).matches;
 
     if (lenis && !reduced) {
-      lenis.scrollTo(0, { immediate: reduced });
+      lenis.scrollTo(0);
     } else {
       window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
     }
 
-    history.replaceState(null, "", " ");
+    history.replaceState(null, "", window.location.pathname);
     setOpen(false);
   };
 
+  const navigateHome = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    const willMorph =
+      !!document.startViewTransition &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (willMorph) {
+      const aside = sidebarRef.current;
+      if (aside) aside.style.viewTransitionName = "cs-sidebar";
+      tagEl(document.querySelector<HTMLElement>("[data-cs-main]"));
+    }
+
+    cover({
+      href: "/home",
+      originEl: homeRef.current,
+      direction: "backward",
+      morph: willMorph,
+    });
+  };
+
   return (
-    <>
-      <button
-        type="button"
-        aria-label="Open table of contents"
-        aria-expanded={open}
-        onClick={() => setOpen(true)}
-        className={cn(
-          "fixed top-1/2 left-0 z-40 flex -translate-y-1/2 items-center gap-1 rounded-r-xl bg-surface px-2 py-3.5 shadow-md lg:hidden",
-          open && "pointer-events-none opacity-0",
-        )}
-      >
-        <span className="flex flex-col gap-[3px]" aria-hidden>
-          <span className="block h-[3px] w-[3px] rounded-full bg-ink-dim" />
-          <span className="block h-[3px] w-[3px] rounded-full bg-ink-dim" />
-          <span className="block h-[3px] w-[3px] rounded-full bg-ink-dim" />
-        </span>
-        <span className="font-mono text-base" aria-hidden>
-          ›
-        </span>
-      </button>
-
-      <button
-        type="button"
-        aria-label="Close navigation"
-        tabIndex={-1}
-        onClick={() => setOpen(false)}
-        className={cn(
-          "fixed inset-0 z-40 bg-ink/35 transition-opacity lg:hidden",
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
-        )}
-      />
-
-      <aside
-        ref={sidebarRef}
-        data-cs-sidebar
-        data-open={open ? "" : undefined}
-        data-lenis-prevent
-        {...componentAttrs(
-          "CaseStudySidebar",
-          "Scroll-spy case study TOC — replaces home sidebar on /work/*.",
-        )}
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-sidebar-bg px-6 py-8 motion-reduce:transition-none",
-          "transition-transform duration-300 ease-(--ease-out-soft)",
-          open ? "translate-x-0 shadow-xl" : "-translate-x-full",
-          "lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[300px] lg:translate-x-0",
-        )}
-      >
+    <aside
+      ref={sidebarRef}
+      data-cs-sidebar
+      data-open={open ? "" : undefined}
+      data-empty={sections.length === 0 ? "" : undefined}
+      data-lenis-prevent
+      {...componentAttrs(
+        "CaseStudySidebar",
+        "Sticky case-study contents with section progress and scroll spy.",
+      )}
+      className="group sticky top-0 left-0 z-20 h-screen w-66 self-start overflow-y-auto border-r border-border-color bg-sidebar-bg px-5.5 py-8 scrollbar-thin max-lg:z-50 max-lg:h-auto max-lg:w-full max-lg:overflow-visible max-lg:border-r-0 max-lg:border-b max-lg:bg-bg/95 max-lg:px-5 max-lg:py-3 max-lg:backdrop-blur-lg max-lg:data-empty:hidden"
+    >
+      {sections.length > 0 && (
         <button
           type="button"
-          aria-label="Close navigation"
-          onClick={() => setOpen(false)}
-          className="absolute top-3.5 right-3.5 flex h-8 w-8 items-center justify-center rounded-full text-xl text-ink-dim hover:bg-surface lg:hidden"
+          aria-controls="case-study-contents"
+          aria-expanded={open}
+          onClick={() => setOpen((current) => !current)}
+          className={cn(
+            caseStudyMono,
+            "hidden min-h-9.5 w-full items-center justify-between gap-4 px-2.5 text-[9.5px] leading-none font-semibold tracking-[0.18em] uppercase tabular-nums max-lg:flex",
+          )}
         >
-          ×
-        </button>
-
-        <p className="mb-6 font-mono text-[11px] tracking-[0.18em] text-ink-faint uppercase">
-          {projectTitle}
-        </p>
-
-        <a
-          ref={homeRef}
-          href="/home"
-          onClick={(e) => {
-            e.preventDefault();
-            const willMorph =
-              !!document.startViewTransition &&
-              !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            if (willMorph) {
-              // Re-apply cs-sidebar name (was cleared after forward VT)
-              // so the back VT snapshot captures it for the slide-out animation.
-              const aside = sidebarRef.current;
-              if (aside) aside.style.viewTransitionName = "cs-sidebar";
-              tagEl(document.querySelector<HTMLElement>("[data-cs-main]"));
-            }
-            cover({
-              href: "/home",
-              originEl: homeRef.current,
-              direction: "backward",
-              morph: willMorph,
-            });
-          }}
-          className="group mb-8 inline-flex items-center gap-2 font-mono text-sm text-ink-dim hover:text-ink"
-        >
-          <span className="transition-transform group-hover:-translate-x-0.5 motion-reduce:transition-none">
-            ←
+          <span className="tracking-normal text-ink-faint">
+            {progress.label}
           </span>
-          Home
-        </a>
+          <span className="text-ink-dim">
+            Contents {open ? "▴" : "▾"}
+          </span>
+        </button>
+      )}
 
-        <nav ref={tocRef} aria-label="Case study sections" data-cs-toc>
-          <p className="mb-3 font-mono text-[11px] tracking-[0.18em] text-ink-dim uppercase">
-            Table of Contents
+      <div
+        id="case-study-contents"
+        className="flex min-h-[calc(100vh-64px)] flex-col gap-6.5 max-lg:hidden max-lg:max-h-[calc(100vh-63px)] max-lg:min-h-0 max-lg:overflow-y-auto max-lg:px-2.5 max-lg:pt-5 max-lg:pb-2.5 max-lg:group-data-open:flex"
+      >
+        <div className="flex flex-col gap-3.25 max-lg:hidden">
+          <p
+            className={cn(
+              caseStudyMono,
+              "text-[10px] leading-[1.35] font-medium tracking-[0.14em] text-ink-faint uppercase",
+            )}
+          >
+            {projectTitle}
           </p>
-          <div className="relative">
-            <span
-              ref={pillRef}
-              data-cs-toc-pill
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 rounded-lg bg-surface opacity-0 motion-reduce:transition-none"
-              style={{
-                transition:
-                  "transform 280ms var(--ease-out-soft), height 280ms var(--ease-out-soft), opacity 200ms var(--ease-out-soft)",
-              }}
-            />
-            <ul
-              ref={listRef}
-              data-cs-toc-list
-              className="relative flex flex-col gap-0.5"
+          <a
+            ref={homeRef}
+            href="/home"
+            onClick={navigateHome}
+            className={cn(
+              caseStudyMono,
+              "inline-flex w-fit items-center gap-2 text-[13.5px] leading-[1.4] font-medium text-ink",
+            )}
+          >
+            <span aria-hidden>←</span>
+            <span>Home</span>
+          </a>
+        </div>
+
+        {sections.length > 0 && (
+          <nav
+            className="flex flex-col gap-2.5"
+            aria-label="Case study sections"
+          >
+            <div
+              className={cn(
+                caseStudyMono,
+                "flex items-center justify-between gap-4 px-2.5 text-[9.5px] leading-none font-semibold tracking-[0.18em] uppercase tabular-nums",
+              )}
             >
-              {sections.map((section, idx) => {
-                const label = `${String(idx + 1).padStart(2, "0")}. ${section.label}`;
+              <span className="text-ink-dim">Contents</span>
+              <span className="tracking-normal text-ink-faint">
+                {progress.label}
+              </span>
+            </div>
+            <ol className="flex flex-col gap-px">
+              {sections.map((section, index) => {
                 const isActive = section.id === activeId;
                 return (
                   <li key={section.id}>
                     <button
                       type="button"
-                      data-cs-toc-item
-                      data-section={section.id}
                       data-current={isActive ? "" : undefined}
+                      aria-current={isActive ? "location" : undefined}
                       onClick={() => scrollToSection(section.id)}
                       className={cn(
-                        "w-full rounded-lg px-3 py-2.5 text-left font-mono text-[13px] tracking-wide transition-colors",
-                        isActive ? "text-ink" : "text-ink-dim hover:text-ink",
+                        "grid w-full grid-cols-[24px_minmax(0,1fr)] items-baseline gap-2 rounded-[7px] px-2.5 py-2.25 text-left transition-[color,background-color,box-shadow] duration-150 motion-reduce:transition-none",
+                        isActive
+                          ? "bg-surface [box-shadow:inset_2px_0_0_var(--accent),0_1px_3px_rgb(0_0_0/0.08)]"
+                          : "hover:bg-black/[0.035] dark:hover:bg-white/3",
                       )}
                     >
-                      {label}
+                      <span
+                        className={cn(
+                          caseStudyMono,
+                          "text-[10.5px] leading-normal font-medium tabular-nums",
+                          isActive
+                            ? "font-semibold text-accent"
+                            : "text-ink-faint",
+                        )}
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-[15px] leading-[1.35] font-medium",
+                          isActive
+                            ? "font-semibold text-ink"
+                            : "text-ink-dim",
+                        )}
+                      >
+                        {section.label}
+                      </span>
                     </button>
                   </li>
                 );
               })}
-            </ul>
+            </ol>
+          </nav>
+        )}
+
+        {externalHref && (
+          <div className="flex flex-col gap-2 border-t border-border-color pt-5.5 max-lg:hidden">
+            <a
+              href={externalHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                caseStudyMono,
+                "flex w-full items-center justify-between gap-3.5 rounded-[7px] border border-border-color bg-transparent px-2.75 py-2.5 text-[11px] font-medium text-ink",
+              )}
+            >
+              <span>Live site</span>
+              <span className="text-accent" aria-hidden>
+                ↗
+              </span>
+            </a>
           </div>
-        </nav>
+        )}
 
         <button
           type="button"
-          data-cs-back-to-top
           onClick={scrollToTop}
-          className="group mt-auto inline-flex items-center gap-2 pt-10 font-mono text-sm text-ink-dim hover:text-ink"
+          className={cn(
+            caseStudyMono,
+            "mt-auto inline-flex w-fit items-center gap-2 text-[11px] font-medium text-ink-faint max-lg:hidden",
+          )}
         >
-          <span className="transition-transform group-hover:-translate-y-0.5 motion-reduce:transition-none">
-            ↑
-          </span>
-          Back to top
+          <span aria-hidden>↑</span>
+          <span>Back to top</span>
         </button>
-      </aside>
-    </>
+      </div>
+    </aside>
   );
 }
