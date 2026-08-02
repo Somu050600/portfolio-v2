@@ -17,12 +17,13 @@ import {
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { useAccent } from "./AccentProvider";
 
 // ---------------------------------------------------------------------------
 // Gear icon — exported so Header / Sidebar can mount the full panel anywhere
 // ---------------------------------------------------------------------------
-export function ThemeCustomizerTrigger() {
+export function ThemeCustomizerTrigger({ className }: { className?: string }) {
   return (
     <Tooltip>
       {/*
@@ -37,7 +38,10 @@ export function ThemeCustomizerTrigger() {
               <button
                 type="button"
                 aria-label="Customize theme"
-                className="flex size-9 items-center justify-center rounded-full text-ink-dim transition-colors hover:bg-ink/8 hover:text-ink"
+                className={cn(
+                  "flex size-9 items-center justify-center rounded-full text-ink-dim transition-colors hover:bg-ink/8 hover:text-ink",
+                  className,
+                )}
               />
             }
           />

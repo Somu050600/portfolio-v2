@@ -3,6 +3,7 @@
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
 import { flushSync } from "react-dom";
+import { cn } from "@/lib/utils";
 import {
   ThemeCustomizer,
   ThemeCustomizerTrigger,
@@ -21,7 +22,11 @@ const SLANT_WIPE_KEYFRAMES = {
  * Header theme controls: quick sun/moon toggle + gear icon opening the
  * full theme editor (ThemeCustomizer panel).
  */
-export default function ThemeToggle() {
+export default function ThemeToggle({
+  variant = "default",
+}: {
+  variant?: "default" | "sidebar";
+}) {
   const { resolvedTheme, setTheme } = useTheme();
   const mounted = useSyncExternalStore(
     subscribeNoop,
@@ -54,13 +59,16 @@ export default function ThemeToggle() {
 
   return (
     <ThemeCustomizer>
-      <div className="flex items-center gap-1">
+      <div className={cn("flex items-center", variant === "default" ? "gap-1" : "gap-0.5")}>
         {/* Quick mode toggle */}
         <button
           type="button"
           onClick={toggleTheme}
           aria-label="Toggle theme"
-          className="flex size-9 items-center justify-center rounded-full text-ink transition-colors hover:bg-ink/8"
+          className={cn(
+            "flex items-center justify-center text-ink transition-colors hover:bg-ink/8",
+            variant === "default" ? "size-9 rounded-full" : "size-7 rounded-md",
+          )}
         >
           <span className={mounted ? "contents" : "invisible"}>
             {mounted && resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
@@ -68,7 +76,9 @@ export default function ThemeToggle() {
         </button>
 
         {/* Gear icon — opens ThemeCustomizer */}
-        <ThemeCustomizerTrigger />
+        <ThemeCustomizerTrigger
+          className={variant === "sidebar" ? "size-7 rounded-md" : undefined}
+        />
       </div>
     </ThemeCustomizer>
   );

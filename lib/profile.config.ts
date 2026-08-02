@@ -1,6 +1,9 @@
 export const profile = {
   name: "Eega Somasekhara Reddy",
   handle: "Somu",
+  role: "Frontend developer",
+  availability: "Open to work",
+  timeZone: "Asia/Kolkata",
   /** Canonical production origin — drives metadataBase, OG, sitemap, JSON-LD. */
   url: "https://eega.dev",
   tagline: "Frontend developer — I ship things that survive real data.",

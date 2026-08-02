@@ -1,30 +1,37 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useMediaQuery } from "@/components/landing/use-media-query";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { componentAttrs, UI_EVENTS } from "@/lib/build-mode";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { profile } from "@/lib/profile.config";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import PixelPet from "./PixelPet";
+import { useLocalTime } from "./sidebar-time";
 import TableOfContents from "./TableOfContents";
 
-type SidebarProps = {
-  children?: ReactNode;
-};
-
-export default function Sidebar({ children }: SidebarProps) {
+export default function Sidebar() {
   const [open, setOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const localTime = useLocalTime(profile.timeZone);
   const cover = usePageTransition();
   const pathname = usePathname();
 
-  // The handle is the "/home" (Work) entry — slide to it like a TOC item.
   const onHandleClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
+    (event: React.MouseEvent<HTMLAnchorElement>) => {
       setOpen(false);
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      e.preventDefault();
+      if (
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      event.preventDefault();
       if (pathname === "/home") return;
       cover({ href: "/home", slide: true });
     },
@@ -32,191 +39,156 @@ export default function Sidebar({ children }: SidebarProps) {
   );
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const onChange = (e: MediaQueryListEvent) => {
-      if (e.matches) setOpen(false);
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
     };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
   return (
     <>
-      {/* Mobile tab */}
-      <button
-        type="button"
-        aria-label="Open navigation"
-        aria-expanded={open}
-        onClick={() => setOpen(true)}
-        className={cn(
-          "fixed top-1/2 left-0 z-40 flex -translate-y-1/2 items-center gap-1 rounded-r-xl bg-surface px-2 py-3.5 shadow-md lg:hidden",
-          open && "pointer-events-none opacity-0",
-        )}
-      >
-        <span className="flex flex-col gap-[3px]" aria-hidden>
-          <span className="block h-[3px] w-[3px] rounded-full bg-ink-dim" />
-          <span className="block h-[3px] w-[3px] rounded-full bg-ink-dim" />
-          <span className="block h-[3px] w-[3px] rounded-full bg-ink-dim" />
-        </span>
-        <span className="font-mono text-base text-ink" aria-hidden>
-          ›
-        </span>
-      </button>
-
-      {/* Backdrop */}
-      <button
-        type="button"
-        aria-label="Close navigation"
-        tabIndex={-1}
-        onClick={() => setOpen(false)}
-        className={cn(
-          "fixed inset-0 z-40 bg-ink/35 transition-opacity lg:hidden",
-          open
-            ? "pointer-events-auto opacity-100"
-            : "pointer-events-none opacity-0",
-        )}
-      />
-
       <aside
-        data-open={open ? "" : undefined}
         data-lenis-prevent
         {...componentAttrs(
           "Sidebar",
-          "Persistent home shell — nav, contact, theme controls, and ⌘K entry.",
+          "Sticky home rail with router navigation, live status, Pixel, contact, and utilities.",
         )}
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[min(85vw,300px)] flex-col overflow-y-auto border-r border-border-color bg-sidebar-bg px-6 py-8 transition-transform duration-300 ease-(--ease-out-soft) motion-reduce:transition-none lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[300px] lg:translate-x-0 lg:shadow-none",
-          open
-            ? "translate-x-0 shadow-xl"
-            : "-translate-x-full lg:translate-x-0",
-        )}
+        className="sticky top-0 z-50 flex w-full shrink-0 flex-col border-b border-border-color bg-sidebar-bg/95 px-5 py-3 backdrop-blur-lg lg:h-screen lg:w-75 lg:overflow-y-auto lg:border-r lg:border-b-0 lg:bg-sidebar-bg lg:px-6.5 lg:pt-9.5 lg:pb-5.5 lg:backdrop-blur-none"
       >
-        <button
-          type="button"
-          aria-label="Close navigation"
-          onClick={() => setOpen(false)}
-          className="absolute top-3.5 right-3.5 flex h-8 w-8 items-center justify-center rounded-full text-xl text-ink-dim hover:bg-surface hover:text-ink lg:hidden"
-        >
-          ×
-        </button>
-
-        <div className="mb-8">
-          <Link
-            href="/home"
-            className="font-serif text-3xl font-light tracking-tight text-ink"
-            onClick={onHandleClick}
+        <div className="flex items-baseline justify-between gap-4 lg:hidden">
+          <Wordmark onClick={onHandleClick} />
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls="home-mobile-menu"
+            onClick={() => setOpen((current) => !current)}
+            className="flex items-center gap-2 [font-family:var(--font-home-jetbrains)] text-[10px] leading-none font-semibold tracking-[0.14em] text-ink-dim uppercase transition-colors hover:text-ink"
           >
-            {profile.handle}
-          </Link>
-          <p className="mt-1 font-mono text-xs tracking-wide text-ink-dim uppercase">
-            {profile.tagline}
-          </p>
-          <p className="mt-4 text-sm leading-relaxed text-ink-dim">
-            {profile.bio}
-          </p>
+            <span>MENU</span>
+            <span aria-hidden>{open ? "▴" : "▾"}</span>
+          </button>
         </div>
 
-        <TableOfContents />
-
-        <div className="mt-auto pt-10">
-          <p className="mb-3 font-mono text-[11px] tracking-[0.18em] text-ink-dim uppercase">
-            Contact
-          </p>
-          <ul className="flex flex-col gap-2 text-sm">
-            <li>
-              <a
-                href={`mailto:${profile.contact.email}`}
-                className="text-ink-dim underline-offset-2 transition-colors hover:text-accent hover:underline"
-              >
-                {profile.contact.email}
-              </a>
-            </li>
-            <li>
-              <a
-                href={profile.contact.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group text-ink-faint transition-colors hover:text-accent"
-              >
-                GitHub{" "}
-                <span className="font-mono text-[10px]">
-                  <span
-                    aria-hidden
-                    className="inline-block transition-transform group-hover:translate-x-0.5"
-                  >
-                    →
-                  </span>
-                </span>
-              </a>
-            </li>
-            <li>
-              <a
-                href={profile.contact.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group text-ink-faint transition-colors hover:text-accent"
-              >
-                LinkedIn{" "}
-                <span className="font-mono text-[10px]">
-                  <span
-                    aria-hidden
-                    className="inline-block transition-transform group-hover:translate-x-0.5"
-                  >
-                    →
-                  </span>
-                </span>
-              </a>
-            </li>
-            <li>
-              <a
-                href={profile.contact.resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group text-ink-dim underline-offset-2 transition-colors hover:text-accent hover:underline"
-              >
-                Résumé{" "}
-                <span
-                  aria-hidden
-                  className="inline-block underline-offset-0 transition-transform group-hover:translate-y-0.5"
-                >
-                  ↓
-                </span>
-              </a>
-            </li>
-          </ul>
-
-          <div className="mt-6 flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={() =>
-                window.dispatchEvent(
-                  new CustomEvent(UI_EVENTS.commandPaletteOpen),
-                )
-              }
-              className="flex w-full items-center justify-between rounded-lg border border-border-color bg-elevated px-3 py-2 font-mono text-[11px] tracking-wide text-ink-dim transition-colors hover:border-ink-faint hover:text-ink"
-              {...componentAttrs(
-                "CommandPaletteTrigger",
-                "Fuzzy command menu — navigate, theme, build mode, links.",
-              )}
-            >
-              <span>Command palette</span>
-              <span className="text-ink-faint">⌘K</span>
-            </button>
-            <ThemeToggle />
+        {open && (
+          <div
+            id="home-mobile-menu"
+            data-mobile-menu
+            className="flex flex-col gap-6 pt-6 lg:hidden"
+          >
+            <TableOfContents onNavigate={() => setOpen(false)} />
+            <StatusRow localTime={localTime} />
+            <UtilityRow />
           </div>
-        </div>
+        )}
 
-        {children}
+        <div className="hidden min-h-0 flex-1 flex-col gap-6 lg:flex">
+          <Wordmark onClick={onHandleClick} />
+          <TableOfContents />
+          <StatusRow localTime={localTime} />
+
+          <div data-sidebar-spacer aria-hidden className="flex-1" />
+
+          {isDesktop && <PixelPet />}
+          <ContactGroup />
+          <UtilityRow />
+        </div>
       </aside>
     </>
+  );
+}
+
+function Wordmark({
+  onClick,
+}: {
+  onClick: (event: React.MouseEvent<HTMLAnchorElement>) => void;
+}) {
+  return (
+    <div className="flex items-baseline gap-2.25">
+      <Link
+        href="/home"
+        onClick={onClick}
+        className="[font-family:var(--font-home-instrument)] text-[20px] leading-none text-ink transition-colors hover:text-accent"
+      >
+        {profile.handle}
+      </Link>
+      <p className="[font-family:var(--font-home-jetbrains)] text-[9.5px] leading-none font-medium tracking-[0.14em] text-ink-faint uppercase">
+        {profile.role}
+      </p>
+    </div>
+  );
+}
+
+function StatusRow({ localTime }: { localTime: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        aria-hidden
+        className="size-1.5 shrink-0 animate-pulse rounded-full bg-accent animation-duration-[3.4s] [box-shadow:0_0_0_3px_color-mix(in_srgb,var(--accent)_16%,transparent)]"
+      />
+      <p className="[font-family:var(--font-home-poppins)] text-[12.5px] leading-none font-medium text-ink-dim">
+        {profile.availability}
+      </p>
+      <time className="ml-auto [font-family:var(--font-home-jetbrains)] text-[10.5px] leading-none font-medium text-ink-faint tabular-nums">
+        {localTime}
+      </time>
+    </div>
+  );
+}
+
+function ContactGroup() {
+  return (
+    <div className="flex flex-col gap-3 border-t border-border-color pt-4">
+      <a
+        href={`mailto:${profile.contact.email}`}
+        className="w-fit [font-family:var(--font-home-poppins)] text-[13.5px] leading-none font-medium text-ink transition-colors hover:text-accent"
+      >
+        Email me
+      </a>
+      <div className="flex flex-wrap gap-4 [font-family:var(--font-home-poppins)] text-[12.5px] leading-none font-medium text-ink-dim">
+        <SocialLink href={profile.contact.github}>GitHub</SocialLink>
+        <SocialLink href={profile.contact.linkedin}>LinkedIn</SocialLink>
+        <SocialLink href={profile.contact.resumeUrl}>Résumé</SocialLink>
+      </div>
+    </div>
+  );
+}
+
+function SocialLink({ children, href }: { children: string; href: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="transition-colors hover:text-ink"
+    >
+      {children}
+    </a>
+  );
+}
+
+function UtilityRow() {
+  return (
+    <div className="flex items-center gap-3.5 border-t border-border-color pt-3.75">
+      <ThemeToggle variant="sidebar" />
+      <button
+        type="button"
+        onClick={() =>
+          window.dispatchEvent(new CustomEvent(UI_EVENTS.commandPaletteOpen))
+        }
+        className="ml-auto flex items-center gap-2 [font-family:var(--font-home-jetbrains)] text-[10px] leading-none font-medium tracking-[0.12em] text-ink-faint uppercase transition-colors hover:text-ink"
+        {...componentAttrs(
+          "CommandPaletteTrigger",
+          "Open the existing fuzzy command menu.",
+        )}
+      >
+        <span>Search</span>
+        <span className="rounded-lg border border-border-color px-1.25 py-0.75 tracking-normal text-ink-dim">
+          ⌘K
+        </span>
+      </button>
+    </div>
   );
 }
