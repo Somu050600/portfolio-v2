@@ -6,7 +6,6 @@ import { componentAttrs, UI_EVENTS } from "@/lib/build-mode";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { profile } from "@/lib/profile.config";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import PixelPet from "./PixelPet";
 import { useLocalTime } from "./sidebar-time";
@@ -17,9 +16,8 @@ export default function Sidebar() {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const localTime = useLocalTime(profile.timeZone);
   const cover = usePageTransition();
-  const pathname = usePathname();
 
-  const onHandleClick = useCallback(
+  const onWordmarkClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
       setOpen(false);
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
@@ -27,10 +25,13 @@ export default function Sidebar() {
       }
 
       event.preventDefault();
-      if (pathname === "/home") return;
-      cover({ href: "/home", slide: true });
+      cover({
+        href: "/",
+        originEl: event.currentTarget,
+        direction: "backward",
+      });
     },
-    [cover, pathname],
+    [cover],
   );
 
   useEffect(() => {
@@ -54,7 +55,7 @@ export default function Sidebar() {
         className="sticky top-0 z-50 flex w-full shrink-0 flex-col border-b border-border-color bg-sidebar-bg/95 px-5 py-3 backdrop-blur-lg lg:h-screen lg:w-75 lg:overflow-y-auto lg:border-r lg:border-b-0 lg:bg-sidebar-bg lg:px-6.5 lg:pt-9.5 lg:pb-5.5 lg:backdrop-blur-none"
       >
         <div className="flex items-baseline justify-between gap-4 lg:hidden">
-          <Wordmark onClick={onHandleClick} />
+          <Wordmark onClick={onWordmarkClick} />
           <button
             type="button"
             aria-expanded={open}
@@ -80,7 +81,7 @@ export default function Sidebar() {
         )}
 
         <div className="hidden min-h-0 flex-1 flex-col gap-6 lg:flex">
-          <Wordmark onClick={onHandleClick} />
+          <Wordmark onClick={onWordmarkClick} />
           <TableOfContents />
           <StatusRow localTime={localTime} />
 
@@ -103,7 +104,7 @@ function Wordmark({
   return (
     <div className="flex items-baseline gap-2.25">
       <Link
-        href="/home"
+        href="/"
         onClick={onClick}
         className="[font-family:var(--font-home-instrument)] text-[20px] leading-none text-ink transition-colors hover:text-accent"
       >

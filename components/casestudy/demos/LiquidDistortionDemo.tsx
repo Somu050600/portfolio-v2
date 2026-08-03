@@ -78,7 +78,18 @@ void main() {
 
 type LiquidDistortionDemoProps = {
   className?: string;
+  autoplay?: boolean;
+  variant?: "playground" | "thumbnail";
 };
+
+export function getLiquidPreviewPointer(timeMs: number) {
+  const seconds = timeMs / 1_000;
+
+  return {
+    x: 0.5 + Math.sin(seconds * 1.35) * 0.28,
+    y: 0.5 + Math.cos(seconds * 0.9) * 0.22,
+  };
+}
 
 type Runtime = {
   renderer: THREE.WebGLRenderer;
@@ -167,10 +178,13 @@ function makeTargets(width: number, height: number) {
 
 export default function LiquidDistortionDemo({
   className,
+  autoplay = false,
+  variant = "playground",
 }: LiquidDistortionDemoProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<Runtime | null>(null);
   const frameRef = useRef<number | null>(null);
+  const lastPointerMoveRef = useRef(Number.NEGATIVE_INFINITY);
   const pointerRef = useRef({
     mouse: new THREE.Vector2(0.5, 0.5),
     last: new THREE.Vector2(0.5, 0.5),
@@ -298,6 +312,7 @@ export default function LiquidDistortionDemo({
 
     function onPointerMove(event: PointerEvent) {
       const rect = root.getBoundingClientRect();
+      lastPointerMoveRef.current = performance.now();
       pointer.mouse.set(
         (event.clientX - rect.left) / rect.width,
         1 - (event.clientY - rect.top) / rect.height,
@@ -308,9 +323,14 @@ export default function LiquidDistortionDemo({
       pointer.vel.set(0, 0);
     }
 
-    function frame() {
+    function frame(timeMs: number) {
       const runtime = runtimeRef.current;
       if (!runtime) return;
+
+      if (autoplay && timeMs - lastPointerMoveRef.current > 900) {
+        const previewPointer = getLiquidPreviewPointer(timeMs);
+        pointer.mouse.set(previewPointer.x, previewPointer.y);
+      }
 
       pointer.vel.set(
         (pointer.mouse.x - pointer.last.x) * sensitivity,
@@ -341,7 +361,7 @@ export default function LiquidDistortionDemo({
     root.addEventListener("pointermove", onPointerMove);
     root.addEventListener("pointerleave", onPointerLeave);
     resize();
-    frame();
+    frameRef.current = requestAnimationFrame(frame);
 
     return () => {
       resizeObserver.disconnect();
@@ -363,7 +383,7 @@ export default function LiquidDistortionDemo({
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [clearTargets]);
+  }, [autoplay, clearTargets]);
 
   const updateTrail = (value: number) => {
     setTrail(value);
@@ -383,57 +403,65 @@ export default function LiquidDistortionDemo({
     if (runtime) runtime.simMat.uniforms.uRadius.value = value / 10000;
   };
 
+  const isThumbnail = variant === "thumbnail";
+
   return (
     <div
       ref={rootRef}
       className={cn(
-        "relative isolate h-[420px] w-full overflow-hidden rounded-lg border border-border-color bg-black",
+        isThumbnail
+          ? "relative isolate h-full w-full overflow-hidden bg-black"
+          : "relative isolate h-105 w-full overflow-hidden rounded-lg border border-border-color bg-black",
         className,
       )}
       style={{ touchAction: "none" }}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-4 p-4">
-        <span className="font-mono text-[10px] tracking-[0.18em] text-white/55 uppercase">
-          Momentum field
-        </span>
-        <span className="hidden font-mono text-[10px] tracking-[0.14em] text-white/45 uppercase sm:block">
-          Swipe fast vs slow
-        </span>
-      </div>
+      {!isThumbnail && (
+        <>
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-4 p-4">
+            <span className="font-mono text-[10px] tracking-[0.18em] text-white/55 uppercase">
+              Momentum field
+            </span>
+            <span className="hidden font-mono text-[10px] tracking-[0.14em] text-white/45 uppercase sm:block">
+              Swipe fast vs slow
+            </span>
+          </div>
 
-      <div className="absolute bottom-4 left-4 z-20 w-[min(236px,calc(100%-2rem))] rounded-lg border border-white/10 bg-[#080b18]/70 px-4 py-3 font-mono text-[11px] text-slate-300 shadow-2xl backdrop-blur-md">
-        <Control
-          label="Trail / viscosity"
-          value={trail.toFixed(2)}
-          min={90}
-          max={99}
-          sliderValue={Math.round(trail * 100)}
-          onChange={(value) => updateTrail(value / 100)}
-        />
-        <Control
-          label="Distortion"
-          value={strength.toFixed(2)}
-          min={5}
-          max={50}
-          sliderValue={Math.round(strength * 100)}
-          onChange={(value) => updateStrength(value / 100)}
-        />
-        <Control
-          label="Ripple size"
-          value={String(size)}
-          min={8}
-          max={60}
-          sliderValue={size}
-          onChange={updateSize}
-        />
-        <button
-          type="button"
-          onClick={clearTargets}
-          className="mt-1 w-full rounded-md border border-white/10 px-3 py-2 text-[10px] tracking-[0.14em] text-slate-300 uppercase transition-colors hover:border-white/25 hover:text-white"
-        >
-          Reset field
-        </button>
-      </div>
+          <div className="absolute bottom-4 left-4 z-20 w-[min(236px,calc(100%-2rem))] rounded-lg border border-white/10 bg-[#080b18]/70 px-4 py-3 font-mono text-[11px] text-slate-300 shadow-2xl backdrop-blur-md">
+            <Control
+              label="Trail / viscosity"
+              value={trail.toFixed(2)}
+              min={90}
+              max={99}
+              sliderValue={Math.round(trail * 100)}
+              onChange={(value) => updateTrail(value / 100)}
+            />
+            <Control
+              label="Distortion"
+              value={strength.toFixed(2)}
+              min={5}
+              max={50}
+              sliderValue={Math.round(strength * 100)}
+              onChange={(value) => updateStrength(value / 100)}
+            />
+            <Control
+              label="Ripple size"
+              value={String(size)}
+              min={8}
+              max={60}
+              sliderValue={size}
+              onChange={updateSize}
+            />
+            <button
+              type="button"
+              onClick={clearTargets}
+              className="mt-1 w-full rounded-md border border-white/10 px-3 py-2 text-[10px] tracking-[0.14em] text-slate-300 uppercase transition-colors hover:border-white/25 hover:text-white"
+            >
+              Reset field
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

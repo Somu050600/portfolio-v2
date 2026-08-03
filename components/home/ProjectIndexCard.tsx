@@ -26,12 +26,8 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
-  useState,
-  type KeyboardEvent,
   type MouseEvent,
-  type PointerEvent as ReactPointerEvent,
 } from "react";
-import { getTouchCardAction } from "./work-card-layout";
 
 // useLayoutEffect on the client, useEffect on the server, to avoid SSR warnings.
 const useIsoLayoutEffect =
@@ -141,7 +137,7 @@ function CardContent({
 
           <div
             data-card-meta
-            className="max-h-0 overflow-hidden transition-[max-height] duration-360 ease-[cubic-bezier(.22,.7,.25,1)] group-hover:max-h-37.5 group-data-[touch-expanded=true]:max-h-37.5 motion-reduce:max-h-37.5"
+            className="max-h-0 overflow-hidden transition-[max-height] duration-360 ease-[cubic-bezier(.22,.7,.25,1)] group-hover:max-h-37.5 motion-reduce:max-h-37.5"
           >
             <dl className="flex flex-col gap-2 border-t border-dotted border-border-color pt-3">
               <MetaRow label="Role" value={role} />
@@ -183,8 +179,6 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   const { subscribeTransitionComplete } = useContext(PageTransitionContext);
   const cardRef = useRef<HTMLAnchorElement>(null);
   const prefetched = useRef(false);
-  const pointerType = useRef("");
-  const [touchExpanded, setTouchExpanded] = useState(false);
   const hasCaseStudy = !!caseStudy;
   const targetHref = external
     ? href
@@ -234,34 +228,6 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     router.prefetch(targetHref);
   };
 
-  const recordPointerType = (event: ReactPointerEvent) => {
-    pointerType.current = event.pointerType;
-  };
-
-  const handleCardClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (
-      getTouchCardAction(pointerType.current, touchExpanded) === "reveal"
-    ) {
-      event.preventDefault();
-      setTouchExpanded(true);
-      return;
-    }
-
-    handleClick(event);
-  };
-
-  const toggleArticleMeta = () => {
-    if (pointerType.current === "touch") {
-      setTouchExpanded((expanded) => !expanded);
-    }
-  };
-
-  const onArticleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    setTouchExpanded((expanded) => !expanded);
-  };
-
   // Backward morph: if a back-navigation targeted this card's slug, tag it on
   // mount (before the overlay resolves the nav → before the new snapshot) so
   // the browser pairs it with the outgoing case study.
@@ -285,12 +251,9 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
       <a
         ref={cardRef}
         href={targetHref}
-        onClick={handleCardClick}
-        onPointerDown={recordPointerType}
+        onClick={handleClick}
         onPointerEnter={prefetch}
         onFocus={prefetch}
-        data-touch-expanded={touchExpanded}
-        aria-expanded={touchExpanded}
         className={cardClass}
         style={cardStyle}
         {...inspect}
@@ -305,13 +268,6 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     <article
       className={cardClass}
       style={cardStyle}
-      onClick={toggleArticleMeta}
-      onPointerDown={recordPointerType}
-      onKeyDown={onArticleKeyDown}
-      data-touch-expanded={touchExpanded}
-      role="button"
-      tabIndex={0}
-      aria-expanded={touchExpanded}
       {...inspect}
     >
       <CardContent {...contentProps} featured={featured} />

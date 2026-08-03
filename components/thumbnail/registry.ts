@@ -18,5 +18,9 @@ export const registry: Partial<
   flip: dynamic(() => import("./treatments/FlipCard"), { ssr: false }),
   ascii: dynamic(() => import("./treatments/AsciiRender"), { ssr: false }),
   replay: dynamic(() => import("./treatments/ReplayDemo"), { ssr: false }),
+  "liquid-distortion": dynamic(
+    () => import("./treatments/LiquidDistortionPreview"),
+    { ssr: false },
+  ),
   "vt-cycle": dynamic(() => import("./treatments/VTCycle"), { ssr: false }),
 };

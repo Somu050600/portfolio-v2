@@ -548,12 +548,12 @@ export const projects: Project[] = [
     tech: ["Three.js", "GLSL", "React"],
     tilt: 0.5,
     thumbnail: {
-      kind: "generative",
-      alt: "Liquid distortion preview",
+      kind: "liquid-distortion",
+      alt: "Liquid distortion playground with a warped cyan, teal, and violet momentum field",
       poster: "/posters/liquid-distortion.svg",
-      params: { sketch: "fluid-dye", height: 228 },
+      params: { height: 228 },
     },
-    note: "Shader distortion WIP — card uses shared fluid-dye sketch as preview.",
+    note: "Shader distortion WIP — playground preview mounts on hover.",
     caseStudy: {
       tagline:
         "A liquid effect that does not simulate water so much as it borrows the one thing water makes visible: momentum.",

@@ -10,6 +10,7 @@ export type ThumbnailKind =
   | "flip"
   | "video"
   | "replay"
+  | "liquid-distortion"
   | "vt-cycle";
 
 export interface Thumbnail {

@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
   arrangeWorkProjects,
-  getTouchCardAction,
   getWorkListReserveHeight,
 } from "./work-card-layout";
 
@@ -42,17 +41,6 @@ describe("work-card arrangement", () => {
       featured: null,
       columns: [[], []],
     });
-  });
-});
-
-describe("touch metadata reveal", () => {
-  test("uses the first touch to reveal details and the next touch to navigate", () => {
-    expect(getTouchCardAction("touch", false)).toBe("reveal");
-    expect(getTouchCardAction("touch", true)).toBe("navigate");
-  });
-
-  test("does not delay mouse navigation", () => {
-    expect(getTouchCardAction("mouse", false)).toBe("navigate");
   });
 });
 

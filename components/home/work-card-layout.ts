@@ -18,13 +18,6 @@ export function arrangeWorkProjects<T extends NumberedProject>(
   };
 }
 
-export function getTouchCardAction(
-  pointerType: string,
-  expanded: boolean,
-): "reveal" | "navigate" {
-  return pointerType === "touch" && !expanded ? "reveal" : "navigate";
-}
-
 export function getWorkListReserveHeight(
   contentHeight: number,
   containerWidth: number,

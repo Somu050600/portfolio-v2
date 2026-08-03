@@ -1,8 +1,15 @@
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { expect, test } from "bun:test";
+import { expect, mock, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { profile } from "@/lib/profile.config";
+
+mock.module("next/navigation", () => ({
+  usePathname: () => "/home",
+  useRouter: () => ({ prefetch: () => {} }),
+}));
+
+const { default: Sidebar } = await import("./Sidebar");
 
 test("keeps sidebar status and timezone in profile configuration", () => {
   expect(profile.role).toBe("Frontend developer");
@@ -29,6 +36,11 @@ test("loads home-sidebar fonts from the home layout", () => {
 
 test("React server rendering remains available to home component tests", () => {
   expect(renderToStaticMarkup(<span>home</span>)).toBe("<span>home</span>");
+});
+
+test("links the Somu wordmark back to the landing page", () => {
+  const markup = renderToStaticMarkup(<Sidebar />);
+  expect(markup).toContain('href="/"');
 });
 
 test("keeps Pixel isolated in a token-backed desktop card", () => {

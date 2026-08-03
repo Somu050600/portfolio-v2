@@ -42,7 +42,6 @@ export default function CaseStudySidebar({
   const cover = usePageTransition();
   const { subscribeTransitionComplete } = useContext(PageTransitionContext);
   const lenis = useLenis();
-  const homeRef = useRef<HTMLAnchorElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState(sections[0]?.id ?? "");
@@ -178,7 +177,7 @@ export default function CaseStudySidebar({
 
     cover({
       href: "/home",
-      originEl: homeRef.current,
+      originEl: event.currentTarget,
       direction: "backward",
       morph: willMorph,
     });
@@ -195,27 +194,39 @@ export default function CaseStudySidebar({
         "CaseStudySidebar",
         "Sticky case-study contents with section progress and scroll spy.",
       )}
-      className="group sticky top-0 left-0 z-20 h-screen w-66 self-start overflow-y-auto border-r border-border-color bg-sidebar-bg px-5.5 py-8 scrollbar-thin max-lg:z-50 max-lg:h-auto max-lg:w-full max-lg:overflow-visible max-lg:border-r-0 max-lg:border-b max-lg:bg-bg/95 max-lg:px-5 max-lg:py-3 max-lg:backdrop-blur-lg max-lg:data-empty:hidden"
+      className="group sticky top-0 left-0 z-20 h-screen w-66 self-start overflow-y-auto border-r border-border-color bg-sidebar-bg px-5.5 py-8 scrollbar-thin max-lg:z-50 max-lg:h-auto max-lg:w-full max-lg:overflow-visible max-lg:border-r-0 max-lg:border-b max-lg:bg-bg/95 max-lg:px-5 max-lg:py-3 max-lg:backdrop-blur-lg"
     >
-      {sections.length > 0 && (
-        <button
-          type="button"
-          aria-controls="case-study-contents"
-          aria-expanded={open}
-          onClick={() => setOpen((current) => !current)}
-          className={cn(
-            caseStudyMono,
-            "hidden min-h-9.5 w-full items-center justify-between gap-4 px-2.5 text-[9.5px] leading-none font-semibold tracking-[0.18em] uppercase tabular-nums max-lg:flex",
-          )}
-        >
-          <span className="tracking-normal text-ink-faint">
-            {progress.label}
-          </span>
-          <span className="text-ink-dim">
-            Contents {open ? "▴" : "▾"}
-          </span>
-        </button>
-      )}
+      <div className="hidden min-h-9.5 items-center gap-2 max-lg:flex">
+        <MobileCaseStudyBackLink onClick={navigateHome} />
+        {sections.length > 0 ? (
+          <button
+            type="button"
+            aria-controls="case-study-contents"
+            aria-expanded={open}
+            onClick={() => setOpen((current) => !current)}
+            className={cn(
+              caseStudyMono,
+              "flex min-h-9.5 flex-1 items-center justify-between gap-4 px-2.5 text-[9.5px] leading-none font-semibold tracking-[0.18em] uppercase tabular-nums",
+            )}
+          >
+            <span className="tracking-normal text-ink-faint">
+              {progress.label}
+            </span>
+            <span className="text-ink-dim">
+              Contents {open ? "▴" : "▾"}
+            </span>
+          </button>
+        ) : (
+          <p
+            className={cn(
+              caseStudyMono,
+              "min-w-0 truncate px-2.5 text-[10px] leading-none font-medium tracking-[0.14em] text-ink-faint uppercase",
+            )}
+          >
+            {projectTitle}
+          </p>
+        )}
+      </div>
 
       <div
         id="case-study-contents"
@@ -231,7 +242,6 @@ export default function CaseStudySidebar({
             {projectTitle}
           </p>
           <a
-            ref={homeRef}
             href="/home"
             onClick={navigateHome}
             className={cn(
@@ -338,5 +348,26 @@ export default function CaseStudySidebar({
         </button>
       </div>
     </aside>
+  );
+}
+
+function MobileCaseStudyBackLink({
+  onClick,
+}: {
+  onClick: (event: React.MouseEvent<HTMLAnchorElement>) => void;
+}) {
+  return (
+    <a
+      data-mobile-case-study-back
+      href="/home"
+      onClick={onClick}
+      aria-label="Back to home"
+      className={cn(
+        caseStudyMono,
+        "inline-flex size-9.5 shrink-0 items-center justify-center rounded-full border border-border-color bg-surface text-[15px] leading-none text-ink transition-[color,border-color,background-color] hover:border-accent hover:bg-elevated hover:text-accent",
+      )}
+    >
+      <span aria-hidden>←</span>
+    </a>
   );
 }
