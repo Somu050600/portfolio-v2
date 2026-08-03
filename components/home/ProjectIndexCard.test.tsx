@@ -20,3 +20,16 @@ test("renders case-study cards as direct links without a touch expansion gate", 
   expect(markup).not.toContain("data-touch-expanded");
   expect(markup).not.toContain('aria-expanded="false"');
 });
+
+test("renders upcoming projects without thumbnail panels", () => {
+  for (const slug of ["fluid-sim", "perf-pass"]) {
+    const project = projects.find((item) => item.slug === slug);
+    expect(project).toBeDefined();
+    if (!project) continue;
+
+    const markup = renderToStaticMarkup(<ProjectIndexCard {...project} />);
+
+    expect(markup).toContain("COMING SOON");
+    expect(markup).not.toContain('data-morph="thumb"');
+  }
+});

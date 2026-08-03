@@ -1,5 +1,10 @@
 export type Category = "pro" | "creative" | "more";
-export type Status = "SHIPPED" | "INTERNSHIP" | "IN PROGRESS" | "OPEN SOURCE";
+export type Status =
+  | "SHIPPED"
+  | "INTERNSHIP"
+  | "IN PROGRESS"
+  | "OPEN SOURCE"
+  | "COMING SOON";
 export type Accent = "blue" | "teal" | "orange" | "green" | "neutral";
 
 import type { Thumbnail } from "./thumbnail";
@@ -845,7 +850,7 @@ export const projects: Project[] = [
     role: "Full-Stack Engineer",
     team: "Platform Security",
     shipped: "2023",
-    status: "SHIPPED",
+    status: "COMING SOON",
     tech: ["SAML", "Node.js", "AWS", "Slack API"],
     tilt: -0.6,
   },
@@ -858,7 +863,7 @@ export const projects: Project[] = [
     role: "Creative Dev",
     team: "Solo",
     shipped: "2025",
-    status: "SHIPPED",
+    status: "COMING SOON",
     tech: ["SVG", "GSAP", "CSS Masks"],
     tilt: -0.9,
   },
@@ -871,18 +876,11 @@ export const projects: Project[] = [
     role: "Creative Dev",
     team: "Solo",
     shipped: "2024",
-    status: "OPEN SOURCE",
+    status: "COMING SOON",
     tech: ["WebGL2", "GLSL", "TypeScript"],
     tilt: -1.5,
-    external: true,
-    href: "https://github.com/Somu050600",
-    thumbnail: {
-      kind: "generative",
-      alt: "Fluid simulation preview",
-      poster: "/posters/fluid-dye.svg",
-      params: { sketch: "fluid-dye", height: 240 },
-    },
-    note: "Card-mount fluid dye sketch — also a full-screen playground experiment.",
+    // external: true,
+    // href: "https://github.com/Somu050600",
   },
   {
     slug: "perf-pass",
@@ -894,15 +892,9 @@ export const projects: Project[] = [
     role: "Frontend Engineer",
     team: "Core Web",
     shipped: "2023",
-    status: "SHIPPED",
+    status: "COMING SOON",
     tech: ["Webpack", "React", "Lighthouse", "CDN"],
     tilt: 1.1,
-    thumbnail: {
-      kind: "image",
-      alt: "Performance Pass preview",
-      poster: "/posters/design-system.svg",
-      params: { height: 200 },
-    },
   },
 
   // ── More (compact list) ────────────────────────────────────────────────────
