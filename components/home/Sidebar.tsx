@@ -47,6 +47,7 @@ export default function Sidebar() {
   return (
     <>
       <aside
+        data-home-sidebar
         data-lenis-prevent
         {...componentAttrs(
           "Sidebar",

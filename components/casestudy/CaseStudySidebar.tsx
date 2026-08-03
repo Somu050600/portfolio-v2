@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { useLenis } from "lenis/react";
+import { ArrowLeftIcon } from "lucide-react";
 import { componentAttrs } from "@/lib/build-mode";
 import { tagEl } from "@/lib/morph";
 import {
@@ -367,7 +368,7 @@ function MobileCaseStudyBackLink({
         "inline-flex size-9.5 shrink-0 items-center justify-center rounded-full border border-border-color bg-surface text-[15px] leading-none text-ink transition-[color,border-color,background-color] hover:border-accent hover:bg-elevated hover:text-accent",
       )}
     >
-      <span aria-hidden>←</span>
+      <ArrowLeftIcon aria-hidden className="size-4" strokeWidth={1.75} />
     </a>
   );
 }

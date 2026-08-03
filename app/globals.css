@@ -316,8 +316,9 @@ html:not([data-vt-group-anim])::view-transition-group(root) {
 /* ==========================================================================
    HOME SECTION SLIDE — directional vertical push between the four sections.
    The content pane is only named while [data-slide-active] is set, so this
-   never disturbs the root circle-reveal or the cs-* morph. The sidebar stays
-   unnamed → it rides in root (animation: none) and sits still.
+   never disturbs the root circle-reveal or the cs-* morph. On mobile, the
+   sticky navbar gets its own stable shared group so it is not repainted as
+   part of both moving root snapshots.
    Both snapshots are clipped to one viewport from the top so the push reads
    as a clean screen swap rather than a fast scroll on tall pages.
    ========================================================================== */
@@ -325,6 +326,23 @@ html[data-slide-active] .home-content {
   view-transition-name: home-content;
   overflow: clip;
   max-height: 100svh;
+}
+
+@media (width < 64rem) {
+  html[data-slide-active] [data-home-sidebar] {
+    view-transition-name: home-sidebar;
+  }
+
+  html[data-slide-active]::view-transition-group(home-sidebar) {
+    z-index: 2;
+    animation: none;
+  }
+
+  html[data-slide-active]::view-transition-old(home-sidebar),
+  html[data-slide-active]::view-transition-new(home-sidebar) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
 }
 
 /* Active-nav accent bar: named only while sliding, so the browser tweens its

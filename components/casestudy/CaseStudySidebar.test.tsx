@@ -13,4 +13,5 @@ test("renders a mobile back control that links to the home page", () => {
   expect(markup).toContain('href="/home"');
   expect(markup).toContain('aria-label="Back to home"');
   expect(markup).toContain("data-mobile-case-study-back");
+  expect(markup).toContain("lucide-arrow-left");
 });

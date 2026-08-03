@@ -93,6 +93,21 @@ test("composes the desktop rail and mobile disclosure from the same sidebar", ()
   expect(sidebarSource).toContain('className="sticky top-0');
 });
 
+test("isolates the sticky mobile navbar from sliding page snapshots", () => {
+  const markup = renderToStaticMarkup(<Sidebar />);
+  const globalStylesPath = fileURLToPath(
+    new URL("../../app/globals.css", import.meta.url),
+  );
+  const globalStyles = readFileSync(globalStylesPath, "utf8");
+
+  expect(markup).toContain("data-home-sidebar");
+  expect(globalStyles).toContain(
+    "html[data-slide-active] [data-home-sidebar]",
+  );
+  expect(globalStyles).toContain("view-transition-name: home-sidebar");
+  expect(globalStyles).toContain("::view-transition-group(home-sidebar)");
+});
+
 test("moves contact links into a mobile-only home footer", () => {
   const footerPath = fileURLToPath(new URL("./HomeFooter.tsx", import.meta.url));
   const shellPath = fileURLToPath(new URL("./HomeShell.tsx", import.meta.url));
