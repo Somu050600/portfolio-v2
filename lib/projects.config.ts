@@ -65,7 +65,7 @@ export interface Project {
 }
 
 export const projects: Project[] = [
-  // ── Pro ──────────────────────────────────────────────────────────────────
+  // ── Primary work ──────────────────────────────────────────────────────────
   {
     slug: "design-system",
     number: 1,
@@ -481,44 +481,8 @@ export const projects: Project[] = [
     },
   },
   {
-    slug: "sso-alert-pipelines",
-    number: 3,
-    title: "SSO & Alert Pipelines",
-    description:
-      "SAML SSO for Google/Microsoft plus event-driven alerts to Slack, Jira, Coralogix, and S3.",
-    category: "pro",
-    role: "Full-Stack Engineer",
-    team: "Platform Security",
-    shipped: "2023",
-    status: "SHIPPED",
-    tech: ["SAML", "Node.js", "AWS", "Slack API"],
-    tilt: -0.6,
-  },
-  {
-    slug: "perf-pass",
-    number: 4,
-    title: "Performance Pass",
-    description:
-      "Bundle splitting, selective SSR/CSR, lazy loading, and caching — 30% TTI reduction.",
-    category: "pro",
-    role: "Frontend Engineer",
-    team: "Core Web",
-    shipped: "2023",
-    status: "SHIPPED",
-    tech: ["Webpack", "React", "Lighthouse", "CDN"],
-    tilt: 1.1,
-    thumbnail: {
-      kind: "image",
-      alt: "Performance Pass preview",
-      poster: "/posters/design-system.svg",
-      params: { height: 200 },
-    },
-  },
-
-  // ── Creative ───────────────────────────────────────────────────────────────
-  {
     slug: "view-transitions",
-    number: 12,
+    number: 3,
     title: "View Transitions: A Field Guide",
     description:
       "What the View Transitions API actually does — window + React, five variants, a live lab.",
@@ -572,8 +536,148 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: "liquid-distortion",
+    number: 4,
+    title: "Liquid Distortion",
+    description: "Three.js shader pass that warps imagery like viscous fluid.",
+    category: "creative",
+    role: "Creative Dev",
+    team: "Solo",
+    shipped: "2024",
+    status: "IN PROGRESS",
+    tech: ["Three.js", "GLSL", "React"],
+    tilt: 0.5,
+    thumbnail: {
+      kind: "generative",
+      alt: "Liquid distortion preview",
+      poster: "/posters/liquid-distortion.svg",
+      params: { sketch: "fluid-dye", height: 228 },
+    },
+    note: "Shader distortion WIP — card uses shared fluid-dye sketch as preview.",
+    caseStudy: {
+      tagline:
+        "A liquid effect that does not simulate water so much as it borrows the one thing water makes visible: momentum.",
+      tags: ["Three.js", "GLSL", "Shader Pass", "WebGL"],
+      hero: { accent: "teal" },
+      sections: [
+        {
+          id: "the-brief",
+          heading: "The Brief",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "I wanted a cursor effect that felt wet without turning into a full fluid solver. Something that could sit behind type, bend the image, and make fast movement feel different from slow movement.",
+            },
+            {
+              type: "paragraph",
+              text: "The first versions were too literal: circles following the cursor, displacement tied directly to pointer position, a ripple that looked the same no matter how you moved. It reacted, but it had no memory.",
+              emphasis: ["no memory"],
+            },
+            {
+              type: "callout",
+              accent: "blue",
+              text: "The effect started working when I stopped asking where the cursor is and started asking how hard it moved this frame.",
+            },
+          ],
+        },
+        {
+          id: "momentum-not-position",
+          heading: "Momentum, Not Position",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The simulation field stores velocity in a texture. Every frame, the pointer's displacement from its last position becomes the force injected into that field. A quick flick writes a stronger vector; a slow drag writes a softer one.",
+              emphasis: ["velocity in a texture"],
+            },
+            {
+              type: "list",
+              ordered: true,
+              items: [
+                {
+                  num: "01",
+                  title: "Measure movement",
+                  text: "Mouse velocity is just current UV minus last UV, scaled and clamped so fast swipes stay expressive without blowing up the field.",
+                },
+                {
+                  num: "02",
+                  title: "Splat into the field",
+                  text: "A radial falloff injects that vector around the cursor. Aspect correction keeps the ripple circular inside any frame.",
+                },
+                {
+                  num: "03",
+                  title: "Let it settle",
+                  text: "Dissipation and a small diffusion step make the vectors smear and fade instead of snapping back to zero.",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: "shader-pipeline",
+          heading: "The Shader Pipeline",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "There are two passes. The simulation pass evolves the velocity field in a pair of ping-pong render targets. The display pass samples that field and uses it to offset a procedural canvas texture.",
+            },
+            {
+              type: "paragraph",
+              text: "The content being distorted is intentionally simple: a gradient, a few color blooms, a dot grid, and large type. The dot grid makes small refractions legible, while the color blooms give the chromatic split something to bite into.",
+              emphasis: ["dot grid", "chromatic split"],
+            },
+            {
+              type: "callout",
+              accent: "teal",
+              text: "The field is not the image. The field is a map of motion. The image only becomes liquid when the display shader reads that map and bends the pixels through it.",
+            },
+          ],
+        },
+        {
+          id: "playground",
+          heading: "The Playground",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Swipe through the canvas, then change the controls. Trail controls how long the velocity field survives, distortion controls how far the texture bends, and ripple size controls how wide each pointer splat is.",
+            },
+            {
+              type: "demo",
+              id: "liquid-distortion",
+              caption:
+                "Move fast, move slow, then pull the controls apart. The force comes from cursor speed, not cursor position.",
+            },
+          ],
+        },
+        {
+          id: "where-it-landed",
+          heading: "Where It Landed",
+          blocks: [
+            {
+              type: "metrics",
+              items: [
+                { value: "2", label: "Shader passes" },
+                { value: "0.5x", label: "Simulation resolution" },
+                { value: "3", label: "Live controls" },
+              ],
+            },
+            {
+              type: "paragraph",
+              text: "The final version is deliberately not a physically complete fluid sim. It is a smaller illusion: advect a velocity texture, let it decay, and use that texture as a lens. That made it cheap enough for an article embed while still feeling responsive.",
+              emphasis: ["a smaller illusion"],
+            },
+            {
+              type: "callout",
+              accent: "neutral",
+              text: "The lesson was that believable interaction often comes from preserving the right state. Here, one frame of cursor history was the difference between a hover effect and something that felt like liquid.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     slug: "this-site",
-    number: 8,
+    number: 5,
     title: "This Site",
     description:
       "Portfolio v2 — View Transitions, theme tokens, and tactile micro-interactions.",
@@ -732,8 +836,35 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: "sso-alert-pipelines",
+    number: 6,
+    title: "SSO & Alert Pipelines",
+    description:
+      "SAML SSO for Google/Microsoft plus event-driven alerts to Slack, Jira, Coralogix, and S3.",
+    category: "pro",
+    role: "Full-Stack Engineer",
+    team: "Platform Security",
+    shipped: "2023",
+    status: "SHIPPED",
+    tech: ["SAML", "Node.js", "AWS", "Slack API"],
+    tilt: -0.6,
+  },
+  {
+    slug: "brush-reveal",
+    number: 7,
+    title: "Brush Reveal",
+    description: "SVG mask animation along a hand-drawn centerline path.",
+    category: "creative",
+    role: "Creative Dev",
+    team: "Solo",
+    shipped: "2025",
+    status: "SHIPPED",
+    tech: ["SVG", "GSAP", "CSS Masks"],
+    tilt: -0.9,
+  },
+  {
     slug: "fluid-sim",
-    number: 5,
+    number: 8,
     title: "Fluid Simulation",
     description: "WebGL2 Navier–Stokes solver with interactive dye injection.",
     category: "creative",
@@ -754,163 +885,30 @@ export const projects: Project[] = [
     note: "Card-mount fluid dye sketch — also a full-screen playground experiment.",
   },
   {
-    slug: "liquid-distortion",
-    number: 6,
-    title: "Liquid Distortion",
-    description: "Three.js shader pass that warps imagery like viscous fluid.",
-    category: "creative",
-    role: "Creative Dev",
-    team: "Solo",
-    shipped: "2024",
-    status: "IN PROGRESS",
-    tech: ["Three.js", "GLSL", "React"],
-    tilt: 0.5,
-    thumbnail: {
-      kind: "generative",
-      alt: "Liquid distortion preview",
-      poster: "/posters/liquid-distortion.svg",
-      params: { sketch: "fluid-dye", height: 228 },
-    },
-    note: "Shader distortion WIP — card uses shared fluid-dye sketch as preview.",
-    caseStudy: {
-      tagline:
-        "A liquid effect that does not simulate water so much as it borrows the one thing water makes visible: momentum.",
-      tags: ["Three.js", "GLSL", "Shader Pass", "WebGL"],
-      hero: { accent: "teal" },
-      sections: [
-        {
-          id: "the-brief",
-          heading: "The Brief",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "I wanted a cursor effect that felt wet without turning into a full fluid solver. Something that could sit behind type, bend the image, and make fast movement feel different from slow movement.",
-            },
-            {
-              type: "paragraph",
-              text: "The first versions were too literal: circles following the cursor, displacement tied directly to pointer position, a ripple that looked the same no matter how you moved. It reacted, but it had no memory.",
-              emphasis: ["no memory"],
-            },
-            {
-              type: "callout",
-              accent: "blue",
-              text: "The effect started working when I stopped asking where the cursor is and started asking how hard it moved this frame.",
-            },
-          ],
-        },
-        {
-          id: "momentum-not-position",
-          heading: "Momentum, Not Position",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "The simulation field stores velocity in a texture. Every frame, the pointer's displacement from its last position becomes the force injected into that field. A quick flick writes a stronger vector; a slow drag writes a softer one.",
-              emphasis: ["velocity in a texture"],
-            },
-            {
-              type: "list",
-              ordered: true,
-              items: [
-                {
-                  num: "01",
-                  title: "Measure movement",
-                  text: "Mouse velocity is just current UV minus last UV, scaled and clamped so fast swipes stay expressive without blowing up the field.",
-                },
-                {
-                  num: "02",
-                  title: "Splat into the field",
-                  text: "A radial falloff injects that vector around the cursor. Aspect correction keeps the ripple circular inside any frame.",
-                },
-                {
-                  num: "03",
-                  title: "Let it settle",
-                  text: "Dissipation and a small diffusion step make the vectors smear and fade instead of snapping back to zero.",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "shader-pipeline",
-          heading: "The Shader Pipeline",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "There are two passes. The simulation pass evolves the velocity field in a pair of ping-pong render targets. The display pass samples that field and uses it to offset a procedural canvas texture.",
-            },
-            {
-              type: "paragraph",
-              text: "The content being distorted is intentionally simple: a gradient, a few color blooms, a dot grid, and large type. The dot grid makes small refractions legible, while the color blooms give the chromatic split something to bite into.",
-              emphasis: ["dot grid", "chromatic split"],
-            },
-            {
-              type: "callout",
-              accent: "teal",
-              text: "The field is not the image. The field is a map of motion. The image only becomes liquid when the display shader reads that map and bends the pixels through it.",
-            },
-          ],
-        },
-        {
-          id: "playground",
-          heading: "The Playground",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "Swipe through the canvas, then change the controls. Trail controls how long the velocity field survives, distortion controls how far the texture bends, and ripple size controls how wide each pointer splat is.",
-            },
-            {
-              type: "demo",
-              id: "liquid-distortion",
-              caption:
-                "Move fast, move slow, then pull the controls apart. The force comes from cursor speed, not cursor position.",
-            },
-          ],
-        },
-        {
-          id: "where-it-landed",
-          heading: "Where It Landed",
-          blocks: [
-            {
-              type: "metrics",
-              items: [
-                { value: "2", label: "Shader passes" },
-                { value: "0.5x", label: "Simulation resolution" },
-                { value: "3", label: "Live controls" },
-              ],
-            },
-            {
-              type: "paragraph",
-              text: "The final version is deliberately not a physically complete fluid sim. It is a smaller illusion: advect a velocity texture, let it decay, and use that texture as a lens. That made it cheap enough for an article embed while still feeling responsive.",
-              emphasis: ["a smaller illusion"],
-            },
-            {
-              type: "callout",
-              accent: "neutral",
-              text: "The lesson was that believable interaction often comes from preserving the right state. Here, one frame of cursor history was the difference between a hover effect and something that felt like liquid.",
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    slug: "brush-reveal",
-    number: 7,
-    title: "Brush Reveal",
-    description: "SVG mask animation along a hand-drawn centerline path.",
-    category: "creative",
-    role: "Creative Dev",
-    team: "Solo",
-    shipped: "2025",
+    slug: "perf-pass",
+    number: 9,
+    title: "Performance Pass",
+    description:
+      "Bundle splitting, selective SSR/CSR, lazy loading, and caching — 30% TTI reduction.",
+    category: "pro",
+    role: "Frontend Engineer",
+    team: "Core Web",
+    shipped: "2023",
     status: "SHIPPED",
-    tech: ["SVG", "GSAP", "CSS Masks"],
-    tilt: -0.9,
+    tech: ["Webpack", "React", "Lighthouse", "CDN"],
+    tilt: 1.1,
+    thumbnail: {
+      kind: "image",
+      alt: "Performance Pass preview",
+      poster: "/posters/design-system.svg",
+      params: { height: 200 },
+    },
   },
 
   // ── More (compact list) ────────────────────────────────────────────────────
   {
     slug: "wallet-rn",
-    number: 9,
+    number: 10,
     title: "Wallet RN",
     description: "React Native expense tracker with offline-first sync.",
     category: "more",
@@ -923,28 +921,47 @@ export const projects: Project[] = [
     href: "https://github.com/Somu050600/wallet-app",
   },
   {
+    slug: "portfolio-v1",
+    number: 11,
+    title: "Portfolio - V1",
+    description: "First Portfolio project",
+    category: "more",
+    role: "Frontend",
+    team: "Self",
+    shipped: "2024",
+    status: "SHIPPED",
+    tech: ["React", "NextJs", "Tailwind"],
+    external: true,
+    href: "https://github.com/Somu050600/portfolio",
+  },
+  {
     slug: "are-we-there-yet",
-    number: 10,
+    number: 12,
     title: "Are We There Yet",
     description: "Real-time trip tracker with ETA predictions.",
     category: "more",
     role: "Full-Stack",
     team: "Hackathon",
-    shipped: "2025",
+    shipped: "2026",
     status: "SHIPPED",
     tech: ["Mapbox", "Node.js", "WebSockets"],
+    external: true,
+    href: "https://github.com/Somu050600/wallet-app",
   },
   {
-    slug: "flight-booking",
-    number: 11,
-    title: "Flight Booking UI",
-    description: "Multi-step booking flow with fare comparison.",
+    slug: "node-bites",
+    number: 13,
+    title: "Node Bites",
+    description:
+      "The Food Explorer App is a React-based application that allows users to explore various meal categories, view meals within those categories, and see detailed information about selected meals.",
     category: "more",
     role: "Frontend",
-    team: "Internship",
-    shipped: "2022",
-    status: "INTERNSHIP",
-    tech: ["React", "Redux", "REST"],
+    team: "Hackathon",
+    shipped: "2024",
+    status: "SHIPPED",
+    tech: ["React", "React Flow", "Tailwind"],
+    external: true,
+    href: "https://github.com/Somu050600/node-bites",
   },
 ];
 

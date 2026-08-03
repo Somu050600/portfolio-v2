@@ -1,83 +1,63 @@
-import Link from "next/link";
-import {
-  categoryLabels,
-  getMoreProjects,
-  getProjectsByCategory,
-} from "@/lib/projects.config";
-import ProjectIndexCard from "./ProjectIndexCard";
 import { componentAttrs } from "@/lib/build-mode";
+import {
+  getIndexProjects,
+  getMoreProjects,
+  type Project,
+} from "@/lib/projects.config";
+import Link from "next/link";
+import ProjectIndexCard from "./ProjectIndexCard";
+import WorkListReserve from "./WorkListReserve";
+import { arrangeWorkProjects } from "./work-card-layout";
+
+function WorkCard({
+  featured = false,
+  project,
+}: {
+  featured?: boolean;
+  project: Project;
+}) {
+  return <ProjectIndexCard {...project} featured={featured} />;
+}
 
 export default function ProjectGrid() {
-  const proProjects = getProjectsByCategory("pro");
-  const creativeProjects = getProjectsByCategory("creative");
+  const { featured, columns } = arrangeWorkProjects(getIndexProjects());
   const moreProjects = getMoreProjects();
 
   return (
-    <div
-      className="px-6 pb-10 md:px-12 md:pb-14 lg:px-16"
+    <section
+      className="@container mx-auto flex w-[min(calc(100%-2rem),940px)] flex-col gap-10 pb-14"
       {...componentAttrs(
         "ProjectGrid",
-        "Two-column masonry grouped by Pro / Creative, plus compact More list.",
+        "Numbered work list with one featured card and independent parity columns.",
       )}
     >
-      {(["pro", "creative"] as const).map((category) => {
-        const items =
-          category === "pro" ? proProjects : creativeProjects;
-        if (items.length === 0) return null;
+      {featured && (
+        <WorkListReserve>
+          <div className="flex flex-col gap-6" data-work-list>
+            <WorkCard project={featured} featured />
 
-        // Split into two independent columns (sequential halves). Each column
-        // stacks on its own, so a card's hover-reveal only nudges cards below
-        // it in the SAME column — the other column never moves (no row-height
-        // coupling, no column rebalance). On mobile the columns stack in order.
-        const mid = Math.ceil(items.length / 2);
-        const columns = [items.slice(0, mid), items.slice(mid)];
-
-        return (
-          <section
-            key={category}
-            className="mb-14"
-            {...componentAttrs(
-              `ProjectGrid.${category}`,
-              category === "pro"
-                ? "Shipped product work — design systems, compliance, SSO, perf."
-                : "Creative experiments — WebGL, shaders, motion studies.",
-            )}
-          >
-            <h2 className="mb-6 font-mono text-xs tracking-[0.2em] text-ink-dim uppercase">
-              {categoryLabels[category]}
-            </h2>
-            <div className="flex flex-col gap-6 md:flex-row md:items-start">
-              {columns.map((col, ci) => (
-                <div key={ci} className="flex flex-1 flex-col gap-6">
-                  {col.map((project) => (
-                    <ProjectIndexCard
-                      key={project.slug}
-                      slug={project.slug}
-                      title={project.title}
-                      number={project.number}
-                      role={project.role}
-                      team={project.team}
-                      shipped={project.shipped}
-                      status={project.status}
-                      description={project.description}
-                      thumbnail={project.thumbnail}
-                      tilt={project.tilt}
-                      external={project.external}
-                      href={project.href}
-                      caseStudy={project.caseStudy}
-                      note={project.note}
-                    />
+            <div
+              data-work-columns
+              className="cols order-2 flex items-start gap-6 @max-[640px]:flex-col @max-[640px]:items-stretch"
+            >
+              {columns.map((column, columnIndex) => (
+                <div
+                  key={columnIndex}
+                  className="flex min-w-0 flex-1 flex-col gap-6 @max-[640px]:contents"
+                >
+                  {column.map((project) => (
+                    <WorkCard key={project.slug} project={project} />
                   ))}
                 </div>
               ))}
             </div>
-          </section>
-        );
-      })}
+          </div>
+        </WorkListReserve>
+      )}
 
       {moreProjects.length > 0 && (
-        <section>
-          <h2 className="mb-4 font-mono text-xs tracking-[0.2em] text-ink-dim uppercase">
+        <section className="flex flex-col gap-4">
+          <h2 className="font-mono text-xs tracking-[0.2em] text-ink-dim uppercase">
             More
           </h2>
           <ul className="flex flex-col gap-2 border-t border-border-color pt-4">
@@ -122,6 +102,6 @@ export default function ProjectGrid() {
           </ul>
         </section>
       )}
-    </div>
+    </section>
   );
 }

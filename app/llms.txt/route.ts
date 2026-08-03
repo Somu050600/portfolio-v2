@@ -37,7 +37,7 @@ export function GET() {
     `- GitHub: ${profile.contact.github}`,
     `- LinkedIn: ${profile.contact.linkedin}`,
     `- Email: ${profile.contact.email}`,
-    `- Résumé: ${profile.contact.resumeUrl}`,
+    `- Resume: ${profile.contact.resumeUrl}`,
     "",
   ].join("\n");
 

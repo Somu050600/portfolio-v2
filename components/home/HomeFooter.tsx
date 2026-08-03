@@ -3,7 +3,7 @@ import { profile } from "@/lib/profile.config";
 const footerLinks = [
   { label: "GitHub", href: profile.contact.github },
   { label: "LinkedIn", href: profile.contact.linkedin },
-  { label: "Résumé", href: profile.contact.resumeUrl },
+  { label: "Resume", href: profile.contact.resumeUrl },
 ] as const;
 
 export default function HomeFooter() {

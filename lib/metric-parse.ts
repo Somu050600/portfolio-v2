@@ -6,7 +6,7 @@ export type ParsedMetric = {
   display: string;
 };
 
-/** Parse résumé-style metric strings for count-up animation. */
+/** Parse Resume-style metric strings for count-up animation. */
 export function parseMetricValue(value: string): ParsedMetric {
   const display = value;
 
@@ -37,10 +37,7 @@ export function parseMetricValue(value: string): ParsedMetric {
   return { prefix: "", target: 0, suffix: "", animatable: false, display };
 }
 
-export function formatMetric(
-  parsed: ParsedMetric,
-  current: number,
-): string {
+export function formatMetric(parsed: ParsedMetric, current: number): string {
   if (!parsed.animatable) return parsed.display;
   const n =
     parsed.target % 1 === 0

@@ -1,8 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
+import { useSettings } from "@/components/settings/SettingsProvider";
 import {
   CommandDialog,
   CommandEmpty,
@@ -13,15 +11,14 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import { useSettings } from "@/components/settings/SettingsProvider";
 import { homeNavItems, isHomeSectionRoute } from "@/lib/home.config";
+import { usePageTransition } from "@/lib/page-transition-context";
 import { profile } from "@/lib/profile.config";
 import { projects } from "@/lib/projects.config";
-import { usePageTransition } from "@/lib/page-transition-context";
-import {
-  openThemeCustomizer,
-  useThemeToggleAction,
-} from "@/lib/theme-actions";
+import { openThemeCustomizer, useThemeToggleAction } from "@/lib/theme-actions";
+import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useRef } from "react";
 
 const EMAIL = profile.contact.email;
 const GITHUB = profile.contact.github;
@@ -91,7 +88,10 @@ export default function CommandPalette() {
       }}
       showCloseButton={false}
     >
-      <CommandInput placeholder="Search commands…" aria-label="Search commands" />
+      <CommandInput
+        placeholder="Search commands…"
+        aria-label="Search commands"
+      />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
 
@@ -123,7 +123,9 @@ export default function CommandPalette() {
                 }}
               >
                 {p.title}
-                <CommandShortcut>No. {String(p.number).padStart(2, "0")}</CommandShortcut>
+                <CommandShortcut>
+                  No. {String(p.number).padStart(2, "0")}
+                </CommandShortcut>
               </CommandItem>
             );
           })}
@@ -143,9 +145,7 @@ export default function CommandPalette() {
           </CommandItem>
           <CommandItem
             value="open theme editor customize accents"
-            onSelect={() =>
-              runAction(() => openThemeCustomizer())
-            }
+            onSelect={() => runAction(() => openThemeCustomizer())}
           >
             Open theme editor
           </CommandItem>
@@ -173,7 +173,7 @@ export default function CommandPalette() {
               window.open(profile.contact.resumeUrl, "_blank", "noopener");
             }}
           >
-            Download résumé
+            Download Resume
           </CommandItem>
         </CommandGroup>
 
@@ -211,11 +211,7 @@ export default function CommandPalette() {
   );
 }
 
-export function CommandPaletteTrigger({
-  className,
-}: {
-  className?: string;
-}) {
+export function CommandPaletteTrigger({ className }: { className?: string }) {
   const { setCommandOpen } = useSettings();
 
   return (

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { roles, type Role } from "@/lib/experience.config";
 import { componentAttrs } from "@/lib/build-mode";
-import { cn } from "@/lib/utils";
-import Counter from "./Counter";
+import { roles, type Role } from "@/lib/experience.config";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { cn } from "@/lib/utils";
+import { useEffect, useRef } from "react";
+import Counter from "./Counter";
 
 function IntegrationRow({ names }: { names: string[] }) {
   return (
@@ -114,11 +114,11 @@ export default function ExperienceTimeline() {
       className="relative"
       {...componentAttrs(
         "ExperienceTimeline",
-        "Vertical résumé timeline — scroll-staggered roles with metric counters.",
+        "Vertical Resume timeline — scroll-staggered roles with metric counters.",
       )}
     >
       <span
-        className="absolute top-0 bottom-0 left-[5px] w-px bg-border-color"
+        className="absolute top-0 bottom-0 left-1.25 w-px bg-border-color"
         aria-hidden
       />
       <div className="flex flex-col gap-14">

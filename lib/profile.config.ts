@@ -11,10 +11,7 @@ export const profile = {
   narrative:
     "Came to frontend the long way — M.Sc. Chemistry + B.E. Civil at BITS Pilani, then fell for the craft of interfaces.",
   hero: {
-    headline: [
-      "Frontend engineer who treats",
-      "the interface like the product.",
-    ],
+    headline: "Design systems, performance, and the unglamorous middle",
     guide:
       "Selected work below — what shipped, what scaled, and the one that took down Prod.",
   },

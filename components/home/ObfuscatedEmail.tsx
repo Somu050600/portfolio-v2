@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback } from "react";
 import { profile } from "@/lib/profile.config";
+import { useCallback } from "react";
 
 const USER = "somasekhareega";
 const DOMAIN = "gmail.com";
@@ -38,7 +38,7 @@ export function ResumeLink() {
       rel="noopener noreferrer"
       className="inline-flex items-center gap-2 rounded-full border border-border-color bg-surface px-4 py-2 font-mono text-xs tracking-wide text-ink transition-colors hover:border-ink-faint"
     >
-      Download résumé
+      Download Resume
       <span aria-hidden>↓</span>
     </a>
   );

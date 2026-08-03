@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
 import { useMediaQuery } from "@/components/landing/use-media-query";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { componentAttrs, UI_EVENTS } from "@/lib/build-mode";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { profile } from "@/lib/profile.config";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import PixelPet from "./PixelPet";
 import { useLocalTime } from "./sidebar-time";
 import TableOfContents from "./TableOfContents";
@@ -22,12 +22,7 @@ export default function Sidebar() {
   const onHandleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
       setOpen(false);
-      if (
-        event.metaKey ||
-        event.ctrlKey ||
-        event.shiftKey ||
-        event.altKey
-      ) {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
         return;
       }
 
@@ -150,7 +145,7 @@ function ContactGroup() {
       <div className="flex flex-wrap gap-4 [font-family:var(--font-home-poppins)] text-[12.5px] leading-none font-medium text-ink-dim">
         <SocialLink href={profile.contact.github}>GitHub</SocialLink>
         <SocialLink href={profile.contact.linkedin}>LinkedIn</SocialLink>
-        <SocialLink href={profile.contact.resumeUrl}>Résumé</SocialLink>
+        <SocialLink href={profile.contact.resumeUrl}>Resume</SocialLink>
       </div>
     </div>
   );

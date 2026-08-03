@@ -5,7 +5,10 @@ export default function SkillsGrid() {
   return (
     <div
       className="grid gap-6 sm:grid-cols-2"
-      {...componentAttrs("SkillsGrid", "Grouped skill chips from the résumé stack.")}
+      {...componentAttrs(
+        "SkillsGrid",
+        "Grouped skill chips from the Resume stack.",
+      )}
     >
       {skillGroups.map((group) => (
         <section

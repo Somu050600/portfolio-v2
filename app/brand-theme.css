@@ -46,14 +46,5 @@
 /* Quieter product-card treatment: surface and motion carry the personality,
    while the existing shared-element transition remains the hero interaction. */
 .index-card {
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  box-shadow: 0 8px 24px -22px color-mix(in oklab, var(--ink) 30%, transparent) !important;
   transform: none !important;
-}
-
-.index-card:hover {
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--accent) 68%, transparent),
-    0 18px 38px -30px color-mix(in oklab, var(--accent) 52%, transparent) !important;
 }

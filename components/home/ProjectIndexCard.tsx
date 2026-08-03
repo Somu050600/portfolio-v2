@@ -26,8 +26,12 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useState,
+  type KeyboardEvent,
   type MouseEvent,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
+import { getTouchCardAction } from "./work-card-layout";
 
 // useLayoutEffect on the client, useEffect on the server, to avoid SSR warnings.
 const useIsoLayoutEffect =
@@ -57,7 +61,9 @@ type ProjectIndexCardProps = Pick<
   | "caseStudy"
   | "note"
   | "thumbnail"
->;
+> & {
+  featured?: boolean;
+};
 
 function CardContent({
   title,
@@ -68,10 +74,18 @@ function CardContent({
   status,
   description,
   thumbnail,
-}: Omit<
-  ProjectIndexCardProps,
-  "tilt" | "external" | "href" | "caseStudy" | "slug"
->) {
+  featured,
+}: Pick<
+  Project,
+  | "title"
+  | "number"
+  | "role"
+  | "team"
+  | "shipped"
+  | "status"
+  | "description"
+  | "thumbnail"
+> & { featured: boolean }) {
   const num = String(number).padStart(2, "0");
   const statuses = Array.isArray(status) ? status : [status];
 
@@ -79,7 +93,7 @@ function CardContent({
     <>
       <div className="flex w-full items-center justify-between">
         <span
-          className="h-[13px] w-[13px] rounded-full bg-bg shadow-[inset_0_1px_1.5px_rgba(36,36,36,0.35),inset_0_-0.5px_0.5px_rgba(255,255,255,0.4),0_0_0_1px_color-mix(in_oklab,var(--ink)_14%,transparent)]"
+          className="size-3.25 rounded-full border border-border-color bg-bg shadow-[inset_0_1px_2px_color-mix(in_oklab,var(--ink)_18%,transparent)]"
           aria-hidden
         />
         <span
@@ -90,14 +104,24 @@ function CardContent({
         </span>
       </div>
 
-      {thumbnail && (
-        <div data-morph="thumb">
-          <Thumbnail thumbnail={thumbnail} />
-        </div>
-      )}
+      <div
+        className={cn(
+          "min-w-0 gap-4",
+          featured
+            ? "grid grid-cols-[1.05fr_1fr] @max-[640px]:grid-cols-1"
+            : "flex flex-col",
+        )}
+      >
+        {thumbnail && (
+          <div
+            data-morph="thumb"
+            className="min-w-0 overflow-hidden rounded-2xl border border-border-color bg-thumb-bg"
+          >
+            <Thumbnail thumbnail={thumbnail} />
+          </div>
+        )}
 
-      <div className="mt-1 flex flex-col">
-        <div className="flex flex-col gap-2">
+        <div className="flex min-w-0 flex-col gap-3">
           <div className="flex items-center justify-between gap-2.5">
             <h3
               data-morph="title"
@@ -111,47 +135,34 @@ function CardContent({
               ))}
             </div>
           </div>
-          {description && (
-            <p className="text-xs leading-snug text-ink-dim">{description}</p>
-          )}
-        </div>
+          <p className="line-clamp-2 min-h-[2.8em] [font-family:var(--font-home-jetbrains)] text-xs leading-[1.4] text-ink-dim">
+            {description}
+          </p>
 
-        <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-(--ease-out-soft) group-hover:grid-rows-[1fr] motion-reduce:grid-rows-[1fr]">
-          <div className="min-h-0 overflow-hidden">
-            <span
-              className="mt-3 mb-3 block h-px w-full opacity-0 transition-opacity duration-200 group-hover:opacity-100 motion-reduce:opacity-100"
-              style={{
-                backgroundImage:
-                  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='1'><circle cx='0.5' cy='0.5' r='0.5' fill='%236e6553' opacity='0.45'/></svg>\")",
-                backgroundRepeat: "repeat-x",
-                backgroundSize: "8px 1px",
-              }}
-              aria-hidden
-            />
-            <dl className="flex translate-y-1 flex-col gap-2 pb-0.5 opacity-0 transition-[opacity,transform] duration-300 group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:translate-y-0 motion-reduce:opacity-100">
-              <div className="grid grid-cols-[90px_1fr] gap-x-10 text-xs leading-snug">
-                <dt className="font-mono tracking-wide text-ink-dim uppercase">
-                  Role
-                </dt>
-                <dd className="text-ink-dim">{role}</dd>
-              </div>
-              <div className="grid grid-cols-[90px_1fr] gap-x-10 text-xs leading-snug">
-                <dt className="font-mono tracking-wide text-ink-dim uppercase">
-                  Team
-                </dt>
-                <dd className="text-ink-dim">{team}</dd>
-              </div>
-              <div className="grid grid-cols-[90px_1fr] gap-x-10 text-xs leading-snug">
-                <dt className="font-mono tracking-wide text-ink-dim uppercase">
-                  Timeframe
-                </dt>
-                <dd className="text-ink-dim">{shipped}</dd>
-              </div>
+          <div
+            data-card-meta
+            className="max-h-0 overflow-hidden transition-[max-height] duration-360 ease-[cubic-bezier(.22,.7,.25,1)] group-hover:max-h-37.5 group-data-[touch-expanded=true]:max-h-37.5 motion-reduce:max-h-37.5"
+          >
+            <dl className="flex flex-col gap-2 border-t border-dotted border-border-color pt-3">
+              <MetaRow label="Role" value={role} />
+              <MetaRow label="Team" value={team} />
+              <MetaRow label="Timeframe" value={shipped} />
             </dl>
           </div>
         </div>
       </div>
     </>
+  );
+}
+
+function MetaRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid grid-cols-[78px_1fr] gap-4 text-xs leading-snug">
+      <dt className="[font-family:var(--font-home-jetbrains)] tracking-wide text-ink-dim uppercase">
+        {label}
+      </dt>
+      <dd className="text-ink-dim">{value}</dd>
+    </div>
   );
 }
 
@@ -163,6 +174,7 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     slug,
     caseStudy,
     note,
+    featured = false,
     ...contentProps
   } = props;
 
@@ -171,6 +183,8 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   const { subscribeTransitionComplete } = useContext(PageTransitionContext);
   const cardRef = useRef<HTMLAnchorElement>(null);
   const prefetched = useRef(false);
+  const pointerType = useRef("");
+  const [touchExpanded, setTouchExpanded] = useState(false);
   const hasCaseStudy = !!caseStudy;
   const targetHref = external
     ? href
@@ -184,17 +198,15 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   );
 
   const cardClass = cn(
-    "group index-card flex flex-col gap-2 rounded-2xl bg-elevated p-4 text-ink shadow-[0_0_4px_0_#999079] motion-reduce:transition-none",
-    "origin-[50%_40%] transition-[transform,box-shadow] duration-300 ease-(--ease-out-soft)",
-    // Accent ring + soft glow on hover. Transform is owned by the inline tilt,
-    // so we lift via box-shadow only (translate utils would clobber the rotate).
-    targetHref &&
-      "cursor-pointer hover:shadow-[0_0_0_1px_var(--accent),0_14px_30px_-16px_color-mix(in_oklab,var(--accent)_55%,transparent)]",
+    "group index-card flex flex-col gap-4 rounded-[20px] border border-border-color bg-surface p-5 text-ink motion-reduce:transition-none",
+    "origin-[50%_40%] transition-[background-color,border-color,box-shadow] duration-300 ease-(--ease-out-soft) hover:border-accent hover:bg-elevated hover:shadow-[0_16px_36px_-28px_color-mix(in_oklab,var(--accent)_52%,transparent)]",
+    targetHref && "cursor-pointer",
   );
 
   const cardStyle = {
     "--card-tilt": `${tilt}deg`,
     transform: "rotate(var(--card-tilt, 0deg))",
+    order: props.number,
   } as React.CSSProperties;
 
   const handleClick = (e: MouseEvent) => {
@@ -222,6 +234,34 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     router.prefetch(targetHref);
   };
 
+  const recordPointerType = (event: ReactPointerEvent) => {
+    pointerType.current = event.pointerType;
+  };
+
+  const handleCardClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (
+      getTouchCardAction(pointerType.current, touchExpanded) === "reveal"
+    ) {
+      event.preventDefault();
+      setTouchExpanded(true);
+      return;
+    }
+
+    handleClick(event);
+  };
+
+  const toggleArticleMeta = () => {
+    if (pointerType.current === "touch") {
+      setTouchExpanded((expanded) => !expanded);
+    }
+  };
+
+  const onArticleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    setTouchExpanded((expanded) => !expanded);
+  };
+
   // Backward morph: if a back-navigation targeted this card's slug, tag it on
   // mount (before the overlay resolves the nav → before the new snapshot) so
   // the browser pairs it with the outgoing case study.
@@ -245,22 +285,36 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
       <a
         ref={cardRef}
         href={targetHref}
-        onClick={handleClick}
+        onClick={handleCardClick}
+        onPointerDown={recordPointerType}
         onPointerEnter={prefetch}
         onFocus={prefetch}
+        data-touch-expanded={touchExpanded}
+        aria-expanded={touchExpanded}
         className={cardClass}
         style={cardStyle}
         {...inspect}
         {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       >
-        <CardContent {...contentProps} />
+        <CardContent {...contentProps} featured={featured} />
       </a>
     );
   }
 
   return (
-    <article className={cardClass} style={cardStyle} {...inspect}>
-      <CardContent {...contentProps} />
+    <article
+      className={cardClass}
+      style={cardStyle}
+      onClick={toggleArticleMeta}
+      onPointerDown={recordPointerType}
+      onKeyDown={onArticleKeyDown}
+      data-touch-expanded={touchExpanded}
+      role="button"
+      tabIndex={0}
+      aria-expanded={touchExpanded}
+      {...inspect}
+    >
+      <CardContent {...contentProps} featured={featured} />
     </article>
   );
 }
