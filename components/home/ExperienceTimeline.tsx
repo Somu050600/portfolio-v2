@@ -2,130 +2,312 @@
 
 import { componentAttrs } from "@/lib/build-mode";
 import { roles, type Role } from "@/lib/experience.config";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef } from "react";
-import Counter from "./Counter";
+import { useState } from "react";
 
-function IntegrationRow({ names }: { names: string[] }) {
-  return (
-    <ul className="mt-4 flex flex-wrap gap-2" aria-label="Integrations">
-      {names.map((name) => (
-        <li
-          key={name}
-          className="rounded-full border border-border-color bg-bg px-2.5 py-1 font-mono text-[10px] tracking-wide text-ink-dim uppercase"
-        >
-          {name}
-        </li>
-      ))}
-    </ul>
-  );
+const mono = "[font-family:var(--font-home-jetbrains)]";
+const display = "[font-family:var(--font-home-instrument)]";
+const sans = "[font-family:var(--font-home-poppins)]";
+const chip = cn(
+  mono,
+  "rounded-full bg-elevated px-2.75 py-1.75 text-[10px] leading-none font-medium tracking-[0.09em] whitespace-nowrap text-ink/90",
+);
+
+export function getNextOpenRole(
+  current: string | null,
+  requested: string,
+): string | null {
+  return current === requested ? null : requested;
 }
 
-function RoleCard({ role, index }: { role: Role; index: number }) {
-  const ref = useRef<HTMLElement>(null);
-  const reducedMotion = useReducedMotion();
+export function shouldOpenRoleOnPointer(
+  pointerType: string,
+  viewportWidth: number,
+  canHover: boolean,
+): boolean {
+  return pointerType !== "touch" && viewportWidth >= 900 && canHover;
+}
 
-  useEffect(() => {
-    if (reducedMotion) return;
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          el.setAttribute("data-visible", "");
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [reducedMotion]);
+function ExperienceRole({
+  role,
+  index,
+  open,
+  onOpen,
+  onClose,
+  onToggle,
+}: {
+  role: Role;
+  index: number;
+  open: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onToggle: () => void;
+}) {
+  const detailsId = `experience-role-${index + 1}-details`;
+  const triggerId = `experience-role-${index + 1}-trigger`;
 
   return (
     <article
-      ref={ref}
+      data-open={open ? "" : undefined}
+      onPointerEnter={(event) => {
+        if (
+          shouldOpenRoleOnPointer(
+            event.pointerType,
+            window.innerWidth,
+            window.matchMedia("(hover: hover)").matches,
+          )
+        ) {
+          onOpen();
+        }
+      }}
+      onPointerLeave={(event) => {
+        if (
+          shouldOpenRoleOnPointer(
+            event.pointerType,
+            window.innerWidth,
+            window.matchMedia("(hover: hover)").matches,
+          )
+        ) {
+          onClose();
+        }
+      }}
       {...componentAttrs(
         `ExperienceTimeline.${role.company}`,
-        `${role.role} at ${role.company} — ${role.start} to ${role.end}.`,
+        `${role.role} at ${role.company} — ${role.dateLabel}.`,
       )}
       className={cn(
-        "relative pl-8 opacity-0 translate-y-6 transition-[opacity,transform] duration-700 ease-(--ease-out-soft) motion-reduce:translate-y-0 motion-reduce:opacity-100",
-        "data-visible:opacity-100 data-visible:translate-y-0",
-        index % 2 === 1 && "md:translate-x-4 md:data-visible:translate-x-4",
+        "relative grid grid-cols-[120px_minmax(0,1fr)] gap-x-9.5 border-t border-dotted border-border-color py-6 pb-6.5",
+        "max-[899px]:grid-cols-1 max-[899px]:gap-y-3 max-[899px]:py-5.5 max-[899px]:pb-6 max-[899px]:pl-5.5",
+        index === 0 && "border-t-0 pt-1.5 max-[899px]:pt-1",
       )}
-      style={{ transitionDelay: reducedMotion ? "0ms" : `${index * 80}ms` }}
     >
-      <span
-        className="absolute top-2 left-0 h-3 w-3 rounded-full border-2 border-accent bg-bg"
-        aria-hidden
-      />
-      <header className="mb-3">
-        <p className="font-mono text-[11px] tracking-[0.16em] text-ink-faint uppercase">
-          {role.start} — {role.end} · {role.location}
-        </p>
-        <h2 className="mt-1 font-serif text-2xl font-light text-ink">
-          {role.role}
-        </h2>
-        <p className="mt-0.5 font-mono text-sm text-ink-dim">{role.company}</p>
-      </header>
-
-      <ul className="flex flex-col gap-2 text-sm leading-relaxed text-ink-dim">
-        {role.highlights.map((h) => (
-          <li key={h} className="flex gap-2">
-            <span className="text-ink-faint" aria-hidden>
-              —
-            </span>
-            <span>{h}</span>
-          </li>
-        ))}
-      </ul>
-
-      {role.integrations && role.integrations.length > 0 && (
-        <IntegrationRow names={role.integrations} />
-      )}
-
-      <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-        {role.metrics.map((m) => (
-          <Counter key={m.label} value={m.value} label={m.label} />
-        ))}
+      <div className="flex flex-col items-end gap-1.5 pt-1.25 text-right max-[899px]:flex-row max-[899px]:items-baseline max-[899px]:gap-2.5 max-[899px]:pt-0 max-[899px]:text-left">
+        <span
+          className={cn(
+            mono,
+            "text-xs leading-[1.4] font-medium text-ink/80",
+          )}
+        >
+          {role.dateLabel}
+        </span>
+        <span
+          className={cn(
+            mono,
+            "text-[10px] leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
+          )}
+        >
+          {role.location}
+        </span>
       </div>
 
-      <ul className="mt-4 flex flex-wrap gap-1.5">
-        {role.stack.map((tech) => (
-          <li
-            key={tech}
-            className="rounded-md bg-surface px-2 py-0.5 font-mono text-[10px] text-ink-dim"
+      <span
+        data-open={open ? "" : undefined}
+        className={cn(
+          "absolute left-33.75 size-2.25 rounded-full border border-ink/30 bg-bg transition-[background-color,border-color,box-shadow] duration-240 ease-[cubic-bezier(.22,.7,.25,1)]",
+          "data-open:border-accent data-open:bg-accent data-open:shadow-[0_0_0_4px_var(--accent-soft)] motion-reduce:transition-none",
+          "max-[899px]:left-0",
+          index === 0
+            ? "top-3.5 max-[899px]:top-2"
+            : "top-8 max-[899px]:top-7",
+        )}
+        aria-hidden
+      />
+
+      <div className="flex min-w-0 flex-col gap-2.25">
+        <button
+          id={triggerId}
+          type="button"
+          aria-controls={detailsId}
+          aria-expanded={open}
+          aria-label={`${open ? "Hide" : "View"} ${role.company} experience details`}
+          onClick={onToggle}
+          className="flex w-full items-baseline gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          <span
+            data-open={open ? "" : undefined}
+            className={cn(
+              display,
+              "text-[26px] leading-[1.15] font-normal text-ink/90 transition-colors duration-240 ease-[cubic-bezier(.22,.7,.25,1)] data-open:text-ink motion-reduce:transition-none max-[899px]:text-[22px]",
+            )}
           >
-            {tech}
-          </li>
-        ))}
-      </ul>
+            {role.company}
+          </span>
+          {role.current && (
+            <span className={cn(chip, "ml-auto max-[899px]:ml-0")}>
+              CURRENT
+            </span>
+          )}
+          <span
+            className={cn(
+              mono,
+              "ml-auto hidden rounded-full border border-accent/30 bg-accent-soft px-2.5 py-1.5 text-[9px] leading-none font-semibold tracking-[0.12em] text-accent uppercase max-[899px]:inline-flex",
+            )}
+          >
+            {open ? "VIEW LESS −" : "VIEW MORE +"}
+          </span>
+        </button>
+
+        <p
+          className={cn(
+            sans,
+            "text-[13px] leading-[1.4] font-medium text-ink-dim",
+          )}
+        >
+          {role.role} · {role.domain}
+        </p>
+        <p
+          className={cn(
+            mono,
+            "max-w-[58ch] text-[12.5px] leading-[1.7] font-normal text-ink-dim",
+          )}
+        >
+          {role.summary}
+        </p>
+
+        <ul
+          className="flex flex-wrap gap-x-5.5 gap-y-2 pt-0.5"
+          aria-label={`${role.company} metrics`}
+        >
+          {role.metrics.map((metric) => (
+            <li
+              key={metric}
+              className={cn(
+                mono,
+                "text-[13px] leading-[1.3] font-normal text-accent",
+              )}
+            >
+              {metric}
+            </li>
+          ))}
+        </ul>
+
+        <div
+          id={detailsId}
+          role="region"
+          aria-labelledby={triggerId}
+          aria-hidden={!open}
+          data-open={open ? "" : undefined}
+          className="grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity,margin-top] duration-[380ms,220ms,380ms] ease-[cubic-bezier(.22,.7,.25,1)] data-open:mt-4 data-open:grid-rows-[1fr] data-open:opacity-100 motion-reduce:transition-none max-[899px]:data-open:mt-3.5"
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="flex flex-col gap-2 border-t border-dotted border-border-color pt-3.5">
+              <ul className="flex flex-col gap-2">
+                {role.bullets.map((bullet) => (
+                  <li
+                    key={bullet}
+                    className={cn(
+                      mono,
+                      "flex gap-2.5 text-xs leading-[1.7] font-normal text-ink-dim",
+                    )}
+                  >
+                    <span className="shrink-0 text-accent" aria-hidden>
+                      —
+                    </span>
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+              <ul
+                className="mt-1.5 flex flex-wrap gap-2"
+                aria-label={`${role.company} technology stack`}
+              >
+                {role.stack.map((technology) => (
+                  <li key={technology} className={chip}>
+                    {technology}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </article>
   );
 }
 
 export default function ExperienceTimeline() {
+  const [openRole, setOpenRole] = useState<string | null>(null);
+
   return (
-    <div
-      className="relative"
+    <section
+      aria-labelledby="experience-heading"
+      className="flex flex-col gap-7.5"
       {...componentAttrs(
         "ExperienceTimeline",
-        "Vertical Resume timeline — scroll-staggered roles with metric counters.",
+        "Spine timeline — accessible single-open role disclosures with visible metrics.",
       )}
     >
-      <span
-        className="absolute top-0 bottom-0 left-1.25 w-px bg-border-color"
-        aria-hidden
-      />
-      <div className="flex flex-col gap-14">
-        {roles.map((role, i) => (
-          <RoleCard key={role.company} role={role} index={i} />
-        ))}
+      <header className="flex flex-col gap-3.75">
+        <div className="flex items-center gap-2.5">
+          <span
+            className={cn(
+              mono,
+              "shrink-0 text-[10px] leading-none font-semibold tracking-[0.16em] text-accent uppercase",
+            )}
+          >
+            02 — EXPERIENCE
+          </span>
+          <span className="h-px flex-1 bg-border-color" aria-hidden />
+          <span
+            className={cn(
+              mono,
+              "shrink-0 text-[10px] leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
+            )}
+          >
+            03 ROLES · 2023 — NOW
+          </span>
+        </div>
+        <h1
+          id="experience-heading"
+          className={cn(
+            display,
+            "text-balance text-[38px] leading-[1.1] font-normal tracking-[-0.01em] text-ink-faint max-[899px]:text-[30px]",
+          )}
+        >
+          Security, compliance, commerce.{" "}
+          <span className="text-ink">Three roles, measurable outcomes.</span>
+        </h1>
+        <p
+          className={cn(
+            mono,
+            "max-w-[62ch] text-[12.5px] leading-[1.65] font-normal text-ink-dim",
+          )}
+        >
+          Every role here has a number attached to it — that&apos;s deliberate.
+          Hover a role to see what it actually involved.
+        </p>
+      </header>
+
+      <div data-expansion-reserve className="pb-42.5 max-[899px]:pb-0">
+        <div className="relative" aria-label="Experience roles">
+          <span
+            className="absolute top-2.5 bottom-1.5 left-34.75 w-px [background:repeating-linear-gradient(to_bottom,color-mix(in_srgb,var(--ink)_18%,transparent)_0_3px,transparent_3px_8px)] max-[899px]:left-1"
+            aria-hidden
+          />
+          {roles.map((role, index) => {
+            const open = role.company === openRole;
+            return (
+              <ExperienceRole
+                key={role.company}
+                role={role}
+                index={index}
+                open={open}
+                onOpen={() => setOpenRole(role.company)}
+                onClose={() =>
+                  setOpenRole((current) =>
+                    current === role.company ? null : current,
+                  )
+                }
+                onToggle={() =>
+                  setOpenRole((current) =>
+                    getNextOpenRole(current, role.company),
+                  )
+                }
+              />
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
