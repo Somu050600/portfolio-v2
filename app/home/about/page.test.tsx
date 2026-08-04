@@ -18,5 +18,9 @@ test("renders the approved Elements about-page narrative", () => {
   expect(markup).toContain("TAP THE HIGHLIGHTED PHRASE");
   expect(markup).toContain("somasekhareega [at] gmail [dot] com");
   expect(markup).toContain("Download Resume ↓");
+  expect(markup).toContain('alt="Somu seated by the sea"');
+  expect(markup).toContain("somu-portrait.png");
+  expect(markup).toContain("/images/about/somu-shirt-mask.png");
+  expect(markup).not.toContain("Portrait · 292×392");
   expect(markup).not.toContain("<footer");
 });

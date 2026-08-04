@@ -6,6 +6,7 @@ import { profile } from "@/lib/profile.config";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import SkillsGrid, { shouldRevealAtomicNumbers } from "./SkillsGrid";
+import ThemeTintedPortrait from "./ThemeTintedPortrait";
 
 const mono = "[font-family:var(--font-home-jetbrains)]";
 const display = "[font-family:var(--font-home-instrument)]";
@@ -109,7 +110,7 @@ export default function AboutElements() {
         </div>
 
         <div className="contents min-[901px]:order-2 min-[901px]:flex min-[901px]:items-start min-[901px]:gap-4.5 min-[1201px]:flex-col min-[1201px]:gap-3.5">
-          <PortraitPlaceholder />
+          <ThemeTintedPortrait />
           <ContactCard />
         </div>
       </div>
@@ -208,21 +209,6 @@ function Principles() {
         ))}
       </ol>
     </section>
-  );
-}
-
-function PortraitPlaceholder() {
-  return (
-    <figure className="order-1 grid h-75 w-full place-items-center overflow-hidden rounded-[14px] border border-dashed border-ink/20 bg-surface min-[901px]:h-98 min-[901px]:w-73 min-[901px]:shrink-0">
-      <figcaption
-        className={cn(
-          mono,
-          "text-[9.5px] leading-[1.6] font-normal tracking-widest text-ink-faint uppercase",
-        )}
-      >
-        Portrait · 292×392
-      </figcaption>
-    </figure>
   );
 }
 
