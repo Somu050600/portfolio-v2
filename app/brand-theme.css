@@ -20,7 +20,12 @@
   --ink-faint: #7d8983;
   --status: #2f6f62;
   --punch: #dfe5e0;
+}
 
+/* The landing remains eucalyptus even when the app's light-mode default uses
+   another accent. The root inherits its fallback from globals.css, while the
+   pre-paint script applies the configured accent before the first paint. */
+.landing-hero {
   --accent: #2f6f62;
   --accent-fg: #ffffff;
   --accent-soft: rgba(47, 111, 98, 0.14);

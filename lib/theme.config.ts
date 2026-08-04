@@ -97,7 +97,7 @@ export type ThemeDraft = {
 export const THEME_DEFAULTS: ThemeDraft = {
   mode: "dark",
   darkAccent: "emerald",
-  lightAccent: "emerald",
+  lightAccent: "terracotta",
 };
 
 /** Hex → rgba string at `alpha` opacity (0–1). */
@@ -146,8 +146,8 @@ export function resolveMode(mode: Mode): "light" | "dark" {
 export const ACCENT_PREPAINT_SCRIPT = `(function(){try{
   var LS=localStorage;
   var stored=JSON.parse(LS.getItem('theme-accents')||'{}');
-  var da=stored.darkAccent||'emerald';
-  var la=stored.lightAccent||'emerald';
+  var da=stored.darkAccent||'${THEME_DEFAULTS.darkAccent}';
+  var la=stored.lightAccent||'${THEME_DEFAULTS.lightAccent}';
   var tm=LS.getItem('theme')||'${THEME_DEFAULTS.mode}';
   var dark=tm==='dark'||(tm==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);
   var A={
