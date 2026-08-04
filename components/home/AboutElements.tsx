@@ -54,8 +54,18 @@ export default function AboutElements() {
             "text-[38px] leading-[1.05] font-normal tracking-[-0.015em] text-ink min-[901px]:text-[46px]",
           )}
         >
-          About
+          {profile.name}
         </h1>
+        <p
+          className={cn(
+            sans,
+            "max-w-[62ch] text-pretty text-sm leading-[1.65] font-normal text-ink-dim min-[901px]:text-[15px]",
+          )}
+        >
+          Also known as {profile.handle}, I&apos;m a frontend engineer working
+          across React, Next.js, TypeScript, design systems, and web
+          performance.
+        </p>
       </header>
 
       <div className="flex flex-col gap-6.5 min-[901px]:gap-4.5 min-[1201px]:grid min-[1201px]:grid-cols-[minmax(0,1fr)_292px] min-[1201px]:items-start min-[1201px]:gap-10.5">

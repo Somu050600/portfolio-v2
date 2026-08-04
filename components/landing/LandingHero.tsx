@@ -404,7 +404,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
 
           <div className="mt-8 flex flex-col items-center gap-3 font-mono sm:mt-10">
             <p className="text-xs tracking-[0.14em] text-(--landing-muted) uppercase sm:text-sm">
-              {landingConfig.hero.role}
+              {profile.name} · {landingConfig.hero.role}
             </p>
             <p className="text-[10px] tracking-[0.08em] text-(--landing-muted) sm:text-xs">
               {landingConfig.hero.specialties}

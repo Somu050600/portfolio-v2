@@ -1,7 +1,16 @@
 import { readFileSync } from "fs";
 import { join } from "path";
+import type { Metadata } from "next";
 import IntroOverlay from "@/components/landing/IntroOverlay";
 import WelcomeScene from "@/components/landing/WelcomeScene";
+import { createPageMetadata, homepageDescription, homepageTitle } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: homepageTitle,
+  description: homepageDescription,
+  path: "/",
+  absoluteTitle: true,
+});
 
 // Both signature SVG files are the single source of truth.
 // Extracted at build time so the SVG files, not the components, own the data.

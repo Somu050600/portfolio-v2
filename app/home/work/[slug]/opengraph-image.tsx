@@ -1,10 +1,11 @@
 import { ImageResponse } from "next/og";
 import { OG, OG_SIZE, ogFonts } from "@/lib/og";
+import { profile } from "@/lib/profile.config";
 import { getCaseStudySlugs, getProjectBySlug } from "@/lib/projects.config";
 
 export const size = OG_SIZE;
 export const contentType = "image/png";
-export const alt = "Case study — Somu";
+export const alt = `Case study by ${profile.name} (${profile.handle})`;
 
 export function generateStaticParams() {
   return getCaseStudySlugs().map((slug) => ({ slug }));
@@ -60,7 +61,7 @@ export default async function Image({
           }}
         >
           <div style={{ display: "flex", fontWeight: 600, letterSpacing: 4 }}>
-            SOMU
+            {profile.handle.toUpperCase()} · {profile.name.toUpperCase()}
           </div>
           <div style={{ display: "flex", color: OG.inkFaint, letterSpacing: 4 }}>
             NO. {num}

@@ -9,6 +9,7 @@ import {
   getExperiment,
   getLiveExperimentSlugs,
 } from "@/lib/playground.config";
+import { createPageMetadata } from "@/lib/seo";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -23,11 +24,12 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const exp = getExperiment(slug);
-  if (!exp) return { title: "Playground — Somu" };
-  return {
+  if (!exp) return { title: "Playground" };
+  return createPageMetadata({
     title: `${exp.title} — Playground`,
     description: exp.description,
-  };
+    path: `/home/playground/${slug}`,
+  });
 }
 
 export default async function PlaygroundExperimentPage({ params }: PageProps) {

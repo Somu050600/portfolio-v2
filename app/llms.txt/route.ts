@@ -13,9 +13,13 @@ export function GET() {
   const caseStudies = projects.filter((p) => p.caseStudy);
 
   const md = [
-    `# ${profile.name} (${profile.handle}) — Frontend Developer`,
+    `# ${profile.name} (${profile.handle}) — ${profile.jobTitle}`,
     "",
     `> ${profile.tagline}`,
+    "",
+    `Canonical website: ${base}`,
+    "",
+    profile.shortDescription,
     "",
     profile.narrative,
     "",

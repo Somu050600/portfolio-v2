@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import HomeShell from "@/components/home/HomeShell";
 import ExperienceTimeline from "@/components/home/ExperienceTimeline";
+import { profile } from "@/lib/profile.config";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Experience",
-  description: "Work history — Aurva, CloudSEK, MatBook.",
-};
+  description: `Professional experience of ${profile.name} across frontend engineering, security, compliance, commerce, design systems, and product interfaces.`,
+  path: "/home/experience",
+});
 
 export default function ExperiencePage() {
   return (

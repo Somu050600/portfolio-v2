@@ -10,6 +10,12 @@ import PageTransitionOverlay from "@/components/PageTransitionOverlay";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { PageTransitionProvider } from "@/lib/page-transition-context";
 import { profile } from "@/lib/profile.config";
+import {
+  homepageDescription,
+  homepageTitle,
+  rootJsonLd,
+  serializeJsonLd,
+} from "@/lib/seo";
 import { ACCENT_PREPAINT_SCRIPT } from "@/lib/theme.config";
 import "./globals.css";
 import "./brand-theme.css";
@@ -39,17 +45,14 @@ const dotGothic = DotGothic16({
   subsets: ["latin"],
 });
 
-const description =
-  "Frontend developer who treats the interface like the product. React, Next.js, TypeScript — design systems, performance, and tactile, motion-led UI.";
-
 export const metadata: Metadata = {
   metadataBase: new URL(profile.url),
   title: {
-    default: "Somu — Frontend Developer",
-    template: "%s · Somu",
+    default: homepageTitle,
+    template: `%s · ${profile.name}`,
   },
-  description,
-  applicationName: "Somu",
+  description: homepageDescription,
+  applicationName: `${profile.name} (${profile.handle})`,
   authors: [{ name: profile.name, url: profile.url }],
   creator: profile.name,
   keywords: [
@@ -64,19 +67,18 @@ export const metadata: Metadata = {
     profile.name,
     "Somu",
   ],
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    siteName: "Somu",
+    siteName: profile.name,
     url: profile.url,
-    title: "Somu — Frontend Developer",
-    description,
+    title: homepageTitle,
+    description: homepageDescription,
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Somu — Frontend Developer",
-    description,
+    title: homepageTitle,
+    description: homepageDescription,
   },
   robots: {
     index: true,
@@ -98,26 +100,6 @@ export const viewport: Viewport = {
 //   2. Applies the correct accent CSS vars before React hydrates (no FOUC).
 const introCheckScript = `try{if(sessionStorage.getItem("introSeen")==="true"||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.setAttribute("data-intro-seen","")}catch(e){}`;
 
-// Person structured data — helps search/social understand who this site is.
-const personJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: profile.name,
-  alternateName: profile.handle,
-  url: profile.url,
-  jobTitle: "Frontend Developer",
-  email: `mailto:${profile.contact.email}`,
-  sameAs: [profile.contact.github, profile.contact.linkedin],
-  knowsAbout: [
-    "Frontend Development",
-    "React",
-    "Next.js",
-    "TypeScript",
-    "Design Systems",
-    "Web Performance",
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -135,10 +117,10 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: introCheckScript }} />
         {/* Accent CSS vars pre-paint — prevents accent flash on reload */}
         <script dangerouslySetInnerHTML={{ __html: ACCENT_PREPAINT_SCRIPT }} />
-        {/* Person structured data */}
+        {/* Canonical Person + WebSite entity graph */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(rootJsonLd) }}
         />
         <noscript>
           <style>{`[data-intro-overlay]{display:none}`}</style>

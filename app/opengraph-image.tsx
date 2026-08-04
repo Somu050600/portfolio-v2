@@ -1,9 +1,10 @@
 import { ImageResponse } from "next/og";
 import { OG, OG_SIZE, ogFonts } from "@/lib/og";
+import { profile } from "@/lib/profile.config";
 
 export const size = OG_SIZE;
 export const contentType = "image/png";
-export const alt = "Somu — Frontend Developer";
+export const alt = `${profile.name} (${profile.handle}) — ${profile.jobTitle}`;
 
 // Home / default card: a terminal splash.
 export default async function Image() {
@@ -48,10 +49,13 @@ export default async function Image() {
               marginTop: 14,
             }}
           >
-            Somu
+            {profile.handle}
           </div>
-          <div style={{ display: "flex", fontSize: 34, marginTop: 18 }}>
-            Frontend developer
+          <div style={{ display: "flex", fontSize: 28, color: OG.darkDim, marginTop: 16 }}>
+            {profile.name}
+          </div>
+          <div style={{ display: "flex", fontSize: 34, marginTop: 10 }}>
+            {profile.jobTitle}
           </div>
           <div style={{ display: "flex", fontSize: 26, color: OG.darkDim, marginTop: 14 }}>
             interfaces that survive real data.

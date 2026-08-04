@@ -1,7 +1,11 @@
 export const profile = {
   name: "Eega Somasekhara Reddy",
   handle: "Somu",
+  alternateNames: ["Somu", "Somu Eega"],
   role: "Frontend developer",
+  jobTitle: "Frontend Engineer",
+  shortDescription:
+    "Frontend engineer specialising in React, Next.js, TypeScript, design systems and web performance.",
   availability: "Open to work",
   timeZone: "Asia/Kolkata",
   /** Canonical production origin — drives metadataBase, OG, sitemap, JSON-LD. */

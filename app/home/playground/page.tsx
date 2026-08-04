@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import HomeShell from "@/components/home/HomeShell";
 import PlaygroundGrid from "@/components/playground/PlaygroundGrid";
+import { profile } from "@/lib/profile.config";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Playground",
-  description: "Interactive experiments — type, fluid, shaders, and motion.",
-};
+  description: `Interaction studies and frontend experiments by ${profile.name}, including typography, motion, browser APIs, and visual systems.`,
+  path: "/home/playground",
+});
 
 export default function PlaygroundPage() {
   return (

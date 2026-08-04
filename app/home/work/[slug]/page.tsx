@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import BlockRenderer from "@/components/casestudy/BlockRenderer";
 import CaseStudyMorph from "@/components/casestudy/CaseStudyMorph";
@@ -12,7 +13,9 @@ import {
   caseStudyMono,
 } from "@/components/casestudy/case-study-classes";
 import Thumbnail from "@/components/thumbnail/Thumbnail";
+import { profile } from "@/lib/profile.config";
 import { getCaseStudySlugs, getProjectBySlug } from "@/lib/projects.config";
+import { createPageMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 type PageProps = {
@@ -31,24 +34,14 @@ export async function generateMetadata({
   if (!project?.caseStudy) return { title: "Case Study" };
 
   const { caseStudy } = project;
-  const path = `/home/work/${slug}`;
+  const path = `/home/work/${slug}` as const;
 
-  return {
+  return createPageMetadata({
     title: project.title,
     description: caseStudy.tagline,
-    alternates: { canonical: path },
-    openGraph: {
-      type: "article",
-      url: path,
-      title: project.title,
-      description: caseStudy.tagline,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: project.title,
-      description: caseStudy.tagline,
-    },
-  };
+    path,
+    type: "article",
+  });
 }
 
 export default async function CaseStudyPage({ params }: PageProps) {
@@ -100,6 +93,20 @@ export default async function CaseStudyPage({ params }: PageProps) {
             </h1>
             <p className="text-[clamp(17px,1.35vw,18px)] leading-[1.6] font-normal tracking-[-0.01em] text-ink-dim text-pretty">
               {caseStudy.tagline}
+            </p>
+            <p
+              className={cn(
+                caseStudyMono,
+                "text-[10.5px] leading-normal font-normal text-ink-faint",
+              )}
+            >
+              Case study by{" "}
+              <Link
+                href="/home/about"
+                className="font-medium text-ink underline decoration-border-color underline-offset-4 transition-colors hover:text-accent"
+              >
+                {profile.name}
+              </Link>
             </p>
             {caseStudy.tags.length > 0 && (
               <ul className="flex flex-wrap gap-2">
