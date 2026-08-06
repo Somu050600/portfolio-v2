@@ -4,7 +4,12 @@ import {
 } from "./photography.generated";
 import type { PhotoAsset } from "./photography.types";
 
-export const photos: readonly PhotoAsset[] = generatedPhotos;
+export const photos: readonly PhotoAsset[] = [...generatedPhotos]
+  .reverse()
+  .map((photo, index) => ({
+    ...photo,
+    no: String(index + 1).padStart(2, "0"),
+  }));
 export const hiddenPhotoId: string = generatedHiddenPhotoId;
 export type Photo = PhotoAsset;
 

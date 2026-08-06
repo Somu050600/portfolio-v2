@@ -15,7 +15,8 @@ test("publishes the photography pipeline through the native case-study model", (
     status: "SHIPPED",
     thumbnail: {
       poster:
-        "/photos/generated/pxl-20260406-130441622-raw-02-original-d6804b0f/grid.webp",
+        "/photos/generated/img-20181015-195513-01-358f1451/grid.webp",
+      alt: "Low sunlight shines through a stone arch toward a garden.",
     },
   });
   const orderedProjects = [...projects].sort((a, b) => a.number - b.number);

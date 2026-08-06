@@ -974,8 +974,8 @@ export const projects: Project[] = [
     thumbnail: {
       kind: "image",
       poster:
-        "/photos/generated/pxl-20260406-130441622-raw-02-original-d6804b0f/grid.webp",
-      alt: "A person stands on a rocky sea cliff above breaking waves.",
+        "/photos/generated/img-20181015-195513-01-358f1451/grid.webp",
+      alt: "Low sunlight shines through a stone arch toward a garden.",
       params: { objectPosition: "center 52%" },
     },
     caseStudy: {

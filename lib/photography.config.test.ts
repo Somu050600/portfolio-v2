@@ -8,21 +8,43 @@ import {
 } from "./photography.config";
 
 describe("generated photography data", () => {
-  test("publishes the curated sources in stable sequential order", () => {
+  test("displays the curated sources in reverse with fresh frame numbers", () => {
     expect(photos).toHaveLength(20);
     expect(photos[0]).toMatchObject({
       no: "01",
-      id: "20251219-000319-03a8c2a2",
-      width: 4518,
-      height: 5533,
+      id: "pxl-20260406-133217115-raw-01-1-13c9267b",
+      width: 6099,
+      height: 7624,
       categories: [],
       tags: [],
       altStatus: "draft",
     });
     expect(photos.at(-1)).toMatchObject({
       no: "20",
-      id: "pxl-20260406-133217115-raw-01-1-13c9267b",
+      id: "20251219-000319-03a8c2a2",
     });
+    expect(photos.map(({ no }) => no)).toEqual([
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+      "09",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+    ]);
     expect(
       photos.some(({ id }) => id === "pxl-20260405-130246834-45bf4fa6"),
     ).toBe(false);
