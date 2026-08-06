@@ -4,6 +4,7 @@
 # next.js
 /.next/
 /out/
+/.photo-pipeline/
 
 # env files
 .env*.local

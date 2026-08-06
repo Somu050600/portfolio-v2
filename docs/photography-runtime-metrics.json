@@ -1,0 +1,57 @@
+{
+  "capturedAt": "2026-08-07",
+  "environment": {
+    "server": "Next.js production build on localhost",
+    "browserCache": "disabled",
+    "desktopViewport": "1440x1000 @1x",
+    "mobileViewport": "390x844 @3x",
+    "mobileNetwork": "150ms latency, 1.6Mbps download, 750Kbps upload"
+  },
+  "desktopInitial": {
+    "frames": 21,
+    "lcpMs": 208,
+    "cls": 0,
+    "totalTransferBytes": 1176076,
+    "imageTransferBytes": 200850,
+    "panoramaRequests": 0,
+    "horizontalOverflowPx": 0
+  },
+  "desktopInteractions": {
+    "viewerClickToDecodeMs": 63.2,
+    "adjacentPrefetchReadyMs": 9.6,
+    "panoramaOpenToInteractiveMs": 540.8,
+    "panoramaInitialYawDegrees": 180,
+    "safelightLayoutStable": true,
+    "focusTrapPassed": true,
+    "focusReturnPassed": true,
+    "runtimeExceptions": 0
+  },
+  "mobileInitial": {
+    "frames": 21,
+    "lcpMs": 1308,
+    "cls": 0,
+    "totalTransferBytes": 1748800,
+    "imageTransferBytes": 832442,
+    "panoramaRequests": 0,
+    "horizontalOverflowPx": 0,
+    "runtimeExceptions": 0
+  },
+  "scrollResponse": {
+    "wheelDeltaPx": 180,
+    "photographyAt10MsPx": 157,
+    "photographySettledAtMs": 60,
+    "smoothRouteAt10MsPx": 35,
+    "smoothRouteAt250MsPx": 150,
+    "policy": "Immediate Lenis response on /home/photography; default 0.1 interpolation elsewhere"
+  },
+  "renderingPolicy": {
+    "javascriptVirtualization": false,
+    "networkDeferral": "Next/Image loading=lazy for 20 of 21 grid images",
+    "reason": "Profiling identified scroll interpolation rather than image layout or decode as the perceived lag source"
+  },
+  "notes": [
+    "Local laboratory results are not field performance claims.",
+    "Interaction timings were read from the page performance marks.",
+    "The full panorama asset and Three.js were requested only after opening a confirmed panorama."
+  ]
+}

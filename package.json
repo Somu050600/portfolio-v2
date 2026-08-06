@@ -6,6 +6,11 @@
     "dev": "next dev",
     "prebuild": "npm run lint",
     "build": "next build",
+    "photos:audit": "bun scripts/photos/pipeline.ts audit",
+    "photos:process": "bun scripts/photos/pipeline.ts process",
+    "photos:validate": "bun scripts/photos/pipeline.ts validate",
+    "photos:report": "bun scripts/photos/pipeline.ts report",
+    "photos:all": "bun scripts/photos/pipeline.ts all",
     "prepare": "git config core.hooksPath .githooks || true",
     "start": "next start",
     "lint": "eslint --max-warnings=0"
@@ -36,6 +41,7 @@
     "@types/three": "0.185.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
+    "sharp": "0.34.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

@@ -1,13 +1,22 @@
 "use client";
 
-import { ReactLenis, useLenis } from "lenis/react";
-import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useMediaQuery } from "@/components/landing/use-media-query";
 import { PageTransitionContext } from "@/lib/page-transition-context";
 import { consumeRestorePending, setLenisInstance } from "@/lib/scroll-restore";
+import gsap from "gsap";
+import { ReactLenis, useLenis } from "lenis/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { usePathname } from "next/navigation";
+import { useContext, useEffect, useMemo, useRef, type ReactNode } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
+
+export function scrollLerpForRoute(
+  pathname: string,
+  reducedMotion: boolean,
+): number {
+  return reducedMotion || pathname === "/home/photography" ? 1 : 0.1;
+}
 
 function TickerBridge() {
   const lenis = useLenis(ScrollTrigger.update);
@@ -55,19 +64,16 @@ function ScrollReset() {
 }
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
-  const [opts, setOpts] = useState({
-    autoRaf: false,
-    lerp: 0.1,
-    syncTouch: false,
-  });
-
-  useEffect(() => {
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = requestAnimationFrame(() => {
-      setOpts((o) => ({ ...o, lerp: 1 }));
-    });
-    return () => cancelAnimationFrame(id);
-  }, []);
+  const pathname = usePathname();
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const opts = useMemo(
+    () => ({
+      autoRaf: false,
+      lerp: scrollLerpForRoute(pathname, reducedMotion),
+      syncTouch: false,
+    }),
+    [pathname, reducedMotion],
+  );
 
   return (
     <ReactLenis root options={opts}>

@@ -277,6 +277,19 @@ html:not([data-vt-group-anim])::view-transition-group(root) {
   z-index: 0;
 }
 
+/* Only the photo being opened or closed is promoted out of the root snapshot.
+   Keep that shared element above the modal snapshot while its bounds morph. */
+::view-transition-group(photo-active) {
+  z-index: 2;
+  animation-duration: 480ms;
+  animation-timing-function: var(--ease-out-soft);
+}
+
+::view-transition-old(photo-active),
+::view-transition-new(photo-active) {
+  mix-blend-mode: normal;
+}
+
 /* ==========================================================================
    CARD ↔ CASE-STUDY MORPH — tuned timing for the shared-element groups.
    These names only exist while a morph transition is in flight.

@@ -314,6 +314,90 @@ function VtApproachesDiagram() {
   );
 }
 
+function PhotographyPipelineDiagram() {
+  const steps = [
+    ["Read-only source audit", "22 images · SHA-256 · EXIF/XMP"],
+    ["Duplicate + privacy review", "2 likely groups · 7 GPS-bearing sources"],
+    ["Raster / DNG / panorama", "separate, explicit processing branches"],
+    ["Orientation + sRGB", "no upscaling · metadata stripped"],
+    ["Role-based derivatives", "thumb · grid · viewer · panorama"],
+    ["Typed manifest", "stable IDs · safe EXIF · draft alt text"],
+    ["Gallery + viewer", "context-sized delivery with measured timing"],
+  ];
+  return (
+    <figure className={cn("not-prose", caseStudyArtifact)} data-cs-artifact>
+      <div className="overflow-hidden rounded-xl border border-border-color bg-surface p-4">
+        <p className="mb-4 font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
+          Photography asset pipeline
+        </p>
+        <ol className="grid gap-2 sm:grid-cols-2">
+          {steps.map(([label, detail], index) => (
+            <li
+              key={label}
+              className={cn(
+                "flex min-w-0 gap-3 rounded-lg border border-border-color bg-elevated p-3",
+                index === steps.length - 1 && "sm:col-span-2",
+              )}
+            >
+              <span className="font-mono text-[10px] text-ink-faint tabular-nums">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className="flex min-w-0 flex-col gap-1">
+                <b className="text-sm font-medium text-ink">{label}</b>
+                <small className="font-mono text-[10px] leading-4 text-ink-dim">
+                  {detail}
+                </small>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </figure>
+  );
+}
+
+function PhotoDeliveryDiagram() {
+  const roles = [
+    {
+      label: "Contact sheet",
+      asset: "Grid WebP",
+      behavior: "1 eager LCP candidate · 21 lazy images",
+    },
+    {
+      label: "Full-screen viewer",
+      asset: "Active viewer WebP",
+      behavior: "Active viewer only · adjacent prefetch after decode",
+    },
+    {
+      label: "360° photograph",
+      asset: "Poster → panorama JPEG",
+      behavior: "Three.js and 8K equirectangular asset load on open",
+    },
+  ];
+  return (
+    <figure className={cn("not-prose", caseStudyArtifact)} data-cs-artifact>
+      <div className="overflow-hidden rounded-xl border border-border-color bg-surface">
+        <p className="border-b border-border-color px-4 py-3 font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
+          One photograph, three delivery contexts
+        </p>
+        <div className="grid gap-px bg-border-color md:grid-cols-3">
+          {roles.map((role) => (
+            <div key={role.label} className="flex flex-col gap-2 bg-surface p-4">
+              <b className="text-sm font-medium text-ink">{role.label}</b>
+              <code className="w-fit rounded bg-elevated px-2 py-1 font-mono text-[10px] text-ink-dim">
+                {role.asset}
+              </code>
+              <p className="font-mono text-[10px] leading-4 text-ink-faint">
+                {role.behavior}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </figure>
+  );
+}
+
 function ParagraphBlock({
   text,
   emphasis = [],
@@ -462,6 +546,9 @@ function BlockItem({ block }: { block: Block }) {
       if (block.kind === "dual-render") return <DualRenderDiagram />;
       if (block.kind === "memory-blowup") return <MemoryBlowupDiagram />;
       if (block.kind === "vt-approaches") return <VtApproachesDiagram />;
+      if (block.kind === "photography-pipeline")
+        return <PhotographyPipelineDiagram />;
+      if (block.kind === "photo-delivery") return <PhotoDeliveryDiagram />;
       return null;
 
     case "demo":

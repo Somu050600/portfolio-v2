@@ -32,7 +32,9 @@ export type Block =
         | "compliance-pipeline"
         | "dual-render"
         | "memory-blowup"
-        | "vt-approaches";
+        | "vt-approaches"
+        | "photography-pipeline"
+        | "photo-delivery";
     }
   | { type: "demo"; id: string; caption?: string }
   | { type: "vtlab" };
@@ -842,7 +844,7 @@ export const projects: Project[] = [
   },
   {
     slug: "sso-alert-pipelines",
-    number: 6,
+    number: 7,
     title: "SSO & Alert Pipelines",
     description:
       "SAML SSO for Google/Microsoft plus event-driven alerts to Slack, Jira, Coralogix, and S3.",
@@ -856,7 +858,7 @@ export const projects: Project[] = [
   },
   {
     slug: "brush-reveal",
-    number: 7,
+    number: 8,
     title: "Brush Reveal",
     description: "SVG mask animation along a hand-drawn centerline path.",
     category: "creative",
@@ -869,7 +871,7 @@ export const projects: Project[] = [
   },
   {
     slug: "fluid-sim",
-    number: 8,
+    number: 9,
     title: "Fluid Simulation",
     description: "WebGL2 Navier–Stokes solver with interactive dye injection.",
     category: "creative",
@@ -884,7 +886,7 @@ export const projects: Project[] = [
   },
   {
     slug: "perf-pass",
-    number: 9,
+    number: 10,
     title: "Performance Pass",
     description:
       "Bundle splitting, selective SSR/CSR, lazy loading, and caching — 30% TTI reduction.",
@@ -900,7 +902,7 @@ export const projects: Project[] = [
   // ── More (compact list) ────────────────────────────────────────────────────
   {
     slug: "wallet-rn",
-    number: 10,
+    number: 11,
     title: "Wallet RN",
     description: "React Native expense tracker with offline-first sync.",
     category: "more",
@@ -914,7 +916,7 @@ export const projects: Project[] = [
   },
   {
     slug: "portfolio-v1",
-    number: 11,
+    number: 12,
     title: "Portfolio - V1",
     description: "First Portfolio project",
     category: "more",
@@ -928,7 +930,7 @@ export const projects: Project[] = [
   },
   {
     slug: "are-we-there-yet",
-    number: 12,
+    number: 13,
     title: "Are We There Yet",
     description: "Real-time trip tracker with ETA predictions.",
     category: "more",
@@ -942,7 +944,7 @@ export const projects: Project[] = [
   },
   {
     slug: "node-bites",
-    number: 13,
+    number: 14,
     title: "Node Bites",
     description:
       "The Food Explorer App is a React-based application that allows users to explore various meal categories, view meals within those categories, and see detailed information about selected meals.",
@@ -954,6 +956,330 @@ export const projects: Project[] = [
     tech: ["React", "React Flow", "Tailwind"],
     external: true,
     href: "https://github.com/Somu050600/node-bites",
+  },
+  {
+    slug: "photography-pipeline",
+    number: 6,
+    title:
+      "Engineering a Photography Portfolio Without Sacrificing the Photographs",
+    description:
+      "A read-only image pipeline for responsive photographs, RAW previews, private metadata, and interactive 360° work.",
+    category: "creative",
+    role: "Frontend Engineer & Photographer",
+    team: "Independent",
+    shipped: "2026",
+    status: "SHIPPED",
+    tech: ["Next.js", "TypeScript", "Sharp", "Three.js"],
+    tilt: 0.8,
+    thumbnail: {
+      kind: "image",
+      poster:
+        "/photos/generated/pxl-20260406-130441622-raw-02-original-d6804b0f/grid.webp",
+      alt: "A person stands on a rocky sea cliff above breaking waves.",
+      params: { objectPosition: "center 52%" },
+    },
+    caseStudy: {
+      tagline:
+        "The hard part was not displaying twenty published photographs. It was preserving their detail, privacy, and 360-degree behavior without making every visitor download the archive.",
+      tags: ["Image Pipeline", "Next.js", "Sharp", "Three.js"],
+      hero: {
+        image:
+          "/photos/generated/20251219-000319-03a8c2a2/grid.webp",
+        accent: "orange",
+      },
+      sections: [
+        {
+          id: "context",
+          heading: "Photography Is Part of the Product",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "This photography page lives inside a frontend-engineering portfolio. That makes image delivery part of the work itself: the photographs need to remain visually convincing while the page still behaves like a fast, accessible application.",
+              emphasis: ["image delivery part of the work itself"],
+            },
+            {
+              type: "paragraph",
+              text: "The original gallery already had its contact-sheet layout, darkroom interactions, keyboard lightbox, responsive columns, and reduced-motion behavior. The implementation task was deliberately narrower: replace placeholder frames with a safe, reproducible asset system without redesigning the page.",
+            },
+          ],
+        },
+        {
+          id: "problem",
+          heading: "One Folder, Several Different Problems",
+          blocks: [
+            {
+              type: "list",
+              items: [
+                {
+                  title: "Large and inconsistent sources",
+                  text: "The selected set totalled 172.5 MB across portrait, landscape, wide, alpha-channel PNG, JPEG, and DNG inputs.",
+                },
+                {
+                  title: "Private metadata",
+                  text: "Seven files exposed GPS markers. Camera and lens details could be useful; coordinates, serials, source paths, filenames, and editing identities could not enter the public bundle.",
+                },
+                {
+                  title: "Different viewing contexts",
+                  text: "A dense masonry grid, a small filmstrip, a full-screen viewer, and an 8K photosphere do not need the same bytes.",
+                },
+                {
+                  title: "RAW and panorama branches",
+                  text: "Two DNGs needed explicit fallback decisions, while two confirmed photospheres had to remain interactive rather than becoming flattened wide strips.",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: "constraints",
+          heading: "Safety Before Cleverness",
+          blocks: [
+            {
+              type: "callout",
+              accent: "orange",
+              text: "The source folder is read-only. The pipeline never renames, moves, edits, strips, or deletes an original; it verifies every source checksum again after processing.",
+            },
+            {
+              type: "paragraph",
+              text: "The first version stays local and static, keeps categories and tags empty, drafts factual alt text for review, uses no creative colour grading, never upscales, respects reduced motion, and loads panoramas only after a visitor opens one.",
+            },
+          ],
+        },
+        {
+          id: "source-audit",
+          heading: "What the Audit Actually Found",
+          blocks: [
+            {
+              type: "metrics",
+              items: [
+                { value: "22", label: "Recognised photographs" },
+                { value: "541 MP", label: "Source pixels audited" },
+                { value: "7", label: "GPS-bearing sources" },
+              ],
+            },
+            {
+              type: "paragraph",
+              text: "The set contained twenty standard rasters and two DNGs. GPano XMP confirmed two true equirectangular photospheres. Six other 2:1 files were flagged as possible panoramas for review, but they remain ordinary photographs because aspect ratio alone is not evidence of projection type.",
+              emphasis: ["aspect ratio alone is not evidence"],
+            },
+            {
+              type: "paragraph",
+              text: "SHA-256 found no exact duplicate groups. Filename association and perceptual review identified two likely edit/original groups. Both user-confirmed duplicates are now excluded by checksum while their sources remain untouched.",
+            },
+          ],
+        },
+        {
+          id: "architecture",
+          heading: "One Deterministic Path, Three Processing Branches",
+          blocks: [
+            { type: "diagram", kind: "photography-pipeline" },
+            {
+              type: "paragraph",
+              text: "A stable public ID combines a sanitized source stem with the first eight characters of its SHA-256 hash. The cache key combines the full source checksum, processing-profile version, Sharp version, and libvips version, so a warm rerun can skip unchanged work without relying on modification times.",
+            },
+          ],
+        },
+        {
+          id: "standard-images",
+          heading: "The Standard Raster Path",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Sharp 0.34.5 and libvips 8.17.3 apply EXIF orientation, flatten any alpha channel, convert to sRGB, and create four uncropped WebP roles. Thumb uses a 360 px long edge at quality 55; grid uses 1400 px at 72; viewer uses 2800 px at 84; and the 32 px placeholder uses quality 30.",
+              emphasis: ["four uncropped WebP roles"],
+            },
+            {
+              type: "paragraph",
+              text: "Public derivatives use Sharp's default metadata-stripping behavior. Dominant colours come from the generated grid image for stable contact-sheet wells, while the tiny WebP placeholder becomes the viewer blur data URL. No creative sharpening or grading is applied.",
+            },
+          ],
+        },
+        {
+          id: "dng-path",
+          heading: "RAW Files Without Pretending",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The machine had no ExifTool, darktable, RawTherapee, or other full RAW developer. Both DNGs did expose sufficiently large embedded 8-bit previews: one at 3456 × 4608 after orientation and one at 1928 × 2560. The pipeline records both outcomes explicitly as extracted from embedded preview.",
+              emphasis: ["extracted from embedded preview"],
+            },
+            {
+              type: "callout",
+              accent: "neutral",
+              text: "A small thumbnail would have triggered manual conversion instead. The pipeline does not treat any decodable DNG payload as automatically suitable for a full-screen result.",
+            },
+          ],
+        },
+        {
+          id: "panorama-path",
+          heading: "Keeping the Photospheres Spherical",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Both confirmed panoramas retain an uncropped, 8192 px equirectangular JPEG at quality 88 with their GPano XMP re-injected after optimisation. Separate centre posters feed the thumb and grid roles, so browsing never downloads a compressed panoramic strip.",
+            },
+            {
+              type: "paragraph",
+              text: "The validator reopened both public panoramas, confirmed ProjectionType=equirectangular and UsePanoramaViewer=True, and measured normalized left/right seam scores of 0.0237 and 0.0249 against a 0.35 review threshold.",
+            },
+            {
+              type: "paragraph",
+              text: "When a panorama opens, Next.js dynamically loads the panorama component. That component then imports Three.js and requests the full equirectangular file. Until the texture is interactive, the normal poster remains visible as a fallback. Both photospheres now start at a 180-degree yaw from their previous default.",
+            },
+          ],
+        },
+        {
+          id: "responsive-delivery",
+          heading: "Download the Detail the Current Context Needs",
+          blocks: [
+            { type: "diagram", kind: "photo-delivery" },
+            {
+              type: "paragraph",
+              text: "The grid sizes string mirrors the real two-, three-, and four-column layouts after page gutters. Only the first grid frame is eager and high-priority; the other nineteen are lazy. The filmstrip uses 360 px thumbs instead of repeating grid assets.",
+            },
+            {
+              type: "paragraph",
+              text: "The lightbox mounts only the active viewer asset. After that image decodes, a generation token starts prefetching the previous and next viewer files; rapid navigation invalidates stale work. Performance marks cover click-to-decode, adjacent readiness, and panorama open-to-interactive timing.",
+            },
+            {
+              type: "paragraph",
+              text: "Only the selected frame receives a temporary photo-active View Transition name. During open and close, that identity moves between the loaded grid image and the active viewer or panorama poster; keeping the other nineteen frames in the root snapshot prevents them from floating above the lightbox.",
+            },
+            {
+              type: "paragraph",
+              text: "The gallery does not use JavaScript virtualization. Next/Image already defers off-screen network work, and every frame reserves its aspect ratio, so unmounting masonry items would add observer state, blank back-scrolls, and repeat decodes for only twenty photographs. A scroll profile instead identified the route-wide Lenis 0.1 interpolation as the source of the heavy feeling, so Photography uses immediate scrolling while the rest of the portfolio keeps its smooth-scroll treatment.",
+            },
+          ],
+        },
+        {
+          id: "privacy-accessibility",
+          heading: "Privacy and Accessibility Share the Manifest Boundary",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The private audit keeps source paths, filenames, checksums, metadata findings, associations, warnings, and duplicate rationale outside public assets. The generated client manifest keeps only stable IDs, role URLs, dimensions, safe camera fields, colours, blur placeholders, and alt-review state.",
+            },
+            {
+              type: "paragraph",
+              text: "All twenty published items have visually reviewed factual alt drafts, but remain marked draft until final editorial approval. The grid reserves exact aspect ratios and exposes the same descriptions through its image-opening controls. Keyboard arrows, Escape, focus return, reduced motion, and the panorama poster fallback remain intact.",
+            },
+          ],
+        },
+        {
+          id: "measurements",
+          heading: "Measured Output, Not a Claimed Score",
+          blocks: [
+            {
+              type: "metrics",
+              items: [
+                { value: "172.5 MB", label: "Source selection" },
+                { value: "28.9 MB", label: "All public roles" },
+                { value: "1.43 ms", label: "Warm pipeline rerun" },
+              ],
+            },
+            {
+              type: "paragraph",
+              text: "Median source size was 6.55 MB. Median generated files were 8.8 KB for thumbs, 116 KB for grid, and 464 KB for standard viewers. Across role duplication, median per-photo reduction was 45.85% and average reduction was 57.92%.",
+            },
+            {
+              type: "paragraph",
+              text: "The two full panoramas account for 16.08 MB of the 28.9 MB output, which is why they are isolated behind interaction. The cold run took 28.53 seconds. The final warm run skipped all twenty published sources in 1.43 ms, reran the complete twenty-two-source audit, and validated all published outputs.",
+            },
+            {
+              type: "paragraph",
+              text: "A cache-disabled local production run at 1440 × 1000 transferred 1.18 MB initially, including 201 KB of image transfer, with zero initial layout shift and no panorama request. The active viewer decoded 63.2 ms after click, adjacent prefetch completed 9.6 ms later, and the panorama became interactive in 541 ms. At 390 × 844 with a 3× device scale and emulated 4G, the initial route transferred 1.75 MB, recorded a 1.31 s LCP, and again recorded zero layout shift. A 180 px wheel step reached 157 px in 10 ms and settled in 60 ms on Photography; the unchanged smooth route reached 35 px at 10 ms and remained at 150 px after 250 ms. These are local lab observations, not field performance claims.",
+            },
+          ],
+        },
+        {
+          id: "decisions",
+          heading: "Decisions and Rejected Alternatives",
+          blocks: [
+            {
+              type: "list",
+              items: [
+                {
+                  title: "Local assets over a CDN",
+                  text: "Twenty published photographs fit a source-controlled workflow today. A CDN would add operational complexity before scale requires it.",
+                },
+                {
+                  title: "WebP over AVIF",
+                  text: "WebP keeps encoding fast and predictable in the existing Next.js path. No representative AVIF benchmark demonstrated a reason to add a second format in this pass.",
+                },
+                {
+                  title: "Role-specific files over one master",
+                  text: "The filmstrip, masonry grid, viewer, and panorama have materially different jobs. A single master would make the browser repeatedly decode or request unnecessary detail.",
+                },
+                {
+                  title: "Adjacent prefetch over preload-all",
+                  text: "Only two likely next images warm after the active frame is decoded. Hidden viewer files do not compete with initial grid delivery.",
+                },
+                {
+                  title: "Interactive panoramas over flattened strips",
+                  text: "The photospheres remain navigable photographs. Their larger files and rendering code are paid only by visitors who open them.",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: "tradeoffs",
+          heading: "The Cost of Doing It Deliberately",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The system adds a processing profile, cache, typed manifest, private review artifacts, validation reports, and four common roles per standard photograph. That is more metadata and storage than copying one JPEG into public.",
+            },
+            {
+              type: "paragraph",
+              text: "Automatic RAW development remains intentionally conservative: embedded previews were adequate for this set, but future DNGs may require manual conversion or a dedicated developer. Panoramas remain the largest files, and alt text still needs human approval.",
+            },
+          ],
+        },
+        {
+          id: "outcome",
+          heading: "A Gallery With Context-Sized Detail",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The gallery now downloads the detail appropriate to browsing, inspecting, or exploring a photosphere. The complete public derivative set is 83% smaller than the untouched selection in aggregate, while the role-aware comparison accounts honestly for duplicated viewing roles at a 57.92% average per-photo reduction.",
+              emphasis: ["detail appropriate to browsing, inspecting, or exploring a photosphere"],
+            },
+            {
+              type: "paragraph",
+              text: "More importantly, the originals remain unchanged, GPS never crosses the public boundary, layout space is known before download, and the two 360-degree photographs keep the interaction that makes them distinct.",
+            },
+          ],
+        },
+        {
+          id: "next",
+          heading: "What I Would Improve Next",
+          blocks: [
+            {
+              type: "list",
+              items: [
+                {
+                  title: "Editorial approval",
+                  text: "Finalize the factual alt-text drafts after editorial review.",
+                },
+                {
+                  title: "RAW consistency",
+                  text: "Add a colour-managed RAW developer when the selection includes files whose embedded previews are not sufficient.",
+                },
+                {
+                  title: "Curated viewing",
+                  text: "Store focal points, collections, and per-panorama starting views only when they are deliberately authored.",
+                },
+                {
+                  title: "Delivery scale",
+                  text: "Move derivatives to an image CDN only when collection size or deployment cost makes local assets the limiting factor.",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   },
 ];
 

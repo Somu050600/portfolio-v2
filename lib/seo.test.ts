@@ -8,8 +8,8 @@ type JsonLdNode = {
 };
 
 type SeoStructuredData = {
-  rootJsonLd?: { "@context": string; "@graph": JsonLdNode[] };
-  aboutJsonLd?: { "@context": string; "@graph": JsonLdNode[] };
+  rootJsonLd?: { "@context": string; "@graph": readonly JsonLdNode[] };
+  aboutJsonLd?: { "@context": string; "@graph": readonly JsonLdNode[] };
   serializeJsonLd?: (value: unknown) => string;
 };
 

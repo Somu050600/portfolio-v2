@@ -4,32 +4,41 @@ import { useMediaQuery } from "@/components/landing/use-media-query";
 import { cn } from "@/lib/utils";
 import {
   formatFrameCount,
-  hiddenPhotoFile,
+  hiddenPhotoId,
+  photoLabel,
   photoMeta,
   photos,
   stepPhotoIndex,
   type Photo,
 } from "@/lib/photography.config";
-import Image from "next/image";
+import dynamic from "next/dynamic";
+import NextImage from "next/image";
+import Link from "next/link";
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type SyntheticEvent,
 } from "react";
+import { flushSync } from "react-dom";
+
+const PanoramaViewer = dynamic(() => import("./PanoramaViewer"), {
+  ssr: false,
+  loading: () => (
+    <div className="absolute inset-0 flex items-center justify-center bg-black/10 text-[10px] tracking-widest text-white uppercase">
+      Loading 360°
+    </div>
+  ),
+});
 
 const PRINT_ROTATIONS = [-3, 2.5, -2, 3, -1.5, 2, -3.5, 1.5, -2.5, 3];
 const TAPE_ROTATIONS = [-5, 4, -3, 5, -2, 3, -4, 2, -5, 4];
 const DEVELOP_HOLD_MS = 650;
 const FLASH_MS = 160;
-
-function photoSource(photo: Photo): string {
-  return `/photos/${photo.file}`;
-}
+const ACTIVE_PHOTO_TRANSITION_NAME = "photo-active";
 
 function hideMissingImage(event: SyntheticEvent<HTMLImageElement>) {
   event.currentTarget.hidden = true;
@@ -39,62 +48,136 @@ function hideMissingImage(event: SyntheticEvent<HTMLImageElement>) {
 function GalleryImage({
   photo,
   index,
-  available,
+  transitionName,
 }: {
   photo: Photo;
   index: number;
-  available: boolean;
+  transitionName?: string;
 }) {
-  if (!available) return null;
-
   return (
-    <Image
+    <NextImage
       className="absolute inset-0 size-full object-cover text-transparent transition-transform duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover/frame:scale-[1.04] motion-reduce:transform-none motion-reduce:transition-none"
-      src={photoSource(photo)}
+      src={photo.gridSrc}
       alt=""
-      width={photo.w}
-      height={photo.h}
+      width={photo.width}
+      height={photo.height}
       sizes="(max-width: 899px) calc((100vw - 50px) / 2), (max-width: 1199px) calc((100vw - 108px) / 3), calc((100vw - 442px) / 4)"
-      loading={index < 4 ? "eager" : "lazy"}
+      loading={index === 0 ? "eager" : "lazy"}
       fetchPriority={index === 0 ? "high" : "auto"}
       decoding="async"
+      placeholder={photo.blurDataURL ? "blur" : "empty"}
+      blurDataURL={photo.blurDataURL}
+      style={{
+        viewTransitionName: transitionName,
+      }}
       onError={hideMissingImage}
     />
   );
 }
 
-export default function PhotographyGallery({
-  availableFiles,
-}: {
-  availableFiles: readonly string[];
-}) {
+export default function PhotographyGallery() {
   const [safelight, setSafelight] = useState(false);
-  const [shots, setShots] = useState(38);
+  const [shots, setShots] = useState<number>(photos.length);
   const [flash, setFlash] = useState(false);
   const [hiddenFrameOpen, setHiddenFrameOpen] = useState(false);
   const [developed, setDeveloped] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [transitionPhotoId, setTransitionPhotoId] = useState<string | null>(
+    null,
+  );
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const lightboxRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const holdStartedAtRef = useRef<number | null>(null);
-  const availableFileSet = useMemo(
-    () => new Set(availableFiles),
-    [availableFiles],
-  );
+  const prefetchGenerationRef = useRef(0);
+  const transitionGenerationRef = useRef(0);
   const lightboxOpen = activeIndex !== null;
   const activePhoto = activeIndex === null ? null : photos[activeIndex];
+  const hiddenPhoto = photos.find(({ id }) => id === hiddenPhotoId);
 
-  const openLightbox = useCallback((index: number, opener: HTMLElement) => {
-    openerRef.current = opener;
-    setActiveIndex(index);
-  }, []);
+  const runPhotoTransition = useCallback(
+    (photoId: string, update: () => void) => {
+      if (!document.startViewTransition || reducedMotion) {
+        update();
+        return;
+      }
+
+      const generation = ++transitionGenerationRef.current;
+      flushSync(() => setTransitionPhotoId(photoId));
+
+      const transition = document.startViewTransition(() => {
+        flushSync(update);
+      });
+
+      void transition.finished.finally(() => {
+        if (generation !== transitionGenerationRef.current) return;
+        setTransitionPhotoId(null);
+      });
+    },
+    [reducedMotion],
+  );
+
+  const openLightbox = useCallback(
+    (index: number, opener: HTMLElement) => {
+      openerRef.current = opener;
+      performance.mark("photo-viewer-click");
+      runPhotoTransition(photos[index].id, () => setActiveIndex(index));
+    },
+    [runPhotoTransition],
+  );
 
   const closeLightbox = useCallback(() => {
-    setActiveIndex(null);
+    prefetchGenerationRef.current += 1;
+    if (!activePhoto) return;
+    runPhotoTransition(activePhoto.id, () => setActiveIndex(null));
+  }, [activePhoto, runPhotoTransition]);
+
+  const prefetchAdjacent = useCallback((index: number) => {
+    const generation = ++prefetchGenerationRef.current;
+    const adjacentSources = [-1, 1]
+      .map((delta) => photos[stepPhotoIndex(index, delta)].viewerSrc)
+      .filter((source): source is string => Boolean(source));
+    performance.mark("photo-adjacent-prefetch-start");
+    void Promise.all(
+      adjacentSources.map(
+        (source) =>
+          new Promise<void>((resolve) => {
+            const image = new window.Image();
+            image.onload = () => resolve();
+            image.onerror = () => resolve();
+            image.src = source;
+          }),
+      ),
+    ).then(() => {
+      if (generation !== prefetchGenerationRef.current) return;
+      performance.mark("photo-adjacent-prefetch-ready");
+      performance.measure(
+        "photo-adjacent-prefetch-duration",
+        "photo-adjacent-prefetch-start",
+        "photo-adjacent-prefetch-ready",
+      );
+    });
   }, []);
+
+  const onViewerLoad = useCallback(
+    (event: SyntheticEvent<HTMLImageElement>) => {
+      const index = activeIndex;
+      if (index === null) return;
+      void event.currentTarget.decode().catch(() => undefined).then(() => {
+        if (activeIndex !== index) return;
+        performance.mark("photo-viewer-decoded");
+        performance.measure(
+          "photo-viewer-click-to-decoded",
+          "photo-viewer-click",
+          "photo-viewer-decoded",
+        );
+        prefetchAdjacent(index);
+      });
+    },
+    [activeIndex, prefetchAdjacent],
+  );
 
   useEffect(() => {
     if (!lightboxOpen) return;
@@ -128,6 +211,7 @@ export default function PhotographyGallery({
       }
       if (event.key === "ArrowRight") {
         event.preventDefault();
+        performance.mark("photo-viewer-click");
         setActiveIndex((current) =>
           current === null ? null : stepPhotoIndex(current, 1),
         );
@@ -135,6 +219,7 @@ export default function PhotographyGallery({
       }
       if (event.key === "ArrowLeft") {
         event.preventDefault();
+        performance.mark("photo-viewer-click");
         setActiveIndex((current) =>
           current === null ? null : stepPhotoIndex(current, -1),
         );
@@ -223,12 +308,18 @@ export default function PhotographyGallery({
               Photographs
             </h1>
             <p className="m-0 max-w-[52ch] text-[12.5px] leading-[1.75] font-normal text-(--photo-dim) max-[899px]:text-[11px] max-[899px]:leading-[1.7]">
-              Thirty-eight kept out of six years. The good ones are downstairs
-              on the table.
+              Twenty selected photographs, developed for the web without
+              touching the originals.
             </p>
           </div>
 
           <div className="flex flex-none items-center gap-2.5 max-[899px]:justify-start">
+            <Link
+              href="/home/work/photography-pipeline"
+              className="mr-1 text-[9.5px] leading-none font-medium tracking-[0.12em] text-(--photo-dim) uppercase underline decoration-(--photo-hair) underline-offset-4 transition-colors hover:text-(--photo-text) focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-(--photo-accent)"
+            >
+              How it was built ↗
+            </Link>
             <button
               type="button"
               className="flex min-h-9.5 cursor-pointer items-center gap-2.25 rounded-[30px] border border-(--photo-button-line) bg-transparent px-3.5 py-2.25 text-[9.5px] leading-none font-medium tracking-[0.14em] text-(--photo-dim) focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-(--photo-accent) max-[899px]:min-h-11"
@@ -244,7 +335,7 @@ export default function PhotographyGallery({
                 )}
                 aria-hidden="true"
               />
-              <span className="w-18.25 text-left">
+              <span className="w-18.25 whitespace-nowrap text-left">
                 {safelight ? "SAFELIGHT ON" : "SAFELIGHT"}
               </span>
             </button>
@@ -268,15 +359,18 @@ export default function PhotographyGallery({
         >
           {photos.map((photo, index) => (
             <figure
-              key={photo.no}
+              key={photo.id}
               className="relative mb-3.5 block break-inside-avoid overflow-hidden border border-(--photo-line) bg-(--photo-panel) max-[899px]:mb-2.5"
-              style={{ aspectRatio: `${photo.w}/${photo.h}` }}
+              style={{
+                aspectRatio: `${photo.width}/${photo.height}`,
+                backgroundColor: photo.dominantColor,
+              }}
               data-photo-frame={photo.no}
             >
               <button
                 type="button"
                 className="group/frame absolute inset-0 block size-full cursor-pointer overflow-hidden border-0 bg-transparent p-0 text-left focus-visible:outline-2 focus-visible:-outline-offset-3 focus-visible:outline-(--photo-accent)"
-                aria-label={`${photo.title}. ${photoMeta(photo)}`}
+                aria-label={`${photoLabel(photo)}. ${photo.alt}. ${photoMeta(photo)}`}
                 onClick={(event) =>
                   openLightbox(index, event.currentTarget)
                 }
@@ -284,14 +378,18 @@ export default function PhotographyGallery({
                 <GalleryImage
                   photo={photo}
                   index={index}
-                  available={availableFileSet.has(photo.file)}
+                  transitionName={
+                    activeIndex === null && transitionPhotoId === photo.id
+                      ? ACTIVE_PHOTO_TRANSITION_NAME
+                      : undefined
+                  }
                 />
                 <span
                   className="absolute right-0 bottom-0 left-0 flex translate-y-1.75 flex-col gap-1 bg-[linear-gradient(180deg,var(--photo-scrim-zero),var(--photo-scrim)_58%)] px-3.75 pt-3.5 pb-3 opacity-0 transition-[opacity,transform] duration-240 ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover/frame:translate-y-0 group-hover/frame:opacity-100 group-focus-visible/frame:translate-y-0 group-focus-visible/frame:opacity-100 max-[899px]:translate-y-0 max-[899px]:px-2.5 max-[899px]:pt-4.5 max-[899px]:pb-2 max-[899px]:opacity-100 motion-reduce:transition-none"
                   aria-hidden="true"
                 >
                   <b className="[font-family:var(--font-home-instrument)] text-[15px] leading-[1.2] font-normal text-(--photo-text) max-[899px]:text-[12.5px]">
-                    {photo.title}
+                    {photoLabel(photo)}
                   </b>
                   <small className="text-[9.5px] leading-normal font-normal text-(--photo-dim-2) max-[899px]:hidden">
                     {photoMeta(photo)}
@@ -332,7 +430,7 @@ export default function PhotographyGallery({
           >
             {photos.slice(0, 10).map((photo, index) => (
               <figure
-                key={photo.no}
+                key={photo.id}
                 className="relative m-0 w-39 flex-none transform-[rotate(var(--print-rotation))] transition-transform duration-220 ease-[cubic-bezier(0.2,0.8,0.3,1)] hover:z-6 hover:transform-[rotate(0deg)_scale(1.04)] max-[899px]:w-33 max-[899px]:snap-center motion-reduce:transform-none motion-reduce:transition-none"
                 style={
                   {
@@ -344,7 +442,7 @@ export default function PhotographyGallery({
                 <button
                   type="button"
                   className="relative block w-full cursor-pointer rounded-xs border-0 bg-(--photo-print) px-2.25 pt-2.25 pb-0 text-left [box-shadow:var(--photo-shadow)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-(--photo-accent)"
-                  aria-label={`Open ${photo.title}`}
+                  aria-label={`Open ${photoLabel(photo)}`}
                   onClick={(event) =>
                     openLightbox(index, event.currentTarget)
                   }
@@ -358,27 +456,28 @@ export default function PhotographyGallery({
                     }
                     aria-hidden="true"
                   />
-                  <span className="relative block aspect-square overflow-hidden bg-(--photo-print-well)">
-                    {availableFileSet.has(photo.file) && (
-                      <Image
-                        className="absolute inset-0 size-full object-cover text-transparent"
-                        src={photoSource(photo)}
-                        alt=""
-                        width={photo.w}
-                        height={photo.h}
-                        sizes="156px"
-                        loading="lazy"
-                        decoding="async"
-                        onError={hideMissingImage}
-                      />
-                    )}
+                  <span
+                    className="relative block aspect-square overflow-hidden bg-(--photo-print-well)"
+                    style={{ backgroundColor: photo.dominantColor }}
+                  >
+                    <NextImage
+                      className="absolute inset-0 size-full object-cover text-transparent"
+                      src={photo.thumbSrc}
+                      alt=""
+                      width={photo.width}
+                      height={photo.height}
+                      sizes="156px"
+                      loading="lazy"
+                      decoding="async"
+                      onError={hideMissingImage}
+                    />
                   </span>
                   <span className="flex items-baseline gap-1.5 px-0.5 pt-2 pb-2.75">
                     <b className="[font-family:var(--font-photography-caveat)] text-sm leading-none font-normal text-[#16130f]">
-                      {photo.title}
+                      {photoLabel(photo)}
                     </b>
                     <small className="ml-auto text-[8px] leading-none font-normal text-[#a09884]">
-                      {photo.year}
+                      {photo.capturedAt?.slice(0, 4) ?? "—"}
                     </small>
                   </span>
                 </button>
@@ -434,13 +533,13 @@ export default function PhotographyGallery({
             onKeyDown={onDevelopKeyDown}
             onKeyUp={onDevelopKeyUp}
           >
-            {availableFileSet.has(hiddenPhotoFile) && (
-              <Image
+            {hiddenPhoto && (
+              <NextImage
                 className="absolute inset-0 size-full object-cover text-transparent filter-[brightness(0.25)_contrast(0.4)_blur(4px)] transition-[filter] duration-1600 group-data-[developed=true]/develop:filter-none motion-reduce:transition-none"
-                src={`/photos/${hiddenPhotoFile}`}
+                src={hiddenPhoto.gridSrc}
                 alt=""
-                width={3000}
-                height={2000}
+                width={hiddenPhoto.width}
+                height={hiddenPhoto.height}
                 sizes="168px"
                 loading="lazy"
                 decoding="async"
@@ -459,7 +558,7 @@ export default function PhotographyGallery({
               The one that nearly wasn&apos;t
             </h2>
             <p className="m-0 max-w-[46ch] text-[11px] leading-[1.65] font-normal text-(--photo-dim)">
-              Three stops under, pulled back in the scan. Press and hold to
+              A final frame from the same processed set. Press and hold to
               develop it.
             </p>
           </div>
@@ -480,25 +579,56 @@ export default function PhotographyGallery({
           className="fixed inset-0 z-90 flex cursor-zoom-out items-center justify-center bg-[rgba(246,243,236,0.975)] px-15 py-11 backdrop-blur-[6px] focus:outline-none dark:bg-[rgba(6,8,7,0.965)] max-[899px]:flex-col max-[899px]:items-stretch max-[899px]:justify-center max-[899px]:p-5.5"
           role="dialog"
           aria-modal="true"
-          aria-label={activePhoto.title}
+          aria-label={photoLabel(activePhoto)}
           tabIndex={-1}
           onClick={closeLightbox}
         >
           <div className="flex w-full max-w-225 flex-col gap-4">
-            <div className="relative h-[min(620px,72vh)] border border-[rgba(22,19,15,0.1)] bg-[#e9e4d8] dark:border-white/6 dark:bg-[#101312] max-[899px]:h-[min(420px,52vh)]">
-              {availableFileSet.has(activePhoto.file) && (
-                <Image
-                  key={activePhoto.file}
-                  className="absolute inset-0 size-full object-contain text-transparent"
-                  src={photoSource(activePhoto)}
-                  alt=""
-                  width={activePhoto.w}
-                  height={activePhoto.h}
-                  sizes="min(900px, 90vw)"
-                  loading="eager"
-                  decoding="async"
-                  onError={hideMissingImage}
+            <div
+              className="relative h-[min(620px,72vh)] overflow-hidden border border-[rgba(22,19,15,0.1)] bg-[#e9e4d8] dark:border-white/6 dark:bg-[#101312] max-[899px]:h-[min(420px,52vh)]"
+              style={{ backgroundColor: activePhoto.dominantColor }}
+            >
+              {activePhoto.type === "panorama360" &&
+              activePhoto.panoramaSrc &&
+              activePhoto.posterSrc ? (
+                <PanoramaViewer
+                  key={activePhoto.id}
+                  src={activePhoto.panoramaSrc}
+                  posterSrc={activePhoto.posterSrc}
+                  alt={activePhoto.alt}
+                  transitionName={
+                    transitionPhotoId === activePhoto.id
+                      ? ACTIVE_PHOTO_TRANSITION_NAME
+                      : undefined
+                  }
+                  onInteractive={() => {
+                    if (activeIndex !== null) prefetchAdjacent(activeIndex);
+                  }}
                 />
+              ) : (
+                activePhoto.viewerSrc && (
+                  <NextImage
+                    key={activePhoto.id}
+                    className="absolute inset-0 size-full object-contain text-transparent"
+                    src={activePhoto.viewerSrc}
+                    alt={activePhoto.alt}
+                    width={activePhoto.width}
+                    height={activePhoto.height}
+                    sizes="(max-width: 899px) calc(100vw - 44px), min(900px, 90vw)"
+                    loading="eager"
+                    decoding="async"
+                    placeholder={activePhoto.blurDataURL ? "blur" : "empty"}
+                    blurDataURL={activePhoto.blurDataURL}
+                    style={{
+                      viewTransitionName:
+                        transitionPhotoId === activePhoto.id
+                          ? ACTIVE_PHOTO_TRANSITION_NAME
+                          : undefined,
+                    }}
+                    onLoad={onViewerLoad}
+                    onError={hideMissingImage}
+                  />
+                )
               )}
             </div>
             <div className="flex items-end gap-7.5 max-[899px]:flex-col max-[899px]:items-stretch max-[899px]:gap-1.5">
@@ -506,7 +636,7 @@ export default function PhotographyGallery({
                 <span className="[font-family:var(--font-home-jetbrains)] text-[9px] leading-none font-semibold tracking-[0.16em] text-[#c2452f] dark:text-[#d64030]">
                   {activePhoto.no}
                 </span>
-                <span>{activePhoto.title}</span>
+                <span>{photoLabel(activePhoto)}</span>
               </div>
               <span className="[font-family:var(--font-home-jetbrains)] text-right text-[10.5px] leading-[1.7] font-normal text-[#6f685b] dark:text-[#98a099] max-[899px]:text-left">
                 {photoMeta(activePhoto)}

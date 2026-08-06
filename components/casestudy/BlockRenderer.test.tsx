@@ -37,3 +37,18 @@ test("keeps the floating code toggle legible over scrolling code", () => {
   expect(caseStudyCodeToggle).toContain("text-thumb-ink");
   expect(caseStudyCodeToggle).toContain("z-10");
 });
+
+test("renders the measured photography pipeline as a native case-study artifact", () => {
+  const html = renderToStaticMarkup(
+    <BlockRenderer
+      blocks={[
+        { type: "diagram", kind: "photography-pipeline" } as never,
+        { type: "diagram", kind: "photo-delivery" } as never,
+      ]}
+    />,
+  );
+
+  expect(html).toContain("Read-only source audit");
+  expect(html).toContain("Active viewer only");
+  expect(html.match(/data-cs-artifact/g)).toHaveLength(2);
+});
