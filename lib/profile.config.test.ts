@@ -28,4 +28,5 @@ test("generates llms.txt from the canonical identity and public routes", async (
   expect(body).toContain("React, Next.js, TypeScript, design systems and web performance");
   expect(body).toContain("[About](https://eega.dev/home/about)");
   expect(body).toContain("[Experience](https://eega.dev/home/experience)");
+  expect(body).toContain("[Photography](https://eega.dev/home/photography)");
 });

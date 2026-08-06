@@ -12,6 +12,7 @@ function resolveActiveKey(pathname: string): HomeNavKey {
   if (pathname.startsWith("/home/work")) return "work";
   if (pathname.startsWith("/home/experience")) return "experience";
   if (pathname.startsWith("/home/about")) return "about";
+  if (pathname.startsWith("/home/photography")) return "photography";
   if (pathname.startsWith("/home/playground")) return "playground";
   return "work";
 }

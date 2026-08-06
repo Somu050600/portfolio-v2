@@ -35,6 +35,7 @@ export function GET() {
     `- [Work](${base}/home): selected professional and creative projects`,
     `- [Experience](${base}/home/experience): roles and timeline`,
     `- [About](${base}/home/about): background and approach`,
+    `- [Photography](${base}/home/photography): film and digital photographs`,
     `- [Playground](${base}/home/playground): interactive experiments`,
     "",
     "## Contact",

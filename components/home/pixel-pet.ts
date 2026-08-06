@@ -50,6 +50,7 @@ export const PIXEL_NAV_LINES: Record<HomeNavKey, string> = {
   work: "the good stuff",
   experience: "he's been busy",
   about: "he's shy",
+  photography: "say cheese",
   playground: "my house",
 };
 

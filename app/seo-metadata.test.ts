@@ -2,6 +2,7 @@ import { describe, expect, mock, test } from "bun:test";
 import { metadata as workMetadata } from "./home/page";
 import { metadata as aboutMetadata } from "./home/about/page";
 import { metadata as experienceMetadata } from "./home/experience/page";
+import { metadata as photographyMetadata } from "./home/photography/page";
 import { metadata as playgroundMetadata } from "./home/playground/page";
 import { generateMetadata as getExperimentMetadata } from "./home/playground/[slug]/page";
 import { generateMetadata as getCaseStudyMetadata } from "./home/work/[slug]/page";
@@ -20,6 +21,7 @@ const expectedStaticPages = [
   [workMetadata, "Work", "/home"],
   [aboutMetadata, "About", "/home/about"],
   [experienceMetadata, "Experience", "/home/experience"],
+  [photographyMetadata, "Photography", "/home/photography"],
   [playgroundMetadata, "Playground", "/home/playground"],
 ] as const;
 
@@ -107,6 +109,7 @@ test("sitemap exposes public routes without fabricated modification dates", () =
   expect(urls).toContain("https://eega.dev/home");
   expect(urls).toContain("https://eega.dev/home/about");
   expect(urls).toContain("https://eega.dev/home/experience");
+  expect(urls).toContain("https://eega.dev/home/photography");
   expect(urls).toContain("https://eega.dev/home/playground");
   expect(urls).toContain("https://eega.dev/home/playground/type-lab");
   expect(urls).toContain("https://eega.dev/home/work/design-system");

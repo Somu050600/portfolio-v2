@@ -1,7 +1,7 @@
-import type { MetadataRoute } from "next";
 import { getLiveExperimentSlugs } from "@/lib/playground.config";
-import { getCaseStudySlugs } from "@/lib/projects.config";
 import { profile } from "@/lib/profile.config";
+import { getCaseStudySlugs } from "@/lib/projects.config";
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = profile.url;
@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/home",
     "/home/experience",
     "/home/about",
+    "/home/photography",
     "/home/playground",
   ].map((path) => ({
     url: new URL(path || "/", base).toString(),
