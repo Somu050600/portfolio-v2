@@ -11,7 +11,7 @@ const shirtMask = {
 } satisfies CSSProperties;
 
 const tintLayer =
-  "pointer-events-none absolute inset-0 hidden size-full transition-colors duration-350 ease-out supports-[mask-image:linear-gradient(#000,#000)]:block supports-[-webkit-mask-image:linear-gradient(#000,#000)]:block motion-reduce:transition-none";
+  "pointer-events-none absolute inset-0 -translate-x-[0.5px] translate-y-[0.5px] hidden size-full transition-colors duration-350 ease-out supports-[mask-image:linear-gradient(#000,#000)]:block supports-[-webkit-mask-image:linear-gradient(#000,#000)]:block motion-reduce:transition-none";
 
 export default function ThemeTintedPortrait() {
   return (
