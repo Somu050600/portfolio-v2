@@ -171,7 +171,7 @@ export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
 
           {/* Mode */}
           <section>
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-ink-faint">
+            <p className="mb-2 font-mono text-metadata uppercase tracking-widest text-ink-faint">
               Mode
             </p>
             <div className="flex gap-2">
@@ -196,7 +196,7 @@ export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
 
           {/* Dark accent */}
           <section>
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-ink-faint">
+            <p className="mb-2 font-mono text-metadata uppercase tracking-widest text-ink-faint">
               Dark accent
             </p>
             <AccentGrid
@@ -212,7 +212,7 @@ export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
 
           {/* Light accent */}
           <section>
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-ink-faint">
+            <p className="mb-2 font-mono text-metadata uppercase tracking-widest text-ink-faint">
               Light accent
             </p>
             <AccentGrid
@@ -348,7 +348,7 @@ function BuildModeAdvanced() {
 
   return (
     <section>
-      <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-ink-faint">
+      <p className="mb-2 font-mono text-metadata uppercase tracking-widest text-ink-faint">
         Advanced
       </p>
       <button
@@ -365,7 +365,7 @@ function BuildModeAdvanced() {
         <span>Build mode</span>
         <span>{buildMode ? "On" : "Off"}</span>
       </button>
-      <p className="mt-2 text-[10px] leading-snug text-ink-faint">
+      <p className="mt-2 font-body text-metadata leading-snug text-ink-faint">
         Inspect overlays, perf HUD, and component notes. Also in ⌘K.
       </p>
     </section>

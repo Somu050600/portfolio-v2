@@ -24,6 +24,8 @@ test("renders the approved Elements about-page narrative", () => {
   expect(markup).toContain('alt="Somu seated by the sea"');
   expect(markup).toContain("somu-portrait.png");
   expect(markup).toContain("/images/about/somu-shirt-mask.png");
+  expect(markup.match(/<h1[^>]*>/)?.[0]).toContain("text-page-title");
+  expect(markup).toContain("text-card-title");
   expect(markup).not.toContain("Portrait · 292×392");
   expect(markup).not.toContain("<footer");
 });

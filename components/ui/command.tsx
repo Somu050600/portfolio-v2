@@ -20,7 +20,7 @@ function Command({
     <CommandPrimitive
       data-slot="command"
       className={cn(
-        "flex h-full w-full flex-col overflow-hidden rounded-xl bg-popover text-popover-foreground",
+        "flex h-full w-full flex-col overflow-hidden rounded-xl bg-popover font-body text-popover-foreground",
         className,
       )}
       {...props}
@@ -73,7 +73,7 @@ function CommandInput({
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
-          "flex h-11 w-full bg-transparent py-3 font-mono text-sm outline-none placeholder:text-ink-faint disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-11 w-full bg-transparent py-3 font-body text-sm outline-none placeholder:text-ink-faint disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
         {...props}
@@ -105,7 +105,7 @@ function CommandEmpty({
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
-      className="py-6 text-center font-mono text-sm text-ink-faint"
+      className="py-6 text-center font-body text-sm text-ink-faint"
       {...props}
     />
   );
@@ -119,7 +119,7 @@ function CommandGroup({
     <CommandPrimitive.Group
       data-slot="command-group"
       className={cn(
-        "overflow-hidden p-1 text-ink [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:tracking-[0.18em] [&_[cmdk-group-heading]]:text-ink-faint [&_[cmdk-group-heading]]:uppercase",
+        "overflow-hidden p-1 text-ink **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:font-mono **:[[cmdk-group-heading]]:text-metadata **:[[cmdk-group-heading]]:tracking-[0.18em] **:[[cmdk-group-heading]]:text-ink-faint **:[[cmdk-group-heading]]:uppercase",
         className,
       )}
       {...props}
@@ -148,7 +148,7 @@ function CommandItem({
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-lg px-2 py-2 font-mono text-sm text-ink outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-surface data-[selected=true]:text-ink [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "relative flex cursor-default items-center gap-2 rounded-lg px-2 py-2 font-body text-sm text-ink outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-surface data-[selected=true]:text-ink [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,
       )}
       {...props}
@@ -164,7 +164,7 @@ function CommandShortcut({
     <span
       data-slot="command-shortcut"
       className={cn(
-        "ml-auto font-mono text-[10px] tracking-wide text-ink-faint",
+        "ml-auto font-mono text-metadata tracking-wide text-ink-faint",
         className,
       )}
       {...props}

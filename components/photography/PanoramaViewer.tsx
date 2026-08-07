@@ -198,7 +198,7 @@ export default function PanoramaViewer({
         className="absolute inset-0 [&>canvas]:block [&>canvas]:size-full"
         aria-hidden="true"
       />
-      <span className="pointer-events-none absolute right-3 bottom-3 rounded-full bg-black/55 px-3 py-1.5 text-[9px] font-medium tracking-widest text-white uppercase backdrop-blur-md">
+      <span className="pointer-events-none absolute right-3 bottom-3 rounded-full bg-black/55 px-3 py-1.5 font-mono text-metadata font-medium tracking-widest text-white uppercase backdrop-blur-md">
         {interactive ? "DRAG TO LOOK AROUND" : "LOADING 360°"}
       </span>
     </div>

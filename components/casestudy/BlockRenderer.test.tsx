@@ -2,7 +2,11 @@ import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import BlockRenderer from "./BlockRenderer";
 import VTLab from "./VTLab";
-import { caseStudyCodeToggle } from "./case-study-classes";
+import {
+  caseStudyCodeToggle,
+  caseStudyMono,
+  caseStudyProse,
+} from "./case-study-classes";
 
 test("uses the shared body typography for a plain paragraph", () => {
   const plain = renderToStaticMarkup(
@@ -36,6 +40,13 @@ test("keeps the floating code toggle legible over scrolling code", () => {
   expect(caseStudyCodeToggle).toContain("backdrop-blur-md");
   expect(caseStudyCodeToggle).toContain("text-thumb-ink");
   expect(caseStudyCodeToggle).toContain("z-10");
+});
+
+test("uses semantic body and technical roles for case-study content", () => {
+  expect(caseStudyProse).toContain("font-body");
+  expect(caseStudyProse).toContain("text-body");
+  expect(caseStudyMono).toContain("font-mono");
+  expect(caseStudyMono).not.toContain("--font-cs-");
 });
 
 test("renders the measured photography pipeline as a native case-study artifact", () => {

@@ -374,7 +374,7 @@ export default function PixelPet() {
       aria-hidden="true"
       className="hidden h-38 cursor-pointer flex-col gap-2.5 overflow-hidden rounded-[10px] border border-border-color bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_82%,transparent),color-mix(in_srgb,var(--accent)_4.5%,var(--bg)))] p-3.25 shadow-sm select-none lg:flex"
     >
-      <div className="flex items-center justify-between gap-3 [font-family:var(--font-home-jetbrains)] text-[9px] leading-none font-semibold tracking-[0.16em] text-ink-faint uppercase tabular-nums">
+      <div className="flex items-center justify-between gap-3 font-mono text-metadata leading-none font-semibold tracking-[0.16em] text-ink-faint uppercase tabular-nums">
         <span>Pixel</span>
         <span ref={counterRef}>VISIT 01</span>
       </div>
@@ -388,7 +388,7 @@ export default function PixelPet() {
           ref={bubbleRef}
           data-pixel-bubble
           data-tone="body"
-          className="absolute bottom-13 box-border w-max max-w-full rounded-[7px] border border-border-color bg-surface px-2 py-1.25 [font-family:var(--font-home-jetbrains)] text-[10px] leading-[1.35] font-normal whitespace-normal text-ink-dim opacity-0 shadow-sm transition-[opacity,transform] duration-150 data-[tone=accent]:border-accent data-[tone=accent]:text-accent data-[tone=muted]:text-ink-faint data-[tone=punch]:text-accent"
+          className="absolute bottom-13 box-border w-max max-w-full rounded-[7px] border border-border-color bg-surface px-2 py-1.25 font-mono text-metadata leading-[1.35] font-normal whitespace-normal text-ink-dim opacity-0 shadow-sm transition-[opacity,transform] duration-150 data-[tone=accent]:border-accent data-[tone=accent]:text-accent data-[tone=muted]:text-ink-faint data-[tone=punch]:text-accent"
         />
 
         <span

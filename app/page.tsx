@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 import type { Metadata } from "next";
+import { landingAccentFont } from "@/app/fonts/landing";
 import IntroOverlay from "@/components/landing/IntroOverlay";
 import WelcomeScene from "@/components/landing/WelcomeScene";
 import { createPageMetadata, homepageDescription, homepageTitle } from "@/lib/seo";
@@ -44,9 +45,9 @@ export default function LandingPage() {
   const fillContent = readFillContent();
 
   return (
-    <>
+    <div className={landingAccentFont.variable}>
       <WelcomeScene />
       <IntroOverlay strokePath={strokePath} fillContent={fillContent} />
-    </>
+    </div>
   );
 }

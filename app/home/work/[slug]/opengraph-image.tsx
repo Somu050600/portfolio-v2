@@ -35,7 +35,7 @@ export default async function Image({
           position: "relative",
           background: OG.paper,
           color: OG.ink,
-          fontFamily: "Source Code Pro",
+          fontFamily: "Poppins",
           padding: 76,
         }}
       >
@@ -57,6 +57,7 @@ export default async function Image({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            fontFamily: "JetBrains Mono",
             fontSize: 26,
           }}
         >
@@ -72,7 +73,8 @@ export default async function Image({
         <div
           style={{
             display: "flex",
-            fontFamily: "Glass Antiqua",
+            fontFamily: "Roboto Condensed",
+            fontWeight: 600,
             fontSize: 84,
             lineHeight: 1.05,
             maxWidth: 1000,
@@ -106,7 +108,7 @@ export default async function Image({
               </div>
             ))}
           </div>
-          <div style={{ display: "flex", fontSize: 26 }}>eega.dev</div>
+          <div style={{ display: "flex", fontFamily: "JetBrains Mono", fontSize: 26 }}>eega.dev</div>
         </div>
       </div>
     ),

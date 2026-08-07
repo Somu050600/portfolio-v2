@@ -17,20 +17,16 @@ test("keeps sidebar status and timezone in profile configuration", () => {
   expect(profile.timeZone).toBe("Asia/Kolkata");
 });
 
-test("loads home-sidebar fonts from the home layout", () => {
-  const layoutPath = fileURLToPath(
-    new URL("../../app/home/layout.tsx", import.meta.url),
-  );
+test("loads one semantic core font system from the root layout", () => {
+  const layoutPath = fileURLToPath(new URL("../../app/layout.tsx", import.meta.url));
   const sidebarPath = fileURLToPath(new URL("./Sidebar.tsx", import.meta.url));
   const layoutSource = readFileSync(layoutPath, "utf8");
   const sidebarSource = readFileSync(sidebarPath, "utf8");
 
-  expect(layoutSource).toContain("Instrument_Serif");
-  expect(layoutSource).toContain("JetBrains_Mono");
-  expect(layoutSource).toContain("Poppins");
-  expect(layoutSource).toContain("--font-home-instrument");
-  expect(layoutSource).toContain("--font-home-jetbrains");
-  expect(layoutSource).toContain("--font-home-poppins");
+  expect(layoutSource).toContain("coreFontVariables");
+  expect(layoutSource).not.toContain("Instrument_Serif");
+  expect(layoutSource).not.toContain("Source_Code_Pro");
+  expect(layoutSource).not.toContain("Glass_Antiqua");
   expect(sidebarSource).not.toContain('from "next/font/google"');
 });
 
@@ -41,6 +37,13 @@ test("React server rendering remains available to home component tests", () => {
 test("links the Somu wordmark back to the landing page", () => {
   const markup = renderToStaticMarkup(<Sidebar />);
   expect(markup).toContain('href="/"');
+});
+
+test("keeps contact actions at the shared 14px UI minimum", () => {
+  const sidebarPath = fileURLToPath(new URL("./Sidebar.tsx", import.meta.url));
+  const sidebarSource = readFileSync(sidebarPath, "utf8");
+
+  expect(sidebarSource).not.toMatch(/text-\[(12\.5|13\.5)px\]/);
 });
 
 test("keeps Pixel isolated in a token-backed desktop card", () => {
@@ -69,8 +72,8 @@ test("uses router-owned, numbered navigation without decorative active chrome", 
 
   expect(navSource).toContain("usePathname");
   expect(navSource).toContain("data-pixel-nav");
-  expect(navSource).toContain("font-home-poppins");
-  expect(navSource).toContain("font-home-jetbrains");
+  expect(navSource).toContain("font-body");
+  expect(navSource).toContain("font-mono");
   expect(navSource).not.toContain("data-toc-pill");
   expect(navSource).not.toContain("data-toc-bar");
   expect(navSource).not.toContain("PILL_TRANSITION");

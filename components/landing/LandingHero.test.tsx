@@ -18,5 +18,7 @@ test("renders the full identity visibly once in the landing hero", () => {
 
   expect(nameOccurrences).toBe(1);
   expect(markup).toContain(`${profile.name} · ${profile.jobTitle}`);
+  expect(markup).toContain("font-accent-dot");
+  expect(markup).not.toContain("font-dot");
   expect(markup).not.toContain(`aria-label="${profile.name}`);
 });

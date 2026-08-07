@@ -11,11 +11,11 @@ export default function HomeFooter() {
     <footer className="flex flex-col gap-4 border-t border-border-color px-5 py-8 lg:hidden">
       <a
         href={`mailto:${profile.contact.email}`}
-        className="w-fit [font-family:var(--font-home-poppins)] text-[13.5px] leading-none font-medium text-ink transition-colors hover:text-accent"
+        className="w-fit font-body text-[13.5px] leading-none font-medium text-ink transition-colors hover:text-accent"
       >
         Email me
       </a>
-      <div className="flex flex-wrap gap-4 [font-family:var(--font-home-poppins)] text-[12.5px] leading-none font-medium text-ink-dim">
+      <div className="flex flex-wrap gap-4 font-body text-[12.5px] leading-none font-medium text-ink-dim">
         {footerLinks.map((link) => (
           <a
             key={link.label}

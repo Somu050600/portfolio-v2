@@ -4,7 +4,7 @@ import { OG, ogFonts } from "@/lib/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-// Apple touch icon — serif S monogram in the brand serif on the accent.
+// Apple touch icon — display S monogram on the brand accent.
 export default function AppleIcon() {
   return new ImageResponse(
     (
@@ -17,7 +17,8 @@ export default function AppleIcon() {
           justifyContent: "center",
           background: OG.accent,
           color: "#f3f1eb",
-          fontFamily: "Glass Antiqua",
+          fontFamily: "Roboto Condensed",
+          fontWeight: 600,
           fontSize: 130,
           lineHeight: 1,
           paddingBottom: 8,

@@ -207,7 +207,7 @@ export default function CaseStudySidebar({
             onClick={() => setOpen((current) => !current)}
             className={cn(
               caseStudyMono,
-              "flex min-h-9.5 flex-1 items-center justify-between gap-4 px-2.5 text-[9.5px] leading-none font-semibold tracking-[0.18em] uppercase tabular-nums",
+              "flex min-h-9.5 flex-1 items-center justify-between gap-4 px-2.5 text-metadata leading-none font-semibold tracking-[0.18em] uppercase tabular-nums",
             )}
           >
             <span className="tracking-normal text-ink-faint">
@@ -221,7 +221,7 @@ export default function CaseStudySidebar({
           <p
             className={cn(
               caseStudyMono,
-              "min-w-0 truncate px-2.5 text-[10px] leading-none font-medium tracking-[0.14em] text-ink-faint uppercase",
+              "min-w-0 truncate px-2.5 text-metadata leading-none font-medium tracking-[0.14em] text-ink-faint uppercase",
             )}
           >
             {projectTitle}
@@ -237,7 +237,7 @@ export default function CaseStudySidebar({
           <p
             className={cn(
               caseStudyMono,
-              "text-[10px] leading-[1.35] font-medium tracking-[0.14em] text-ink-faint uppercase",
+              "text-metadata leading-[1.35] font-medium tracking-[0.14em] text-ink-faint uppercase",
             )}
           >
             {projectTitle}
@@ -263,7 +263,7 @@ export default function CaseStudySidebar({
             <div
               className={cn(
                 caseStudyMono,
-                "flex items-center justify-between gap-4 px-2.5 text-[9.5px] leading-none font-semibold tracking-[0.18em] uppercase tabular-nums",
+                "flex items-center justify-between gap-4 px-2.5 text-metadata leading-none font-semibold tracking-[0.18em] uppercase tabular-nums",
               )}
             >
               <span className="text-ink-dim">Contents</span>
@@ -291,7 +291,7 @@ export default function CaseStudySidebar({
                       <span
                         className={cn(
                           caseStudyMono,
-                          "text-[10.5px] leading-normal font-medium tabular-nums",
+                          "text-metadata leading-normal font-medium tabular-nums",
                           isActive
                             ? "font-semibold text-accent"
                             : "text-ink-faint",

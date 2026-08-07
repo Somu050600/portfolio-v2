@@ -54,7 +54,7 @@ const quadrantLabels = [
  * tightening for its monospace advance lives in globals.css.
  */
 const FINAL_WORD_CLASS =
-  "landing-final-word font-dot text-[0.92em] tracking-[-0.02em] not-italic";
+  "landing-final-word font-accent-dot text-[0.92em] tracking-[-0.02em] not-italic";
 
 /** [key to press, what it does] — see use-landing-easter-eggs.ts */
 const easterEggHints = [
@@ -235,7 +235,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
         <span
           key={quadrant}
           aria-hidden="true"
-          className={`pointer-events-none absolute z-4 font-mono text-[10px] tracking-[0.16em] text-(--landing-muted) transition-opacity duration-80 ease-linear max-[519px]:hidden ${placement}`}
+          className={`pointer-events-none absolute z-4 font-mono text-metadata tracking-[0.16em] text-(--landing-muted) transition-opacity duration-80 ease-linear max-[519px]:hidden ${placement}`}
         >
           {label}
         </span>
@@ -276,7 +276,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
             </button>
             <span
               id="photography-coming-soon"
-              className="pointer-events-none absolute top-[calc(100%+12px)] left-1/2 w-max -translate-x-1/2 -translate-y-0.5 text-[9px] tracking-[0.12em] text-(--landing-muted) uppercase opacity-0 transition-[opacity,transform] duration-180 group-hover:translate-y-0 group-hover:opacity-85 group-focus-within:translate-y-0 group-focus-within:opacity-85"
+              className="pointer-events-none absolute top-[calc(100%+12px)] left-1/2 w-max -translate-x-1/2 -translate-y-0.5 text-metadata tracking-[0.12em] text-(--landing-muted) uppercase opacity-0 transition-[opacity,transform] duration-180 group-hover:translate-y-0 group-hover:opacity-85 group-focus-within:translate-y-0 group-focus-within:opacity-85"
             >
               Coming soon
             </span>
@@ -322,7 +322,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
             className="flex items-baseline justify-between gap-4"
           >
             Photography{" "}
-            <small className="text-[8px] tracking-widest text-(--landing-muted) uppercase">
+            <small className="text-metadata tracking-widest text-(--landing-muted) uppercase">
               Coming soon
             </small>
           </span>
@@ -406,7 +406,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
             <p className="text-xs tracking-[0.14em] text-(--landing-muted) uppercase sm:text-sm">
               {profile.name} · {landingConfig.hero.role}
             </p>
-            <p className="text-[10px] tracking-[0.08em] text-(--landing-muted) sm:text-xs">
+            <p className="text-metadata tracking-[0.08em] text-(--landing-muted) sm:text-xs">
               {landingConfig.hero.specialties}
             </p>
             <ExploreCta
@@ -430,7 +430,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
         <p
           aria-live="polite"
           aria-atomic="true"
-          className="max-w-[58vw] text-[10px] tracking-[0.16em] text-(--landing-muted) uppercase sm:text-[11px]"
+          className="max-w-[58vw] text-metadata tracking-[0.16em] text-(--landing-muted) uppercase"
         >
           {focusStatus}
         </p>
@@ -444,7 +444,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
           // Absolutely centred in the footer rather than sitting in the flex
           // flow: as a flex child, justify-between re-distributed it every time
           // the status text or the Motion label changed width.
-          className={`absolute bottom-6 left-1/2 hidden -translate-x-1/2 text-[10px] tracking-[0.14em] text-(--landing-muted) uppercase sm:bottom-8 ${
+          className={`absolute bottom-6 left-1/2 hidden -translate-x-1/2 text-metadata tracking-[0.14em] text-(--landing-muted) uppercase sm:bottom-8 ${
             motionDisabled
               ? "lg:flex lg:items-center lg:gap-4"
               : "h-4 w-56 lg:block"
@@ -475,7 +475,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
           type="button"
           aria-pressed={motionDisabled}
           onClick={() => setMotionOverride(!motionDisabled)}
-          className="group inline-flex shrink-0 items-center gap-2 text-[10px] tracking-[0.12em] text-(--landing-muted) uppercase outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent) sm:text-[11px]"
+          className="group inline-flex shrink-0 items-center gap-2 text-metadata tracking-[0.12em] text-(--landing-muted) uppercase outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
         >
           <span>Motion</span>
           <span
@@ -492,7 +492,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
       {technicalVisible ? (
         <aside
           aria-label="Technical layer"
-          className="absolute right-6 bottom-20 z-30 w-[min(360px,calc(100vw-3rem))] border border-(--landing-line) bg-(--landing-paper)/95 p-4 font-mono text-[10px] shadow-[0_18px_60px_rgba(37,42,38,0.12)] backdrop-blur-sm sm:right-9 sm:bottom-24"
+          className="absolute right-6 bottom-20 z-30 w-[min(360px,calc(100vw-3rem))] border border-(--landing-line) bg-(--landing-paper)/95 p-4 font-mono text-metadata shadow-[0_18px_60px_rgba(37,42,38,0.12)] backdrop-blur-sm sm:right-9 sm:bottom-24"
         >
           <dl className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-2">
             {technicalRows.map(([term, description]) => (

@@ -11,10 +11,11 @@ import sitemap from "./sitemap";
 const font = () => ({ variable: "font-variable", className: "font-class" });
 
 mock.module("next/font/google", () => ({
+  Caveat: font,
   DotGothic16: font,
-  Geist: font,
-  Glass_Antiqua: font,
-  Source_Code_Pro: font,
+  JetBrains_Mono: font,
+  Poppins: font,
+  Roboto_Condensed: font,
 }));
 
 const expectedStaticPages = [

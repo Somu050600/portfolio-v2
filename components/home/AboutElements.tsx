@@ -8,9 +8,9 @@ import { useState } from "react";
 import SkillsGrid, { shouldRevealAtomicNumbers } from "./SkillsGrid";
 import ThemeTintedPortrait from "./ThemeTintedPortrait";
 
-const mono = "[font-family:var(--font-home-jetbrains)]";
-const display = "[font-family:var(--font-home-instrument)]";
-const sans = "[font-family:var(--font-home-poppins)]";
+const mono = "font-mono";
+const display = "font-display";
+const sans = "font-body";
 
 export default function AboutElements() {
   const [chemistryPinned, setChemistryPinned] = useState(false);
@@ -33,7 +33,7 @@ export default function AboutElements() {
           <span
             className={cn(
               mono,
-              "shrink-0 text-[10px] leading-none font-semibold tracking-[0.16em] text-accent uppercase",
+              "shrink-0 text-metadata leading-none font-semibold tracking-[0.16em] text-accent uppercase",
             )}
           >
             03 — ABOUT
@@ -42,7 +42,7 @@ export default function AboutElements() {
           <span
             className={cn(
               mono,
-              "shrink-0 text-[10px] leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
+              "shrink-0 text-metadata leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
             )}
           >
             24 ELEMENTS
@@ -51,7 +51,7 @@ export default function AboutElements() {
         <h1
           className={cn(
             display,
-            "text-[38px] leading-[1.05] font-normal tracking-[-0.015em] text-ink min-[901px]:text-[46px]",
+            "text-page-title font-semibold tracking-tight text-ink",
           )}
         >
           {profile.name}
@@ -105,7 +105,7 @@ export default function AboutElements() {
               <p
                 className={cn(
                   mono,
-                  "text-[9px] leading-none font-normal tracking-[0.12em] text-ink-faint uppercase min-[901px]:hidden",
+                  "text-metadata leading-none font-normal tracking-[0.12em] text-ink-faint uppercase min-[901px]:hidden",
                 )}
               >
                 TAP THE HIGHLIGHTED PHRASE
@@ -153,7 +153,7 @@ function PathStops() {
               <span
                 className={cn(
                   display,
-                  "text-[17px] leading-[1.2] font-normal text-ink transition-colors duration-240 group-hover:text-ink motion-reduce:transition-none min-[901px]:text-[19px]",
+                  "text-card-title font-medium text-ink transition-colors duration-240 group-hover:text-ink motion-reduce:transition-none",
                 )}
               >
                 {stop.title}
@@ -161,7 +161,7 @@ function PathStops() {
               <span
                 className={cn(
                   mono,
-                  "text-[9.5px] leading-[1.6] font-normal tracking-widest text-ink-faint uppercase",
+                  "text-metadata leading-[1.6] font-normal tracking-widest text-ink-faint uppercase",
                 )}
               >
                 {stop.caption}
@@ -176,13 +176,16 @@ function PathStops() {
 
 function Principles() {
   return (
-    <section aria-labelledby="about-principles-heading" className="flex flex-col gap-3.5">
+    <section
+      aria-labelledby="about-principles-heading"
+      className="flex flex-col gap-3.5"
+    >
       <div className="flex items-center gap-2.5">
         <h2
           id="about-principles-heading"
           className={cn(
             mono,
-            "text-[10px] leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
+            "text-metadata leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
           )}
         >
           What I care about
@@ -231,10 +234,7 @@ function ContactCard() {
           className="size-1.5 shrink-0 animate-pulse rounded-full bg-accent motion-reduce:animate-none [box-shadow:0_0_0_3px_var(--accent-soft)]"
         />
         <span
-          className={cn(
-            sans,
-            "text-xs leading-none font-normal text-ink-dim",
-          )}
+          className={cn(sans, "text-xs leading-none font-normal text-ink-dim")}
         >
           Open to work
         </span>
@@ -242,7 +242,7 @@ function ContactCard() {
       <span
         className={cn(
           mono,
-          "break-all text-[9.5px] leading-[1.6] font-normal tracking-widest text-ink-faint",
+          "break-all text-metadata leading-[1.6] font-normal tracking-widest text-ink-faint",
         )}
       >
         somasekhareega [at] gmail [dot] com
@@ -259,8 +259,14 @@ function ContactCard() {
       <div className="grid grid-cols-2 gap-2">
         <ContactLink href={profile.contact.github}>GitHub</ContactLink>
         <ContactLink href={profile.contact.linkedin}>LinkedIn</ContactLink>
+        <ContactLink href={profile.contact.phone}>Phone</ContactLink>
+        <ContactLink href={profile.contact.whatsapp}>WhatsApp</ContactLink>
+        <ContactLink href={profile.contact.instagram}>Instagram</ContactLink>
+        <ContactLink href={profile.contact.twitter}>Twitter</ContactLink>
       </div>
-      <ContactLink href={profile.contact.resumeUrl}>Download Resume ↓</ContactLink>
+      <ContactLink href={profile.contact.resumeUrl}>
+        Download Resume ↓
+      </ContactLink>
     </aside>
   );
 }

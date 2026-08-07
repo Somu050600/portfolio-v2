@@ -74,7 +74,7 @@ export default function TableOfContents({
               >
                 <span
                   className={cn(
-                    "w-4 shrink-0 [font-family:var(--font-home-jetbrains)] text-[10px] leading-none font-medium tabular-nums transition-colors duration-150",
+                    "font-mono w-4 shrink-0 text-metadata leading-none font-medium tabular-nums transition-colors duration-150",
                     isActive
                       ? "text-accent"
                       : "text-ink-faint group-hover:text-accent",
@@ -84,7 +84,7 @@ export default function TableOfContents({
                 </span>
                 <span
                   className={cn(
-                    "[font-family:var(--font-home-poppins)] text-[20px] leading-[1.15] font-semibold tracking-[-0.035em] transition-colors duration-150 lg:text-[27px]",
+                    "font-body text-[20px] leading-[1.15] font-semibold tracking-[-0.035em] transition-colors duration-150 lg:text-[27px]",
                     isActive
                       ? "text-ink"
                       : "text-ink-faint group-hover:text-ink",

@@ -78,14 +78,14 @@ export default function SlidingBarDemo({
       )}
       aria-hidden
     >
-      <p className="mb-3 font-mono text-[10px] tracking-[0.18em] text-ink-faint uppercase">
+      <p className="mb-3 font-mono text-metadata tracking-[0.18em] text-ink-faint uppercase">
         Explore
       </p>
 
       <div className="relative" style={{ height: ITEMS.length * STEP }}>
         {/* sliding accent bar — follows activeIndex (the click), not the cursor */}
         <span
-          className="pointer-events-none absolute left-0 z-10 w-[2px] rounded-full bg-accent"
+          className="pointer-events-none absolute left-0 z-10 w-0.5 rounded-full bg-accent"
           style={{
             height: BAR_H,
             top: (STEP - BAR_H) / 2 - 3,

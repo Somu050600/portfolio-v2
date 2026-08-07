@@ -16,7 +16,7 @@ export default function ObfuscatedEmail() {
     <button
       type="button"
       onClick={reveal}
-      className="text-left text-sm text-ink-dim underline-offset-2 hover:text-ink hover:underline"
+      className="font-body text-left text-sm text-ink-dim underline-offset-2 hover:text-ink hover:underline"
     >
       <span aria-hidden>
         {USER}
@@ -36,7 +36,7 @@ export function ResumeLink() {
       href={profile.contact.resumeUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 rounded-full border border-border-color bg-surface px-4 py-2 font-mono text-xs tracking-wide text-ink transition-colors hover:border-ink-faint"
+      className="inline-flex items-center gap-2 rounded-full border border-border-color bg-surface px-4 py-2 font-body text-sm font-medium text-ink transition-colors hover:border-ink-faint"
     >
       Download Resume
       <span aria-hidden>↓</span>

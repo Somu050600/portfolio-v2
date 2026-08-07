@@ -85,12 +85,12 @@ export default function Counter({ value, label, className }: CounterProps) {
       )}
     >
       <p
-        className="font-serif text-xl font-light text-ink tabular-nums"
+        className="font-display text-card-title font-medium text-ink tabular-nums"
         suppressHydrationWarning={parsed.animatable}
       >
         {shown}
       </p>
-      <p className="mt-0.5 font-mono text-[10px] tracking-wide text-ink-faint uppercase">
+      <p className="mt-0.5 font-mono text-metadata tracking-wide text-ink-faint uppercase">
         {label}
       </p>
       <noscript>

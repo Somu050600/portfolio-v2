@@ -419,10 +419,10 @@ export default function LiquidDistortionDemo({
       {!isThumbnail && (
         <>
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-4 p-4">
-            <span className="font-mono text-[10px] tracking-[0.18em] text-white/55 uppercase">
+            <span className="font-mono text-metadata tracking-[0.18em] text-white/55 uppercase">
               Momentum field
             </span>
-            <span className="hidden font-mono text-[10px] tracking-[0.14em] text-white/45 uppercase sm:block">
+            <span className="hidden font-mono text-metadata tracking-[0.14em] text-white/45 uppercase sm:block">
               Swipe fast vs slow
             </span>
           </div>
@@ -455,7 +455,7 @@ export default function LiquidDistortionDemo({
             <button
               type="button"
               onClick={clearTargets}
-              className="mt-1 w-full rounded-md border border-white/10 px-3 py-2 text-[10px] tracking-[0.14em] text-slate-300 uppercase transition-colors hover:border-white/25 hover:text-white"
+              className="mt-1 w-full rounded-md border border-white/10 px-3 py-2 font-mono text-metadata tracking-[0.14em] text-slate-300 uppercase transition-colors hover:border-white/25 hover:text-white"
             >
               Reset field
             </button>
@@ -483,7 +483,7 @@ function Control({
 }) {
   return (
     <label className="mb-3 block last:mb-0">
-      <span className="mb-1.5 flex justify-between gap-3 text-[10px] tracking-[0.12em] text-slate-400 uppercase">
+      <span className="mb-1.5 flex justify-between gap-3 font-mono text-metadata tracking-[0.12em] text-slate-400 uppercase">
         {label}
         <b className="font-normal text-slate-100">{value}</b>
       </span>

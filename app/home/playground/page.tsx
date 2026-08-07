@@ -3,6 +3,7 @@ import HomeShell from "@/components/home/HomeShell";
 import PlaygroundGrid from "@/components/playground/PlaygroundGrid";
 import { profile } from "@/lib/profile.config";
 import { createPageMetadata } from "@/lib/seo";
+import { typeStyles } from "@/lib/typography";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Playground",
@@ -15,10 +16,10 @@ export default function PlaygroundPage() {
     <HomeShell>
       <main className="px-6 py-10 md:px-12 md:py-14 lg:px-16">
         <header className="mb-10 max-w-2xl">
-          <h1 className="font-serif text-4xl font-light tracking-tight text-ink md:text-5xl">
+          <h1 className={`${typeStyles.pageTitle} text-ink`}>
             Playground
           </h1>
-          <p className="mt-4 text-sm leading-relaxed text-ink-dim md:text-base">
+          <p className={`${typeStyles.body} mt-4 text-ink-dim`}>
             Sketches and interaction studies — heavy demos are code-split and
             pause when off-screen.
           </p>

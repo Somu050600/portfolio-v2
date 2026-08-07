@@ -2,6 +2,7 @@
 
 import { useMediaQuery } from "@/components/landing/use-media-query";
 import { cn } from "@/lib/utils";
+import { typeStyles } from "@/lib/typography";
 import {
   formatFrameCount,
   hiddenPhotoId,
@@ -28,7 +29,7 @@ import { flushSync } from "react-dom";
 const PanoramaViewer = dynamic(() => import("./PanoramaViewer"), {
   ssr: false,
   loading: () => (
-    <div className="absolute inset-0 flex items-center justify-center bg-black/10 text-[10px] tracking-widest text-white uppercase">
+    <div className="absolute inset-0 flex items-center justify-center bg-black/10 font-mono text-metadata tracking-widest text-white uppercase">
       Loading 360°
     </div>
   ),
@@ -288,7 +289,7 @@ export default function PhotographyGallery() {
     <>
       <main
         className={cn(
-          "mx-auto flex min-h-screen w-full max-w-360 flex-col gap-8 bg-(--photo-bg) px-16 pt-13 pb-15 [--photo-accent:#c2452f] [--photo-bg:#f6f3ec] [--photo-bulb-off:#c9c1b0] [--photo-button-line:rgba(22,19,15,0.16)] [--photo-dim-2:#6f685b] [--photo-dim:#6f685b] [--photo-frame:#e0d9c9] [--photo-hair-soft:rgba(22,19,15,0.08)] [--photo-hair:rgba(22,19,15,0.14)] [--photo-kicker:#8a8272] [--photo-line:rgba(22,19,15,0.1)] [--photo-meta-2:#a09884] [--photo-meta:#a09884] [--photo-panel:#e9e4d8] [--photo-print-well:#e0d9c9] [--photo-print:#fffdf8] [--photo-reel:#efeade] [--photo-scrim-zero:rgba(246,243,236,0)] [--photo-scrim:rgba(246,243,236,0.95)] [--photo-shadow:0_16px_30px_-18px_rgba(22,19,15,0.5)] [--photo-speck:rgba(22,19,15,0.16)] [--photo-tape:rgba(198,182,140,0.55)] [--photo-text-2:#16130f] [--photo-text:#16130f] [font-family:var(--font-home-jetbrains)] text-(--photo-text) transition-[filter] duration-400 dark:[--photo-accent:#d64030] dark:[--photo-bg:#0d100e] dark:[--photo-bulb-off:#3a403b] dark:[--photo-button-line:rgba(255,255,255,0.12)] dark:[--photo-dim-2:#98a099] dark:[--photo-dim:#767d77] dark:[--photo-frame:#0b0d0c] dark:[--photo-hair-soft:rgba(255,255,255,0.055)] dark:[--photo-hair:rgba(255,255,255,0.1)] dark:[--photo-kicker:#5c625d] dark:[--photo-line:rgba(255,255,255,0.06)] dark:[--photo-meta-2:#3f453f] dark:[--photo-meta:#4e544f] dark:[--photo-panel:#101312] dark:[--photo-print-well:#ddd6c6] dark:[--photo-print:#f7f4ec] dark:[--photo-reel:#0a0c0b] dark:[--photo-scrim-zero:rgba(8,10,9,0)] dark:[--photo-scrim:rgba(8,10,9,0.93)] dark:[--photo-shadow:0_16px_30px_-18px_rgba(0,0,0,0.9)] dark:[--photo-speck:rgba(255,255,255,0.13)] dark:[--photo-tape:rgba(226,214,180,0.5)] dark:[--photo-text-2:#e8ece7] dark:[--photo-text:#f4f6f2] max-[1199px]:px-10 max-[1199px]:pt-11 max-[1199px]:pb-13 max-[899px]:gap-5.5 max-[899px]:px-5 max-[899px]:pt-11 max-[899px]:pb-10 motion-reduce:transition-none",
+          "mx-auto flex min-h-screen w-full max-w-360 flex-col gap-8 bg-(--photo-bg) px-16 pt-13 pb-15 font-body [--photo-accent:#c2452f] [--photo-bg:#f6f3ec] [--photo-bulb-off:#c9c1b0] [--photo-button-line:rgba(22,19,15,0.16)] [--photo-dim-2:#6f685b] [--photo-dim:#6f685b] [--photo-frame:#e0d9c9] [--photo-hair-soft:rgba(22,19,15,0.08)] [--photo-hair:rgba(22,19,15,0.14)] [--photo-kicker:#8a8272] [--photo-line:rgba(22,19,15,0.1)] [--photo-meta-2:#a09884] [--photo-meta:#a09884] [--photo-panel:#e9e4d8] [--photo-print-well:#e0d9c9] [--photo-print:#fffdf8] [--photo-reel:#efeade] [--photo-scrim-zero:rgba(246,243,236,0)] [--photo-scrim:rgba(246,243,236,0.95)] [--photo-shadow:0_16px_30px_-18px_rgba(22,19,15,0.5)] [--photo-speck:rgba(22,19,15,0.16)] [--photo-tape:rgba(198,182,140,0.55)] [--photo-text-2:#16130f] [--photo-text:#16130f] text-(--photo-text) transition-[filter] duration-400 dark:[--photo-accent:#d64030] dark:[--photo-bg:#0d100e] dark:[--photo-bulb-off:#3a403b] dark:[--photo-button-line:rgba(255,255,255,0.12)] dark:[--photo-dim-2:#98a099] dark:[--photo-dim:#767d77] dark:[--photo-frame:#0b0d0c] dark:[--photo-hair-soft:rgba(255,255,255,0.055)] dark:[--photo-hair:rgba(255,255,255,0.1)] dark:[--photo-kicker:#5c625d] dark:[--photo-line:rgba(255,255,255,0.06)] dark:[--photo-meta-2:#3f453f] dark:[--photo-meta:#4e544f] dark:[--photo-panel:#101312] dark:[--photo-print-well:#ddd6c6] dark:[--photo-print:#f7f4ec] dark:[--photo-reel:#0a0c0b] dark:[--photo-scrim-zero:rgba(8,10,9,0)] dark:[--photo-scrim:rgba(8,10,9,0.93)] dark:[--photo-shadow:0_16px_30px_-18px_rgba(0,0,0,0.9)] dark:[--photo-speck:rgba(255,255,255,0.13)] dark:[--photo-tape:rgba(226,214,180,0.5)] dark:[--photo-text-2:#e8ece7] dark:[--photo-text:#f4f6f2] max-[1199px]:px-10 max-[1199px]:pt-11 max-[1199px]:pb-13 max-[899px]:gap-5.5 max-[899px]:px-5 max-[899px]:pt-11 max-[899px]:pb-10 motion-reduce:transition-none",
           safelight &&
             "filter-[sepia(0.75)_hue-rotate(-38deg)_saturate(3.6)_brightness(0.7)]",
         )}
@@ -296,7 +297,7 @@ export default function PhotographyGallery() {
         <header className="flex items-end gap-7.5 max-[899px]:flex-col max-[899px]:items-stretch max-[899px]:gap-3">
           <div className="flex min-w-0 flex-1 flex-col gap-3.25">
             <div className="flex items-center gap-2.5">
-              <span className="text-[9.5px] leading-none font-semibold tracking-[0.18em] text-(--photo-kicker) uppercase">
+              <span className="font-mono text-metadata leading-none font-semibold tracking-[0.18em] text-(--photo-kicker) uppercase">
                 04 — PHOTOGRAPHY
               </span>
               <span
@@ -304,10 +305,10 @@ export default function PhotographyGallery() {
                 aria-hidden="true"
               />
             </div>
-            <h1 className="m-0 [font-family:var(--font-home-instrument)] text-[52px] leading-[1.04] font-normal tracking-[-0.015em] text-(--photo-text) max-[1199px]:text-[44px] max-[899px]:text-4xl">
+            <h1 className={`${typeStyles.pageTitle} m-0 text-(--photo-text)`}>
               Photographs
             </h1>
-            <p className="m-0 max-w-[52ch] text-[12.5px] leading-[1.75] font-normal text-(--photo-dim) max-[899px]:text-[11px] max-[899px]:leading-[1.7]">
+            <p className={`${typeStyles.bodySmall} m-0 max-w-[52ch] text-(--photo-dim)`}>
               Twenty selected photographs, developed for the web without
               touching the originals.
             </p>
@@ -316,13 +317,13 @@ export default function PhotographyGallery() {
           <div className="flex flex-none items-center gap-2.5 max-[899px]:justify-start">
             <Link
               href="/home/work/photography-pipeline"
-              className="mr-1 text-[9.5px] leading-none font-medium tracking-[0.12em] text-(--photo-dim) uppercase underline decoration-(--photo-hair) underline-offset-4 transition-colors hover:text-(--photo-text) focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-(--photo-accent)"
+              className="mr-1 font-mono text-metadata leading-none font-medium tracking-[0.12em] text-(--photo-dim) uppercase underline decoration-(--photo-hair) underline-offset-4 transition-colors hover:text-(--photo-text) focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-(--photo-accent)"
             >
               How it was built ↗
             </Link>
             <button
               type="button"
-              className="flex min-h-9.5 cursor-pointer items-center gap-2.25 rounded-[30px] border border-(--photo-button-line) bg-transparent px-3.5 py-2.25 text-[9.5px] leading-none font-medium tracking-[0.14em] text-(--photo-dim) focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-(--photo-accent) max-[899px]:min-h-11"
+              className="flex min-h-9.5 cursor-pointer items-center gap-2.25 rounded-[30px] border border-(--photo-button-line) bg-transparent px-3.5 py-2.25 font-mono text-metadata leading-none font-medium tracking-[0.14em] text-(--photo-dim) focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-(--photo-accent) max-[899px]:min-h-11"
               aria-label="Toggle safelight"
               aria-pressed={safelight}
               onClick={() => setSafelight((current) => !current)}
@@ -388,10 +389,10 @@ export default function PhotographyGallery() {
                   className="absolute right-0 bottom-0 left-0 flex translate-y-1.75 flex-col gap-1 bg-[linear-gradient(180deg,var(--photo-scrim-zero),var(--photo-scrim)_58%)] px-3.75 pt-3.5 pb-3 opacity-0 transition-[opacity,transform] duration-240 ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover/frame:translate-y-0 group-hover/frame:opacity-100 group-focus-visible/frame:translate-y-0 group-focus-visible/frame:opacity-100 max-[899px]:translate-y-0 max-[899px]:px-2.5 max-[899px]:pt-4.5 max-[899px]:pb-2 max-[899px]:opacity-100 motion-reduce:transition-none"
                   aria-hidden="true"
                 >
-                  <b className="[font-family:var(--font-home-instrument)] text-[15px] leading-[1.2] font-normal text-(--photo-text) max-[899px]:text-[12.5px]">
+                  <b className="font-display text-[15px] leading-[1.2] font-medium text-(--photo-text) max-[899px]:text-[12.5px]">
                     {photoLabel(photo)}
                   </b>
-                  <small className="text-[9.5px] leading-normal font-normal text-(--photo-dim-2) max-[899px]:hidden">
+                  <small className="font-mono text-metadata leading-normal font-normal text-(--photo-dim-2) max-[899px]:hidden">
                     {photoMeta(photo)}
                   </small>
                 </span>
@@ -406,19 +407,19 @@ export default function PhotographyGallery() {
         >
           <div className="flex items-baseline gap-3">
             <span
-              className="text-[9.5px] leading-none font-semibold tracking-[0.18em] text-(--photo-kicker) uppercase"
+              className="font-mono text-metadata leading-none font-semibold tracking-[0.18em] text-(--photo-kicker) uppercase"
               id="reel-heading"
             >
               ON THE TABLE
             </span>
-            <span className="[font-family:var(--font-photography-caveat)] text-[15px] leading-none font-normal text-(--photo-kicker) max-[899px]:hidden">
+            <span className="font-accent-hand text-[15px] leading-none font-normal text-(--photo-kicker) max-[899px]:hidden">
               the ones I keep coming back to
             </span>
             <span
               className="h-px flex-1 bg-(--photo-hair-soft)"
               aria-hidden="true"
             />
-            <span className="text-[9.5px] leading-none font-normal tracking-[0.14em] text-(--photo-meta-2) uppercase">
+            <span className="font-mono text-metadata leading-none font-normal tracking-[0.14em] text-(--photo-meta-2) uppercase">
               <span className="max-[899px]:hidden">SCROLL →</span>
               <span className="hidden max-[899px]:inline">SWIPE →</span>
             </span>
@@ -473,10 +474,10 @@ export default function PhotographyGallery() {
                     />
                   </span>
                   <span className="flex items-baseline gap-1.5 px-0.5 pt-2 pb-2.75">
-                    <b className="[font-family:var(--font-photography-caveat)] text-sm leading-none font-normal text-[#16130f]">
+                    <b className="font-accent-hand text-sm leading-none font-normal text-[#16130f]">
                       {photoLabel(photo)}
                     </b>
-                    <small className="ml-auto text-[8px] leading-none font-normal text-[#a09884]">
+                    <small className="ml-auto font-mono text-[8px] leading-none font-normal text-[#a09884]">
                       {photo.capturedAt?.slice(0, 4) ?? "—"}
                     </small>
                   </span>
@@ -501,7 +502,7 @@ export default function PhotographyGallery() {
             aria-hidden="true"
           />
           <span
-            className="text-[9.5px] leading-none font-normal tracking-[0.14em] text-(--photo-meta-2) uppercase"
+            className="font-mono text-metadata leading-none font-normal tracking-[0.14em] text-(--photo-meta-2) uppercase"
             aria-live="polite"
           >
             <span className="max-[899px]:hidden">
@@ -547,17 +548,17 @@ export default function PhotographyGallery() {
               />
             )}
             <span
-              className="pointer-events-none absolute inset-0 flex items-center justify-center bg-(--photo-frame) text-[10px] leading-none font-normal tracking-[0.12em] text-(--photo-meta) opacity-92 transition-opacity duration-1600 group-data-[developed=true]/develop:opacity-0 motion-reduce:transition-none"
+              className="pointer-events-none absolute inset-0 flex items-center justify-center bg-(--photo-frame) font-mono text-metadata leading-none font-normal tracking-[0.12em] text-(--photo-meta) opacity-92 transition-opacity duration-1600 group-data-[developed=true]/develop:opacity-0 motion-reduce:transition-none"
               aria-hidden="true"
             >
               HOLD
             </span>
           </button>
           <div className="flex flex-col gap-1.75">
-            <h2 className="m-0 [font-family:var(--font-home-instrument)] text-[21px] leading-[1.1] font-normal text-(--photo-text-2)">
+            <h2 className={`${typeStyles.cardTitle} m-0 text-(--photo-text-2)`}>
               The one that nearly wasn&apos;t
             </h2>
-            <p className="m-0 max-w-[46ch] text-[11px] leading-[1.65] font-normal text-(--photo-dim)">
+            <p className={`${typeStyles.bodySmall} m-0 max-w-[46ch] text-(--photo-dim)`}>
               A final frame from the same processed set. Press and hold to
               develop it.
             </p>
@@ -632,17 +633,17 @@ export default function PhotographyGallery() {
               )}
             </div>
             <div className="flex items-end gap-7.5 max-[899px]:flex-col max-[899px]:items-stretch max-[899px]:gap-1.5">
-              <div className="flex min-w-0 flex-1 flex-col gap-1.25 [font-family:var(--font-home-instrument)] text-2xl leading-[1.1] font-normal text-[#16130f] dark:text-[#f4f6f2]">
-                <span className="[font-family:var(--font-home-jetbrains)] text-[9px] leading-none font-semibold tracking-[0.16em] text-[#c2452f] dark:text-[#d64030]">
+              <div className="flex min-w-0 flex-1 flex-col gap-1.25 font-display text-2xl leading-[1.1] font-medium text-[#16130f] dark:text-[#f4f6f2]">
+                <span className="font-mono text-metadata leading-none font-semibold tracking-[0.16em] text-[#c2452f] dark:text-[#d64030]">
                   {activePhoto.no}
                 </span>
                 <span>{photoLabel(activePhoto)}</span>
               </div>
-              <span className="[font-family:var(--font-home-jetbrains)] text-right text-[10.5px] leading-[1.7] font-normal text-[#6f685b] dark:text-[#98a099] max-[899px]:text-left">
+              <span className="font-mono text-metadata text-right leading-[1.7] font-normal text-[#6f685b] dark:text-[#98a099] max-[899px]:text-left">
                 {photoMeta(activePhoto)}
               </span>
               <span
-                className="[font-family:var(--font-home-jetbrains)] text-[9.5px] leading-none font-normal tracking-widest text-[#a09884] dark:text-[#4e544f]"
+                className="font-mono text-metadata leading-none font-normal tracking-widest text-[#a09884] dark:text-[#4e544f]"
                 aria-hidden="true"
               >
                 <span className="max-[899px]:hidden">← → ESC</span>

@@ -18,7 +18,7 @@ export default async function Image() {
           flexDirection: "column",
           background: OG.dark,
           color: OG.darkInk,
-          fontFamily: "Source Code Pro",
+          fontFamily: "Poppins",
           padding: 72,
         }}
       >
@@ -29,21 +29,22 @@ export default async function Image() {
             <div style={{ width: 14, height: 14, borderRadius: 99, background: "#febc2e" }} />
             <div style={{ width: 14, height: 14, borderRadius: 99, background: "#28c840" }} />
           </div>
-          <div style={{ display: "flex", marginLeft: 20, fontSize: 22, color: OG.darkDim }}>
+          <div style={{ display: "flex", marginLeft: 20, fontFamily: "JetBrains Mono", fontSize: 22, color: OG.darkDim }}>
             somu — zsh
           </div>
         </div>
 
         {/* body */}
         <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center" }}>
-          <div style={{ display: "flex", fontSize: 28, color: OG.darkDim }}>
+          <div style={{ display: "flex", fontFamily: "JetBrains Mono", fontSize: 28, color: OG.darkDim }}>
             <span style={{ color: OG.accent }}>{">"}</span>
             <span style={{ marginLeft: 14 }}>whoami</span>
           </div>
           <div
             style={{
               display: "flex",
-              fontFamily: "Glass Antiqua",
+              fontFamily: "Roboto Condensed",
+              fontWeight: 600,
               fontSize: 132,
               lineHeight: 1,
               marginTop: 14,
@@ -51,7 +52,7 @@ export default async function Image() {
           >
             {profile.handle}
           </div>
-          <div style={{ display: "flex", fontSize: 28, color: OG.darkDim, marginTop: 16 }}>
+          <div style={{ display: "flex", fontSize: 28, fontWeight: 500, color: OG.darkDim, marginTop: 16 }}>
             {profile.name}
           </div>
           <div style={{ display: "flex", fontSize: 34, marginTop: 10 }}>
@@ -68,6 +69,7 @@ export default async function Image() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            fontFamily: "JetBrains Mono",
             fontSize: 24,
             color: OG.darkDim,
           }}

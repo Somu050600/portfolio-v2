@@ -17,12 +17,12 @@ export default function PlaygroundGrid() {
         const inner = (
           <>
             <div className="mb-3 flex items-start justify-between gap-3">
-              <h2 className="font-serif text-xl font-light text-ink">
+              <h2 className="font-display text-card-title font-medium text-ink">
                 {exp.title}
               </h2>
               <span
                 className={cn(
-                  "shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] tracking-wide uppercase",
+                  "shrink-0 rounded-full px-2 py-0.5 font-mono text-metadata tracking-wide uppercase",
                   live
                     ? "bg-accent-soft text-ink"
                     : "border border-border-color text-ink-faint",
@@ -38,7 +38,7 @@ export default function PlaygroundGrid() {
               {exp.tags.map((tag) => (
                 <li
                   key={tag}
-                  className="rounded-md bg-surface px-2 py-0.5 font-mono text-[10px] text-ink-dim"
+                  className="rounded-md bg-surface px-2 py-0.5 font-mono text-metadata text-ink-dim"
                 >
                   {tag}
                 </li>

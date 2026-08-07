@@ -71,7 +71,7 @@ export default function PerfHUD() {
 
   return (
     <aside
-      className="fixed right-4 bottom-4 z-[9992] w-44 rounded-xl border border-border-color bg-elevated/95 p-3 font-mono text-[10px] text-ink-dim shadow-lg backdrop-blur-sm"
+      className="fixed right-4 bottom-4 z-9992 w-44 rounded-xl border border-border-color bg-elevated/95 p-3 font-mono text-metadata text-ink-dim shadow-lg backdrop-blur-sm"
       aria-label="Performance HUD"
     >
       <p className="mb-2 tracking-[0.18em] text-ink-faint uppercase">
@@ -96,7 +96,7 @@ export default function PerfHUD() {
         )}
       </dl>
       {reducedMotion && (
-        <p className="mt-2 text-[9px] text-ink-faint">Reduced motion</p>
+        <p className="mt-2 text-metadata text-ink-faint">Reduced motion</p>
       )}
     </aside>
   );

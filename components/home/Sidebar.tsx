@@ -5,6 +5,7 @@ import ThemeToggle from "@/components/theme/ThemeToggle";
 import { componentAttrs, UI_EVENTS } from "@/lib/build-mode";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { profile } from "@/lib/profile.config";
+import { typeStyles } from "@/lib/typography";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import PixelPet from "./PixelPet";
@@ -62,7 +63,7 @@ export default function Sidebar() {
             aria-expanded={open}
             aria-controls="home-mobile-menu"
             onClick={() => setOpen((current) => !current)}
-            className="flex items-center gap-2 [font-family:var(--font-home-jetbrains)] text-[10px] leading-none font-semibold tracking-[0.14em] text-ink-dim uppercase transition-colors hover:text-ink"
+            className="flex items-center gap-2 font-body text-sm leading-none font-semibold tracking-[0.08em] text-ink-dim uppercase transition-colors hover:text-ink"
           >
             <span>MENU</span>
             <span aria-hidden>{open ? "▴" : "▾"}</span>
@@ -107,11 +108,11 @@ function Wordmark({
       <Link
         href="/"
         onClick={onClick}
-        className="[font-family:var(--font-home-instrument)] text-[20px] leading-none text-ink transition-colors hover:text-accent"
+        className="font-display text-[20px] leading-none font-semibold text-ink transition-colors hover:text-accent"
       >
         {profile.handle}
       </Link>
-      <p className="[font-family:var(--font-home-jetbrains)] text-[9.5px] leading-none font-medium tracking-[0.14em] text-ink-faint uppercase">
+      <p className="font-mono text-metadata leading-none font-medium tracking-[0.14em] text-ink-faint uppercase">
         {profile.role}
       </p>
     </div>
@@ -125,10 +126,10 @@ function StatusRow({ localTime }: { localTime: string }) {
         aria-hidden
         className="size-1.5 shrink-0 animate-pulse rounded-full bg-accent animation-duration-[3.4s] [box-shadow:0_0_0_3px_color-mix(in_srgb,var(--accent)_16%,transparent)]"
       />
-      <p className="[font-family:var(--font-home-poppins)] text-[12.5px] leading-none font-medium text-ink-dim">
+      <p className={`${typeStyles.metadata} leading-none text-ink-dim`}>
         {profile.availability}
       </p>
-      <time className="ml-auto [font-family:var(--font-home-jetbrains)] text-[10.5px] leading-none font-medium text-ink-faint tabular-nums">
+      <time className="ml-auto font-mono text-metadata leading-none font-medium text-ink-faint tabular-nums">
         {localTime}
       </time>
     </div>
@@ -140,11 +141,11 @@ function ContactGroup() {
     <div className="flex flex-col gap-3 border-t border-border-color pt-4">
       <a
         href={`mailto:${profile.contact.email}`}
-        className="w-fit [font-family:var(--font-home-poppins)] text-[13.5px] leading-none font-medium text-ink transition-colors hover:text-accent"
+        className="w-fit font-body text-sm leading-none font-medium text-ink transition-colors hover:text-accent"
       >
         Email me
       </a>
-      <div className="flex flex-wrap gap-4 [font-family:var(--font-home-poppins)] text-[12.5px] leading-none font-medium text-ink-dim">
+      <div className="flex flex-wrap gap-4 font-body text-sm leading-none font-medium text-ink-dim">
         <SocialLink href={profile.contact.github}>GitHub</SocialLink>
         <SocialLink href={profile.contact.linkedin}>LinkedIn</SocialLink>
         <SocialLink href={profile.contact.resumeUrl}>Resume</SocialLink>
@@ -175,7 +176,7 @@ function UtilityRow() {
         onClick={() =>
           window.dispatchEvent(new CustomEvent(UI_EVENTS.commandPaletteOpen))
         }
-        className="ml-auto flex items-center gap-2 [font-family:var(--font-home-jetbrains)] text-[10px] leading-none font-medium tracking-[0.12em] text-ink-faint uppercase transition-colors hover:text-ink"
+        className="ml-auto flex items-center gap-2 font-body text-sm leading-none font-medium tracking-[0.08em] text-ink-faint uppercase transition-colors hover:text-ink"
         {...componentAttrs(
           "CommandPaletteTrigger",
           "Open the existing fuzzy command menu.",

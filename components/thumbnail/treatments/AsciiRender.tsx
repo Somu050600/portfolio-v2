@@ -37,7 +37,7 @@ function drawFrame(
   ctx.fillStyle = "#121316";
   ctx.fillRect(0, 0, width, height);
 
-  ctx.font = `${cs}px "Source Code Pro",ui-monospace,monospace`;
+  ctx.font = `${cs}px "JetBrains Mono",ui-monospace,monospace`;
   ctx.textBaseline = "top";
 
   const ar = parseInt(accentColor.slice(1, 3), 16);
@@ -69,7 +69,7 @@ function drawFrame(
     }
   }
 
-  ctx.font = `${Math.round(cs * 0.8)}px "Source Code Pro",ui-monospace,monospace`;
+  ctx.font = `${Math.round(cs * 0.8)}px "JetBrains Mono",ui-monospace,monospace`;
   ctx.textBaseline = "bottom";
   ctx.fillStyle = `rgba(140,145,170,${(0.3 + rainProg * 0.2).toFixed(3)})`;
   ctx.fillText("ASCII  RENDER", cs, height - cs * 0.5);

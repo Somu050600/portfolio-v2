@@ -10,6 +10,7 @@ import {
   getLiveExperimentSlugs,
 } from "@/lib/playground.config";
 import { createPageMetadata } from "@/lib/seo";
+import { typeStyles } from "@/lib/typography";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -43,10 +44,10 @@ export default async function PlaygroundExperimentPage({ params }: PageProps) {
       <main className="px-6 py-10 md:px-12 md:py-14 lg:px-16">
         <PlaygroundBackLink />
         <header className="mb-8 max-w-2xl">
-          <h1 className="font-serif text-4xl font-light text-ink md:text-5xl">
+          <h1 className={`${typeStyles.pageTitle} text-ink`}>
             {exp.title}
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-ink-dim md:text-base">
+          <p className={`${typeStyles.body} mt-3 text-ink-dim`}>
             {exp.description}
           </p>
         </header>

@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { typeStyles } from "@/lib/typography";
 
 const FluidSimFull = dynamic(() => import("@/sketches/fluid-sim-full"), {
   ssr: false,
@@ -22,7 +23,7 @@ export default function FluidSimExperiment() {
 
   if (reducedMotion) {
     return (
-      <p className="text-sm text-ink-dim">
+      <p className={`${typeStyles.bodySmall} text-ink-dim`}>
         Fluid sim is disabled when reduced motion is preferred.
       </p>
     );
@@ -37,13 +38,13 @@ export default function FluidSimExperiment() {
           className="h-full min-h-[70vh] w-full"
         />
       </div>
-      <p className="mt-3 font-mono text-xs text-ink-faint">
+      <p className={`${typeStyles.metadata} mt-3 text-ink-faint`}>
         Drag to inject dye · visibility-paused when tab is hidden
       </p>
       <button
         type="button"
         onClick={() => setActive((v) => !v)}
-        className="mt-2 self-start font-mono text-xs text-ink-dim underline-offset-2 hover:text-ink hover:underline"
+        className="mt-2 self-start font-mono text-sm font-medium text-ink-dim underline-offset-2 hover:text-ink hover:underline"
       >
         {active ? "Pause simulation" : "Resume simulation"}
       </button>
@@ -55,7 +56,7 @@ export function PlaygroundBackLink() {
   return (
     <Link
       href="/home/playground"
-      className="mb-8 inline-flex items-center gap-2 font-mono text-sm text-ink-dim hover:text-ink"
+      className="mb-8 inline-flex items-center gap-2 font-body text-sm font-medium text-ink-dim hover:text-ink"
     >
       <span aria-hidden>←</span> Playground
     </Link>

@@ -68,7 +68,7 @@ export default function ProjectGrid() {
                     href={project.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-baseline justify-between gap-4 text-sm hover:text-ink"
+                    className="group flex items-baseline justify-between gap-4 font-body text-sm hover:text-ink"
                   >
                     <span className="text-ink-dim group-hover:text-ink">
                       {project.title}
@@ -80,7 +80,7 @@ export default function ProjectGrid() {
                 ) : project.caseStudy ? (
                   <Link
                     href={`/home/work/${project.slug}`}
-                    className="group flex items-baseline justify-between gap-4 text-sm hover:text-ink"
+                    className="group flex items-baseline justify-between gap-4 font-body text-sm hover:text-ink"
                   >
                     <span className="text-ink-dim group-hover:text-ink">
                       {project.title}
@@ -90,7 +90,7 @@ export default function ProjectGrid() {
                     </span>
                   </Link>
                 ) : (
-                  <span className="flex items-baseline justify-between gap-4 text-sm">
+                  <span className="flex items-baseline justify-between gap-4 font-body text-sm">
                     <span className="text-ink-dim">{project.title}</span>
                     <span className="shrink-0 font-mono text-xs text-ink-faint">
                       {project.shipped}

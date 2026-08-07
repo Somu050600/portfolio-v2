@@ -9,7 +9,7 @@ import { componentAttrs } from "@/lib/build-mode";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-const mono = "[font-family:var(--font-home-jetbrains)]";
+const mono = "font-mono";
 
 export function isSkillDimmed(
   activeGroup: string,
@@ -47,7 +47,7 @@ export default function SkillsGrid({
           id="about-skills-heading"
           className={cn(
             mono,
-            "text-[10px] leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
+            "text-metadata leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
           )}
         >
           Skills
@@ -56,7 +56,7 @@ export default function SkillsGrid({
         <span
           className={cn(
             mono,
-            "text-[10px] leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
+            "text-metadata leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
           )}
         >
           Filter ↓
@@ -78,7 +78,7 @@ export default function SkillsGrid({
               onClick={() => setActiveGroup(group.key)}
               className={cn(
                 mono,
-                "shrink-0 rounded-full border px-2.75 py-1.75 text-[9.5px] leading-none font-medium tracking-[0.12em] transition-[color,border-color,background-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none",
+                "shrink-0 rounded-full border px-2.75 py-1.75 text-metadata leading-none font-medium tracking-[0.12em] transition-[color,border-color,background-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none",
                 active
                   ? "border-accent bg-accent text-accent-fg"
                   : "border-border-color text-ink-dim hover:border-ink-faint hover:text-ink",

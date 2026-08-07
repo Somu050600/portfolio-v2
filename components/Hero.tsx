@@ -41,8 +41,8 @@ export default function Hero() {
             data-hero-line
             className={
               i === 0
-                ? "text-6xl font-bold tracking-tight md:text-8xl"
-                : "text-3xl font-light text-neutral-400 md:text-5xl"
+                ? "font-display text-display-hero font-semibold tracking-[-0.035em]"
+                : "font-display text-page-title font-medium text-neutral-400"
             }
           >
             {line}

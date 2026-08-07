@@ -205,9 +205,9 @@ export default function TypeLab() {
 
       <div
         ref={containerRef}
-        className="min-h-[200px] rounded-2xl border border-border-color bg-elevated p-8 md:p-12"
+        className="min-h-50 rounded-2xl border border-border-color bg-elevated p-8 md:p-12"
       >
-        <p className="font-serif text-3xl leading-snug font-light text-ink md:text-4xl">
+        <p className="font-display text-section-title font-medium text-ink">
           {chars.map((ch, i) => (
             <span
               key={i}

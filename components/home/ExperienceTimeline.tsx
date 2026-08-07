@@ -5,12 +5,12 @@ import { roles, type Role } from "@/lib/experience.config";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-const mono = "[font-family:var(--font-home-jetbrains)]";
-const display = "[font-family:var(--font-home-instrument)]";
-const sans = "[font-family:var(--font-home-poppins)]";
+const mono = "font-mono";
+const display = "font-display";
+const sans = "font-body";
 const chip = cn(
   mono,
-  "rounded-full bg-elevated px-2.75 py-1.75 text-[10px] leading-none font-medium tracking-[0.09em] whitespace-nowrap text-ink/90",
+  "rounded-full bg-elevated px-2.75 py-1.75 text-metadata leading-none font-medium tracking-[0.09em] whitespace-nowrap text-ink/90",
 );
 
 export function getNextOpenRole(
@@ -93,7 +93,7 @@ function ExperienceRole({
         <span
           className={cn(
             mono,
-            "text-[10px] leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
+            "text-metadata leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
           )}
         >
           {role.location}
@@ -127,7 +127,7 @@ function ExperienceRole({
             data-open={open ? "" : undefined}
             className={cn(
               display,
-              "text-[26px] leading-[1.15] font-normal text-ink/90 transition-colors duration-240 ease-[cubic-bezier(.22,.7,.25,1)] data-open:text-ink motion-reduce:transition-none max-[899px]:text-[22px]",
+              "text-card-title font-medium text-ink/90 transition-colors duration-240 ease-[cubic-bezier(.22,.7,.25,1)] data-open:text-ink motion-reduce:transition-none",
             )}
           >
             {role.company}
@@ -140,7 +140,7 @@ function ExperienceRole({
           <span
             className={cn(
               mono,
-              "ml-auto hidden rounded-full border border-accent/30 bg-accent-soft px-2.5 py-1.5 text-[9px] leading-none font-semibold tracking-[0.12em] text-accent uppercase max-[899px]:inline-flex",
+              "ml-auto hidden rounded-full border border-accent/30 bg-accent-soft px-2.5 py-1.5 text-metadata leading-none font-semibold tracking-[0.12em] text-accent uppercase max-[899px]:inline-flex",
             )}
           >
             {open ? "VIEW LESS −" : "VIEW MORE +"}
@@ -157,8 +157,8 @@ function ExperienceRole({
         </p>
         <p
           className={cn(
-            mono,
-            "max-w-[58ch] text-[12.5px] leading-[1.7] font-normal text-ink-dim",
+            sans,
+            "max-w-[58ch] text-body-sm font-normal text-ink-dim",
           )}
         >
           {role.summary}
@@ -196,8 +196,8 @@ function ExperienceRole({
                   <li
                     key={bullet}
                     className={cn(
-                      mono,
-                      "flex gap-2.5 text-xs leading-[1.7] font-normal text-ink-dim",
+                      sans,
+                      "flex gap-2.5 text-body-sm font-normal text-ink-dim",
                     )}
                   >
                     <span className="shrink-0 text-accent" aria-hidden>
@@ -242,7 +242,7 @@ export default function ExperienceTimeline() {
           <span
             className={cn(
               mono,
-              "shrink-0 text-[10px] leading-none font-semibold tracking-[0.16em] text-accent uppercase",
+              "shrink-0 text-metadata leading-none font-semibold tracking-[0.16em] text-accent uppercase",
             )}
           >
             02 — EXPERIENCE
@@ -251,7 +251,7 @@ export default function ExperienceTimeline() {
           <span
             className={cn(
               mono,
-              "shrink-0 text-[10px] leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
+              "shrink-0 text-metadata leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
             )}
           >
             03 ROLES · 2023 — NOW
@@ -261,7 +261,7 @@ export default function ExperienceTimeline() {
           id="experience-heading"
           className={cn(
             display,
-            "text-balance text-[38px] leading-[1.1] font-normal tracking-[-0.01em] text-ink-faint max-[899px]:text-[30px]",
+            "text-balance text-page-title font-semibold tracking-tight text-ink-faint",
           )}
         >
           Security, compliance, commerce.{" "}
@@ -269,8 +269,8 @@ export default function ExperienceTimeline() {
         </h1>
         <p
           className={cn(
-            mono,
-            "max-w-[62ch] text-[12.5px] leading-[1.65] font-normal text-ink-dim",
+            sans,
+            "max-w-[62ch] text-body-sm font-normal text-ink-dim",
           )}
         >
           Every role here has a number attached to it — that&apos;s deliberate.

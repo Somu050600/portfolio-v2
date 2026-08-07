@@ -2,6 +2,7 @@
 
 import { componentAttrs } from "@/lib/build-mode";
 import { profile } from "@/lib/profile.config";
+import { typeStyles } from "@/lib/typography";
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
 import { useCallback, useLayoutEffect, useRef } from "react";
@@ -74,11 +75,11 @@ export default function WorkHero() {
     >
       <h1
         ref={headlineRef}
-        className="max-w-3xl text-balance font-serif text-4xl font-light tracking-tight text-ink md:text-6xl"
+        className={`${typeStyles.displayHero} max-w-3xl text-balance text-ink`}
       >
         {profile.hero.headline}
       </h1>
-      <p className="mt-6 max-w-xl font-mono text-xs leading-relaxed tracking-wide text-ink-dim md:text-sm">
+      <p className={`${typeStyles.bodySmall} mt-6 max-w-xl text-ink-dim`}>
         {profile.hero.guide}
       </p>
     </header>

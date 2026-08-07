@@ -19,24 +19,66 @@ export const OG = {
 
 const dir = join(process.cwd(), "assets/fonts");
 
-/** Brand fonts for satori/ImageResponse, read from the vendored TTFs. */
+/** Design-system fonts for satori/ImageResponse, read from vendored TTFs. */
 export function ogFonts() {
   return [
     {
-      name: "Glass Antiqua",
-      data: readFileSync(join(dir, "GlassAntiqua-Regular.ttf")),
+      name: "Roboto Condensed",
+      data: readFileSync(join(dir, "RobotoCondensed-Regular.ttf")),
       weight: 400 as const,
       style: "normal" as const,
     },
     {
-      name: "Source Code Pro",
-      data: readFileSync(join(dir, "SourceCodePro-Regular.ttf")),
+      name: "Roboto Condensed",
+      data: readFileSync(join(dir, "RobotoCondensed-Medium.ttf")),
+      weight: 500 as const,
+      style: "normal" as const,
+    },
+    {
+      name: "Roboto Condensed",
+      data: readFileSync(join(dir, "RobotoCondensed-SemiBold.ttf")),
+      weight: 600 as const,
+      style: "normal" as const,
+    },
+    {
+      name: "Roboto Condensed",
+      data: readFileSync(join(dir, "RobotoCondensed-Bold.ttf")),
+      weight: 700 as const,
+      style: "normal" as const,
+    },
+    {
+      name: "Poppins",
+      data: readFileSync(join(dir, "Poppins-Regular.ttf")),
       weight: 400 as const,
       style: "normal" as const,
     },
     {
-      name: "Source Code Pro",
-      data: readFileSync(join(dir, "SourceCodePro-SemiBold.ttf")),
+      name: "Poppins",
+      data: readFileSync(join(dir, "Poppins-Medium.ttf")),
+      weight: 500 as const,
+      style: "normal" as const,
+    },
+    {
+      name: "Poppins",
+      data: readFileSync(join(dir, "Poppins-SemiBold.ttf")),
+      weight: 600 as const,
+      style: "normal" as const,
+    },
+    {
+      name: "JetBrains Mono",
+      data: readFileSync(join(dir, "JetBrainsMono-Regular.ttf")),
+      weight: 400 as const,
+      style: "normal" as const,
+    },
+    {
+      name: "JetBrains Mono",
+      data: readFileSync(join(dir, "JetBrainsMono-Medium.ttf")),
+      weight: 500 as const,
+      style: "normal" as const,
+    },
+    {
+      name: "JetBrains Mono",
+      data: readFileSync(join(dir, "JetBrainsMono-SemiBold.ttf")),
       weight: 600 as const,
       style: "normal" as const,
     },

@@ -18,7 +18,7 @@ export function PlaceholderPage({
         <p className="mb-3 font-mono text-xs tracking-[0.2em] text-ink-faint uppercase">
           Coming in Prompt 2
         </p>
-        <h1 className="font-serif text-4xl font-light text-ink md:text-5xl">
+        <h1 className="font-display text-page-title font-semibold text-ink">
           {title}
         </h1>
         <p className="mt-4 max-w-lg text-sm leading-relaxed text-ink-dim md:text-base">

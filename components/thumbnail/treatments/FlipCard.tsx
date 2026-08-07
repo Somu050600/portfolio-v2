@@ -132,7 +132,7 @@ export default function FlipCard({ active, params, accent }: TreatmentProps) {
     >
       {/* c1 — front: visible at rest, slides out on hover */}
       <div
-        className={cn("thumb-screen absolute inset-0 flex flex-col gap-[11px] p-3.5", transition)}
+        className={cn("thumb-screen absolute inset-0 flex flex-col gap-2.75 p-3.5", transition)}
         style={{ transform: revealed ? c1Exit(dir) : "translate(0,0)" }}
       >
         {/* 1. Label row */}
@@ -157,7 +157,7 @@ export default function FlipCard({ active, params, accent }: TreatmentProps) {
             {front.swatches.map((color, i) => (
               <span
                 key={`${color}-${i}`}
-                className="h-[22px] w-[22px] shrink-0 rounded-[5px] ring-1 ring-white/10"
+                className="size-5.5 shrink-0 rounded-[5px] ring-1 ring-white/10"
                 style={{ backgroundColor: color }}
               />
             ))}
@@ -168,7 +168,7 @@ export default function FlipCard({ active, params, accent }: TreatmentProps) {
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0 flex flex-col gap-1">
             {typeScale?.display && (
-              <span className="font-serif text-[30px] font-light leading-none text-thumb-ink">
+              <span className="font-display text-[30px] font-medium leading-none text-thumb-ink">
                 {typeScale.display}
               </span>
             )}

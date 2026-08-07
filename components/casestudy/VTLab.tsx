@@ -127,7 +127,7 @@ export default function VTLab() {
           backgroundSize: "15px 15px",
         }}
       >
-        <span className="absolute top-3 left-3 rounded-full border border-border-color bg-surface/80 px-2 py-0.5 font-mono text-[9px] tracking-[0.12em] text-ink-faint uppercase backdrop-blur-sm">
+        <span className="absolute top-3 left-3 rounded-full border border-border-color bg-surface/80 px-2 py-0.5 font-mono text-metadata tracking-[0.12em] text-ink-faint uppercase backdrop-blur-sm">
           Simulated preview
         </span>
         <button

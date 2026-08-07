@@ -12,6 +12,8 @@ test("renders the approved experience narrative as accessible disclosures", () =
   expect(markup).toContain("−30% TTI");
   expect(markup).toContain("+25% checkout conversion");
   expect(markup).toContain("AI-optimized design system with semantic tokens");
+  expect(markup.match(/<h1[^>]*>/)?.[0]).toContain("text-page-title");
+  expect(markup).toContain("text-card-title");
   expect(markup.match(/aria-expanded="false"/g)).toHaveLength(3);
   expect(markup.match(/role="region"/g)).toHaveLength(3);
   expect(markup.match(/VIEW MORE \+/g) ?? []).toHaveLength(3);

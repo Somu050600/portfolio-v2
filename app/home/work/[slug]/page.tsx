@@ -15,6 +15,7 @@ import {
 import Thumbnail from "@/components/thumbnail/Thumbnail";
 import { profile } from "@/lib/profile.config";
 import { getCaseStudySlugs, getProjectBySlug } from "@/lib/projects.config";
+import { typeStyles } from "@/lib/typography";
 import { createPageMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
@@ -80,24 +81,24 @@ export default async function CaseStudyPage({ params }: PageProps) {
               data-morph="no"
               className={cn(
                 caseStudyMono,
-                "w-fit text-[10px] leading-none font-medium tracking-[0.2em] text-ink-faint uppercase",
+                "w-fit text-metadata leading-none font-medium tracking-[0.2em] text-ink-faint uppercase",
               )}
             >
               No. {String(project.number).padStart(2, "0")}
             </p>
             <h1
               data-morph="title"
-              className="max-w-[16ch] text-[clamp(34px,3.15vw,44px)] leading-[1.1] font-semibold tracking-[-0.035em] text-ink text-balance"
+              className={`${typeStyles.pageTitle} max-w-[16ch] text-balance text-ink`}
             >
               {project.title}
             </h1>
-            <p className="text-[clamp(17px,1.35vw,18px)] leading-[1.6] font-normal tracking-[-0.01em] text-ink-dim text-pretty">
+            <p className={`${typeStyles.lead} text-pretty text-ink-dim`}>
               {caseStudy.tagline}
             </p>
             <p
               className={cn(
                 caseStudyMono,
-                "text-[10.5px] leading-normal font-normal text-ink-faint",
+                "text-metadata leading-normal font-normal text-ink-faint",
               )}
             >
               Case study by{" "}
@@ -115,7 +116,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
                     key={tag}
                     className={cn(
                       caseStudyMono,
-                      "rounded-full border border-border-color bg-surface px-2.5 py-1.75 text-[10px] leading-none font-medium tracking-widest text-ink-faint uppercase",
+                      "rounded-full border border-border-color bg-surface px-2.5 py-1.75 text-metadata leading-none font-medium tracking-widest text-ink-faint uppercase",
                     )}
                   >
                     {tag}
@@ -128,7 +129,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
                 {meta.map((item) => (
                   <div key={item.key} className="flex min-w-0 flex-col gap-2">
                     <dt className={caseStudyMetaKey}>{item.key}</dt>
-                    <dd className="text-[14.5px] leading-[1.3] font-medium text-ink">
+                    <dd className={`${typeStyles.bodySmall} font-medium text-ink`}>
                       {item.value}
                     </dd>
                   </div>
@@ -200,14 +201,14 @@ export default async function CaseStudyPage({ params }: PageProps) {
                     <span
                       className={cn(
                         caseStudyMono,
-                        "shrink-0 text-[10px] leading-none font-semibold tracking-[0.16em] text-accent tabular-nums",
+                        "shrink-0 text-metadata leading-none font-semibold tracking-[0.16em] text-accent tabular-nums",
                       )}
                     >
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <span className="h-px w-full bg-border-color" aria-hidden />
                   </div>
-                  <h2 className="max-w-[24ch] text-[clamp(25px,2.3vw,29px)] leading-[1.2] font-semibold tracking-[-0.03em] text-ink text-balance">
+                  <h2 className={`${typeStyles.sectionTitle} max-w-[24ch] text-balance text-ink`}>
                     {section.heading}
                   </h2>
                 </header>

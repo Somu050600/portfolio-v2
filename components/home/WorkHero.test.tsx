@@ -14,6 +14,10 @@ describe("WorkHero", () => {
     );
     expect(markup).not.toContain("data-hero-line");
     expect(markup).toContain(profile.hero.headline);
+    expect(markup).toContain("font-display");
+    expect(markup).toContain("text-display-hero");
+    expect(markup).toContain("font-body");
+    expect(markup).not.toContain("font-serif");
   });
 
   test("animates every visual line together", () => {

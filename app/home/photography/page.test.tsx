@@ -33,6 +33,10 @@ test("renders every processed photograph as a ratio-reserved frame", () => {
   expect(markup).toContain("The one that nearly wasn&#x27;t");
   expect(markup).toContain("20 FRAMES SHOT");
   expect(markup).toContain("20 SHOT");
+  expect(markup).toContain("font-accent-hand");
+  expect(markup).toContain("font-display");
+  expect(markup).toContain("font-mono");
+  expect(markup).not.toContain("--font-home-");
 });
 
 test("renders the responsive gallery layout with Tailwind utilities", () => {

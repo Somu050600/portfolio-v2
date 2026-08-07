@@ -35,7 +35,7 @@ const useIsoLayoutEffect =
 
 function StatusBadge({ status }: { status: Status }) {
   return (
-    <span className="shrink-0 rounded-full border border-border-color bg-bg px-2 py-0.5 font-mono text-[10px] tracking-wide text-ink-dim uppercase">
+    <span className="shrink-0 rounded-full border border-border-color bg-bg px-2 py-0.5 font-mono text-metadata tracking-wide text-ink-dim uppercase">
       {status}
     </span>
   );
@@ -121,7 +121,7 @@ function CardContent({
           <div className="flex items-center justify-between gap-2.5">
             <h3
               data-morph="title"
-              className="min-w-0 flex-1 truncate font-serif text-xl font-light text-ink"
+              className="min-w-0 flex-1 truncate font-display text-card-title font-medium text-ink"
             >
               {title}
             </h3>
@@ -131,7 +131,7 @@ function CardContent({
               ))}
             </div>
           </div>
-          <p className="line-clamp-2 min-h-[2.8em] [font-family:var(--font-home-jetbrains)] text-xs leading-[1.4] text-ink-dim">
+          <p className="line-clamp-2 min-h-[2.8em] font-body text-body-sm text-ink-dim">
             {description}
           </p>
 
@@ -154,7 +154,7 @@ function CardContent({
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid grid-cols-[78px_1fr] gap-4 text-xs leading-snug">
-      <dt className="[font-family:var(--font-home-jetbrains)] tracking-wide text-ink-dim uppercase">
+      <dt className="font-mono tracking-wide text-ink-dim uppercase">
         {label}
       </dt>
       <dd className="text-ink-dim">{value}</dd>
