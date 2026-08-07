@@ -23,8 +23,8 @@ export const profile = {
     email: "somasekhareega@gmail.com",
     github: "https://github.com/Somu050600",
     linkedin: "https://www.linkedin.com/in/somueega",
-    phone: "+91 6303955065",
-    whatsapp: "https://wa.me/6303955065",
+    phone: "tel:+91 6303955065",
+    whatsapp: "https://wa.me/+916303955065",
     instagram: "https://www.instagram.com/somasekhareega/",
     twitter: "https://x.com/ESomu1",
     resumeUrl:

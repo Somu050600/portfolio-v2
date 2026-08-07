@@ -18,7 +18,8 @@ function resolveActiveKey(pathname: string): HomeNavKey {
 }
 
 type TableOfContentsProps = {
-  onNavigate?: () => void;
+  /** May return a promise — the transition waits for it (mobile drawer close). */
+  onNavigate?: () => void | Promise<void>;
 };
 
 export default function TableOfContents({
@@ -40,9 +41,14 @@ export default function TableOfContents({
       }
 
       event.preventDefault();
-      onNavigate?.();
-      if (href === pathname) return;
-      cover({ href, slide: true });
+      if (href === pathname) {
+        void onNavigate?.();
+        return;
+      }
+      // Let the mobile drawer finish collapsing before the page slides.
+      void Promise.resolve(onNavigate?.()).then(() =>
+        cover({ href, slide: true }),
+      );
     },
     [cover, onNavigate, pathname],
   );

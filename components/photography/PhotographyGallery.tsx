@@ -23,6 +23,7 @@ import {
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type SyntheticEvent,
+  type TouchEvent as ReactTouchEvent,
 } from "react";
 import { flushSync } from "react-dom";
 
@@ -35,6 +36,9 @@ const PanoramaViewer = dynamic(() => import("./PanoramaViewer"), {
   ),
 });
 
+const SWIPE_MIN_DISTANCE_PX = 56;
+/** Horizontal travel must beat vertical by this much to count as a swipe. */
+const SWIPE_DIRECTION_RATIO = 1.4;
 const PRINT_ROTATIONS = [-3, 2.5, -2, 3, -1.5, 2, -3.5, 1.5, -2.5, 3];
 const TAPE_ROTATIONS = [-5, 4, -3, 5, -2, 3, -4, 2, -5, 4];
 const DEVELOP_HOLD_MS = 650;
@@ -92,6 +96,8 @@ export default function PhotographyGallery() {
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const holdStartedAtRef = useRef<number | null>(null);
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+  const swipeConsumedRef = useRef(false);
   const prefetchGenerationRef = useRef(0);
   const transitionGenerationRef = useRef(0);
   const lightboxOpen = activeIndex !== null;
@@ -128,6 +134,13 @@ export default function PhotographyGallery() {
     },
     [runPhotoTransition],
   );
+
+  const stepActive = useCallback((delta: number) => {
+    performance.mark("photo-viewer-click");
+    setActiveIndex((current) =>
+      current === null ? null : stepPhotoIndex(current, delta),
+    );
+  }, []);
 
   const closeLightbox = useCallback(() => {
     prefetchGenerationRef.current += 1;
@@ -212,18 +225,12 @@ export default function PhotographyGallery() {
       }
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        performance.mark("photo-viewer-click");
-        setActiveIndex((current) =>
-          current === null ? null : stepPhotoIndex(current, 1),
-        );
+        stepActive(1);
         return;
       }
       if (event.key === "ArrowLeft") {
         event.preventDefault();
-        performance.mark("photo-viewer-click");
-        setActiveIndex((current) =>
-          current === null ? null : stepPhotoIndex(current, -1),
-        );
+        stepActive(-1);
         return;
       }
       if (event.key === "Tab") {
@@ -234,7 +241,7 @@ export default function PhotographyGallery() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [closeLightbox, lightboxOpen]);
+  }, [closeLightbox, lightboxOpen, stepActive]);
 
   useEffect(
     () => () => {
@@ -276,6 +283,48 @@ export default function PhotographyGallery() {
       event.preventDefault();
       beginDevelop();
     }
+  };
+
+  const onLightboxTouchStart = (event: ReactTouchEvent<HTMLDivElement>) => {
+    swipeConsumedRef.current = false;
+    // Inside the panorama every finger belongs to the camera, not the gallery.
+    if ((event.target as HTMLElement).closest("[data-panorama]")) {
+      swipeStartRef.current = null;
+      return;
+    }
+    if (event.touches.length !== 1) {
+      swipeStartRef.current = null;
+      return;
+    }
+    const touch = event.touches[0];
+    swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const onLightboxTouchEnd = (event: ReactTouchEvent<HTMLDivElement>) => {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!start) return;
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (
+      Math.abs(deltaX) < SWIPE_MIN_DISTANCE_PX ||
+      Math.abs(deltaX) < Math.abs(deltaY) * SWIPE_DIRECTION_RATIO
+    ) {
+      return;
+    }
+    // Swiping left pulls the next frame in from the right.
+    swipeConsumedRef.current = true;
+    stepActive(deltaX < 0 ? 1 : -1);
+  };
+
+  const onLightboxClick = () => {
+    if (swipeConsumedRef.current) {
+      swipeConsumedRef.current = false;
+      return;
+    }
+    closeLightbox();
   };
 
   const onDevelopKeyUp = (event: ReactKeyboardEvent<HTMLButtonElement>) => {
@@ -582,7 +631,9 @@ export default function PhotographyGallery() {
           aria-modal="true"
           aria-label={photoLabel(activePhoto)}
           tabIndex={-1}
-          onClick={closeLightbox}
+          onClick={onLightboxClick}
+          onTouchStart={onLightboxTouchStart}
+          onTouchEnd={onLightboxTouchEnd}
         >
           <div className="flex w-full max-w-225 flex-col gap-4">
             <div
@@ -648,7 +699,7 @@ export default function PhotographyGallery() {
               >
                 <span className="max-[899px]:hidden">← → ESC</span>
                 <span className="hidden max-[899px]:inline">
-                  TAP ANYWHERE TO CLOSE
+                  SWIPE ← → · TAP TO CLOSE
                 </span>
               </span>
             </div>

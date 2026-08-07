@@ -45,7 +45,11 @@ const quadrantLabels = [
   ["tl", "DESIGN SYSTEMS", "top-[18%] left-[9%] opacity-(--quadrant-1)"],
   ["tr", "PERFORMANCE", "top-[18%] right-[9%] opacity-(--quadrant-2)"],
   ["bl", "PHOTOGRAPHY", "bottom-[17%] left-[9%] opacity-(--quadrant-3)"],
-  ["br", "VIEW TRANSITIONS", "right-[9%] bottom-[17%] opacity-(--quadrant-4)"],
+  [
+    "br",
+    "Architecture & Scalability",
+    "right-[9%] bottom-[17%] opacity-(--quadrant-4)",
+  ],
 ] as const;
 
 /**
@@ -265,22 +269,13 @@ export default function LandingHero({ background }: LandingHeroProps) {
           >
             Work
           </Link>
-          <span className="group relative">
-            <button
-              type="button"
-              aria-disabled="true"
-              aria-describedby="photography-coming-soon"
-              className={navLinkClass}
-            >
-              Photography
-            </button>
-            <span
-              id="photography-coming-soon"
-              className="pointer-events-none absolute top-[calc(100%+12px)] left-1/2 w-max -translate-x-1/2 -translate-y-0.5 text-metadata tracking-[0.12em] text-(--landing-muted) uppercase opacity-0 transition-[opacity,transform] duration-180 group-hover:translate-y-0 group-hover:opacity-85 group-focus-within:translate-y-0 group-focus-within:opacity-85"
-            >
-              Coming soon
-            </span>
-          </span>
+          <Link
+            className={navLinkClass}
+            href="/home/photography"
+            onClick={(event) => onNavClick(event, "/home/photography")}
+          >
+            Photography
+          </Link>
           <Link
             className={navLinkClass}
             href="/home/about"
@@ -317,15 +312,13 @@ export default function LandingHero({ background }: LandingHeroProps) {
           >
             Work
           </Link>
-          <span
-            aria-disabled="true"
-            className="flex items-baseline justify-between gap-4"
+          <Link
+            href="/home/photography"
+            onClick={(event) => onNavClick(event, "/home/photography")}
+            className="outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
           >
-            Photography{" "}
-            <small className="text-metadata tracking-widest text-(--landing-muted) uppercase">
-              Coming soon
-            </small>
-          </span>
+            Photography
+          </Link>
           <Link
             href="/home/about"
             onClick={(event) => onNavClick(event, "/home/about")}
