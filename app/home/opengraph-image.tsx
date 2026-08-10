@@ -1,7 +1,7 @@
 import { createOgImage } from "@/lib/og-card";
 import { getOgImageMetadata, getOgInputForPath } from "@/lib/og";
 
-const input = getOgInputForPath("/")!;
+const input = getOgInputForPath("/home")!;
 
 export function generateImageMetadata() {
   return getOgImageMetadata(input);

@@ -1,35 +1,218 @@
 import { expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import sharp from "sharp";
+import * as ogModule from "./og";
 
-const read = (relativePath: string) =>
-  readFileSync(fileURLToPath(new URL(relativePath, import.meta.url)), "utf8");
+type OgInput = {
+  template: "hero" | "rail" | "band";
+  title: string;
+  subtitle?: string;
+  kicker?: string;
+  meta?: string[];
+  metaLine?: string;
+  index?: string;
+  accent?: string;
+  name?: string;
+  stack?: string;
+};
 
-test("uses every approved design-system role in generated images", () => {
-  const og = read("./og.ts");
-  const rootCard = read("../app/opengraph-image.tsx");
-  const caseStudyCard = read("../app/home/work/[slug]/opengraph-image.tsx");
-  const appleIcon = read("../app/apple-icon.tsx");
+type OgApi = {
+  getOgImageMetadata: (input: OgInput) => Array<{
+    id: string;
+    alt: string;
+    size: { width: number; height: number };
+    contentType: string;
+  }>;
+  getOgInputForPath: (path: string) => OgInput | undefined;
+  normalizeOgInput: (input: OgInput) => OgInput;
+  ogCardFonts: () => Array<{ name: string; weight: number }>;
+};
 
-  expect(og).toContain("RobotoCondensed-Regular.ttf");
-  expect(og).toContain("RobotoCondensed-Medium.ttf");
-  expect(og).toContain("RobotoCondensed-SemiBold.ttf");
-  expect(og).toContain("RobotoCondensed-Bold.ttf");
-  expect(og).toContain("Poppins-Regular.ttf");
-  expect(og).toContain("Poppins-Medium.ttf");
-  expect(og).toContain("Poppins-SemiBold.ttf");
-  expect(og).toContain("JetBrainsMono-Regular.ttf");
-  expect(og).toContain("JetBrainsMono-Medium.ttf");
-  expect(og).toContain("JetBrainsMono-SemiBold.ttf");
-  expect(rootCard).toContain('fontFamily: "Roboto Condensed"');
-  expect(rootCard).toContain('fontFamily: "Poppins"');
-  expect(caseStudyCard).toContain('fontFamily: "Roboto Condensed"');
-  expect(caseStudyCard).toContain('fontFamily: "Poppins"');
-  expect(appleIcon).toContain('fontFamily: "Roboto Condensed"');
-  expect(`${og}${rootCard}${caseStudyCard}${appleIcon}`).not.toContain(
-    "Glass Antiqua",
-  );
-  expect(`${og}${rootCard}${caseStudyCard}`).not.toContain("Source Code Pro");
+const og = ogModule as typeof ogModule & Partial<OgApi>;
+
+function requireOgApi<K extends keyof OgApi>(key: K): OgApi[K] | undefined {
+  const value = og[key];
+  expect(value).toBeFunction();
+  return value;
+}
+
+test("clamps long card copy at a word boundary and drops its subtitle", () => {
+  const normalizeOgInput = requireOgApi("normalizeOgInput");
+  if (!normalizeOgInput) return;
+
+  expect(
+    normalizeOgInput({
+      template: "band",
+      title:
+        "Engineering a photography portfolio without sacrificing the photographs",
+      subtitle: "This line must be removed before the title is allowed to overflow.",
+    }),
+  ).toMatchObject({
+    title: "Engineering a photography portfolio without…",
+    subtitle: undefined,
+  });
+});
+
+test("keeps realistic copy intact when it fits its template", () => {
+  const normalizeOgInput = requireOgApi("normalizeOgInput");
+  if (!normalizeOgInput) return;
+
+  expect(
+    normalizeOgInput({
+      template: "rail",
+      title: "Work",
+      subtitle: "Selected frontend engineering projects and product interfaces.",
+    }),
+  ).toEqual({
+    template: "rail",
+    title: "Work",
+    subtitle: "Selected frontend engineering projects and product interfaces.",
+  });
+});
+
+test("maps every published static route to a distinct light-theme card", () => {
+  const getOgInputForPath = requireOgApi("getOgInputForPath");
+  if (!getOgInputForPath) return;
+
+  const paths = [
+    "/",
+    "/home",
+    "/home/experience",
+    "/home/about",
+    "/home/photography",
+    "/home/playground",
+  ];
+  const cards = paths.map((path) => getOgInputForPath(path));
+
+  expect(cards.every(Boolean)).toBe(true);
+  expect(cards.map((card) => card?.title)).toEqual([
+    "Clarity in interface.",
+    "Work",
+    "Experience",
+    "About",
+    "Photography",
+    "Playground",
+  ]);
+  expect(cards.map((card) => card?.template)).toEqual([
+    "hero",
+    "rail",
+    "rail",
+    "rail",
+    "rail",
+    "rail",
+  ]);
+});
+
+test("derives complete image metadata and alt text from each card title", () => {
+  const getOgImageMetadata = requireOgApi("getOgImageMetadata");
+  if (!getOgImageMetadata) return;
+
+  expect(
+    getOgImageMetadata({ template: "rail", title: "Photography" }),
+  ).toEqual([
+    {
+      id: "default",
+      alt: "Photography — eega.dev",
+      size: { width: 1200, height: 630 },
+      contentType: "image/png",
+    },
+  ]);
+});
+
+test("keeps the full route title in alt text when visible card copy is clamped", () => {
+  const getOgImageMetadata = requireOgApi("getOgImageMetadata");
+  if (!getOgImageMetadata) return;
+
+  const title =
+    "Engineering a Photography Portfolio Without Sacrificing the Photographs";
+  expect(
+    getOgImageMetadata({ template: "band", title })[0]?.alt,
+  ).toBe(`${title} — eega.dev`);
+});
+
+test("renders every OG type role with existing portfolio fonts only", () => {
+  const ogCardFonts = requireOgApi("ogCardFonts");
+  if (!ogCardFonts) return;
+
+  expect(ogCardFonts().map(({ name, weight }) => `${name}:${weight}`)).toEqual([
+    "Poppins:400",
+    "Poppins:600",
+    "JetBrains Mono:400",
+    "JetBrains Mono:500",
+  ]);
+});
+
+test("provides one canonical landing-derived guilloche background", async () => {
+  const dataUrl = ogModule.ogImageDataUrl("guilloche");
+  const png = Buffer.from(dataUrl.split(",")[1] ?? "", "base64");
+
+  expect(await sharp(png).metadata()).toMatchObject({
+    format: "png",
+    width: 1200,
+    height: 630,
+  });
+});
+
+test("renders hero, rail, and band cards as real 1200x630 PNGs", async () => {
+  const cardModule = await import("./og-card").catch(() => undefined);
+  expect(cardModule).toBeDefined();
+  if (!cardModule) return;
+
+  const inputs: OgInput[] = [
+    {
+      template: "hero",
+      title: "Clarity in interface.",
+      accent: "Beautifully",
+      name: "Eega Somasekhara Reddy",
+      stack: "React · Next.js · Design Systems · Performance",
+    },
+    {
+      template: "rail",
+      kicker: "ABOUT",
+      title: "About",
+      subtitle: "Building fast, tactile interfaces for the web.",
+      meta: ["EEGA.DEV", "FRONTEND", "SYSTEMS"],
+    },
+    {
+      template: "band",
+      kicker: "CASE STUDY",
+      title: "This Site",
+      subtitle: "A portfolio built as a production interface.",
+      metaLine: "2025 · DESIGN + DEV",
+      index: "05",
+    },
+  ];
+
+  for (const input of inputs) {
+    const response = cardModule.createOgImage(input);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("image/png");
+
+    const metadata = await sharp(await response.arrayBuffer()).metadata();
+    expect(metadata).toMatchObject({
+      format: "png",
+      width: 1200,
+      height: 630,
+    });
+  }
+});
+
+test("keeps the hero glow lighter than its surrounding paper field", async () => {
+  const cardModule = await import("./og-card");
+  const input = og.getOgInputForPath?.("/");
+  expect(input).toBeDefined();
+  if (!input) return;
+
+  const response = cardModule.createOgImage(input);
+  const { data, info } = await sharp(await response.arrayBuffer())
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const luminanceAt = (x: number, y: number) => {
+    const offset = (y * info.width + x) * info.channels;
+    return data[offset] + data[offset + 1] + data[offset + 2];
+  };
+
+  expect(luminanceAt(600, 315)).toBeGreaterThan(luminanceAt(110, 315));
 });
 
 test("renders the generated Apple icon with the vendored fonts", async () => {

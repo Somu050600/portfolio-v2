@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "npm run lint",
     "build": "next build",
+    "og:assets": "bun scripts/generate-og-assets.ts",
     "photos:audit": "bun scripts/photos/pipeline.ts audit",
     "photos:process": "bun scripts/photos/pipeline.ts process",
     "photos:validate": "bun scripts/photos/pipeline.ts validate",
