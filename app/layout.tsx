@@ -12,6 +12,7 @@ import {
   serializeJsonLd,
 } from "@/lib/seo";
 import { ACCENT_PREPAINT_SCRIPT } from "@/lib/theme.config";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import "./brand-theme.css";
 
@@ -95,6 +96,7 @@ export default function RootLayout({
           </PageTransitionProvider>
         </ThemeProvider>
         <ConsoleSignature />
+        <SpeedInsights />
       </body>
     </html>
   );
