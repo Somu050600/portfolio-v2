@@ -75,7 +75,7 @@ export default function ThemeToggle({
           </span>
         </button>
 
-        {/* Gear icon — opens ThemeCustomizer */}
+        {/* Gear icon, opens ThemeCustomizer */}
         <ThemeCustomizerTrigger
           className={variant === "sidebar" ? "size-7 rounded-md" : undefined}
         />

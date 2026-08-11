@@ -120,14 +120,14 @@ export default function Thumbnail({ thumbnail, className }: ThumbnailProps) {
 
   const posterNote =
     thumbnail.kind === "image"
-      ? "Static image — poster layer only."
+      ? "Static image, poster layer only."
       : thumbnail.kind === "video"
         ? "Poster by default; native video on hover when in view."
         : isCheap && hasTreatment
-          ? `CSS ${thumbnail.kind} treatment — static front at rest, animates on hover.`
+          ? `CSS ${thumbnail.kind} treatment: static front at rest, animates on hover.`
           : hasTreatment
             ? `Poster fallback; ${thumbnail.kind} treatment mounts on hover (≤3 global).`
-            : "Poster only — treatment not registered yet.";
+            : "Poster only. Treatment not registered yet.";
 
   return (
     <div

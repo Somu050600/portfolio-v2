@@ -1011,7 +1011,7 @@ async function writePrivateReports(
     ),
   ].join("\n");
   await writeFile(path.join(options.privateOutputDir, "photo-source-audit.csv"), `${csv}\n`);
-  const markdown = `# Photography source audit\n\n- Recognised images: ${metrics.recognisedSourceCount ?? 0}\n- DNG files: ${metrics.dngCount ?? 0}\n- Confirmed panoramas: ${metrics.confirmedPanoramaCount ?? 0}\n- Possible panoramas: ${metrics.possiblePanoramaCount ?? 0}\n- GPS-bearing sources: ${metrics.filesContainingGps ?? 0}\n- Exact duplicate groups: ${metrics.exactDuplicateGroups ?? 0}\n- Likely duplicate groups: ${metrics.likelyDuplicateGroups ?? 0}\n- Manual conversions: ${metrics.filesRequiringManualConversion ?? 0}\n\n## Review items\n\n${audits.filter((audit) => audit.warnings.length).map((audit) => `- **${audit.originalFilename}** — ${audit.warnings.join(" ")}`).join("\n") || "None."}\n`;
+  const markdown = `# Photography source audit\n\n- Recognised images: ${metrics.recognisedSourceCount ?? 0}\n- DNG files: ${metrics.dngCount ?? 0}\n- Confirmed panoramas: ${metrics.confirmedPanoramaCount ?? 0}\n- Possible panoramas: ${metrics.possiblePanoramaCount ?? 0}\n- GPS-bearing sources: ${metrics.filesContainingGps ?? 0}\n- Exact duplicate groups: ${metrics.exactDuplicateGroups ?? 0}\n- Likely duplicate groups: ${metrics.likelyDuplicateGroups ?? 0}\n- Manual conversions: ${metrics.filesRequiringManualConversion ?? 0}\n\n## Review items\n\n${audits.filter((audit) => audit.warnings.length).map((audit) => `- **${audit.originalFilename}** · ${audit.warnings.join(" ")}`).join("\n") || "None."}\n`;
   await writeFile(path.join(options.privateOutputDir, "photo-source-audit.md"), markdown);
   if (validation) {
     await writeFile(

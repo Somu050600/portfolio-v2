@@ -20,6 +20,9 @@ export function useLocalTime(timeZone: string) {
   return useSyncExternalStore(
     subscribe,
     () => formatLocalTime(new Date(), timeZone),
-    () => "--:--",
+    // The server snapshot renders a real time, so first paint never shows a
+    // dead clock. It can be a minute stale by the time the client hydrates, so
+    // the <time> element suppresses that mismatch and the 30s tick corrects it.
+    () => formatLocalTime(new Date(), timeZone),
   );
 }

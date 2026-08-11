@@ -347,7 +347,7 @@ export default function PhotographyGallery() {
           <div className="flex min-w-0 flex-1 flex-col gap-3.25">
             <div className="flex items-center gap-2.5">
               <span className="font-mono text-metadata leading-none font-semibold tracking-[0.18em] text-(--photo-kicker) uppercase">
-                04 — PHOTOGRAPHY
+                04 · PHOTOGRAPHY
               </span>
               <span
                 className="h-px w-22.5 bg-(--photo-hair)"
@@ -420,7 +420,9 @@ export default function PhotographyGallery() {
               <button
                 type="button"
                 className="group/frame absolute inset-0 block size-full cursor-pointer overflow-hidden border-0 bg-transparent p-0 text-left focus-visible:outline-2 focus-visible:-outline-offset-3 focus-visible:outline-(--photo-accent)"
-                aria-label={`${photoLabel(photo)}. ${photo.alt}. ${photoMeta(photo)}`}
+                aria-label={[photoLabel(photo), photo.alt, photoMeta(photo)]
+                  .filter(Boolean)
+                  .join(". ")}
                 onClick={(event) =>
                   openLightbox(index, event.currentTarget)
                 }
@@ -441,9 +443,11 @@ export default function PhotographyGallery() {
                   <b className="font-display text-[15px] leading-[1.2] font-medium text-(--photo-text) max-[899px]:text-[12.5px]">
                     {photoLabel(photo)}
                   </b>
-                  <small className="font-mono text-metadata leading-normal font-normal text-(--photo-dim-2) max-[899px]:hidden">
-                    {photoMeta(photo)}
-                  </small>
+                  {photoMeta(photo) && (
+                    <small className="font-mono text-metadata leading-normal font-normal text-(--photo-dim-2) max-[899px]:hidden">
+                      {photoMeta(photo)}
+                    </small>
+                  )}
                 </span>
               </button>
             </figure>
@@ -527,7 +531,7 @@ export default function PhotographyGallery() {
                       {photoLabel(photo)}
                     </b>
                     <small className="ml-auto font-mono text-[8px] leading-none font-normal text-[#a09884]">
-                      {photo.capturedAt?.slice(0, 4) ?? "—"}
+                      {photo.capturedAt?.slice(0, 4) ?? "·"}
                     </small>
                   </span>
                 </button>
@@ -624,6 +628,10 @@ export default function PhotographyGallery() {
       />
 
       {activePhoto && (
+        // Click-to-close is the backdrop gesture; the keyboard path is Escape
+        // plus arrow keys, bound on window while the dialog is open (see the
+        // effect above), which the rule cannot see from the JSX.
+        /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
         <div
           ref={lightboxRef}
           className="fixed inset-0 z-90 flex cursor-zoom-out items-center justify-center bg-[rgba(246,243,236,0.975)] px-15 py-11 backdrop-blur-[6px] focus:outline-none dark:bg-[rgba(6,8,7,0.965)] max-[899px]:flex-col max-[899px]:items-stretch max-[899px]:justify-center max-[899px]:p-5.5"
@@ -690,9 +698,11 @@ export default function PhotographyGallery() {
                 </span>
                 <span>{photoLabel(activePhoto)}</span>
               </div>
-              <span className="font-mono text-metadata text-right leading-[1.7] font-normal text-[#6f685b] dark:text-[#98a099] max-[899px]:text-left">
-                {photoMeta(activePhoto)}
-              </span>
+              {photoMeta(activePhoto) && (
+                <span className="font-mono text-metadata text-right leading-[1.7] font-normal text-[#6f685b] dark:text-[#98a099] max-[899px]:text-left">
+                  {photoMeta(activePhoto)}
+                </span>
+              )}
               <span
                 className="font-mono text-metadata leading-none font-normal tracking-widest text-[#a09884] dark:text-[#4e544f]"
                 aria-hidden="true"

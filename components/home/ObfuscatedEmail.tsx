@@ -6,7 +6,7 @@ import { useCallback } from "react";
 const USER = "somasekhareega";
 const DOMAIN = "gmail.com";
 
-/** Obfuscated email — not a raw mailto in SSR HTML. */
+/** Obfuscated email, not a raw mailto in SSR HTML. */
 export default function ObfuscatedEmail() {
   const reveal = useCallback(() => {
     window.location.href = `mailto:${USER}@${DOMAIN}`;

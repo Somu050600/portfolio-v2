@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       { userAgent: "*", allow: "/" },
-      // Explicitly welcome AI crawlers/agents — this is a portfolio; citations
+      // Explicitly welcome AI crawlers/agents. This is a portfolio; citations
       // and discovery are wanted. Context for them lives in /llms.txt + JSON-LD.
       {
         userAgent: [

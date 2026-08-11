@@ -45,7 +45,7 @@ describe("structured identity data", () => {
         "@type": "ProfilePage",
         "@id": "https://eega.dev/home/about#profile-page",
         url: "https://eega.dev/home/about",
-        name: "Eega Somasekhara Reddy — Frontend Engineer",
+        name: "Eega Somasekhara Reddy, Frontend Engineer",
         mainEntity: { "@id": "https://eega.dev/#person" },
       },
     ]);

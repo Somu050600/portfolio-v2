@@ -39,7 +39,7 @@ export default function SkillsGrid({
       className="flex min-w-0 flex-col gap-3.5"
       {...componentAttrs(
         "SkillsGrid",
-        "Filterable 24-element periodic table of frontend skills.",
+        `Filterable ${aboutSkills.length}-element periodic table of frontend skills.`,
       )}
     >
       <div className="flex items-center gap-2.5">

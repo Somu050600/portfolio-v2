@@ -1,10 +1,5 @@
 export type Category = "pro" | "creative" | "more";
-export type Status =
-  | "SHIPPED"
-  | "INTERNSHIP"
-  | "IN PROGRESS"
-  | "OPEN SOURCE"
-  | "COMING SOON";
+export type Status = "SHIPPED" | "INTERNSHIP" | "IN PROGRESS" | "OPEN SOURCE";
 export type Accent = "blue" | "teal" | "orange" | "green" | "neutral";
 
 import type { Thumbnail } from "./thumbnail";
@@ -45,15 +40,31 @@ export interface CaseStudySection {
   blocks: Block[];
 }
 
+/**
+ * Three lines at the top of a long-form study: a skimmer who bounces at
+ * section two still leaves with the thesis.
+ */
+export interface CaseStudyGlance {
+  problem: string;
+  decision: string;
+  outcome: string;
+}
+
 export interface CaseStudy {
   tagline: string;
   tags: string[];
   hero: { image?: string; accent: Accent };
+  glance?: CaseStudyGlance;
   sections: CaseStudySection[];
 }
 
 export interface Project {
   slug: string;
+  /**
+   * Printed as `No. NN` on the card and the case study. Position, not identity:
+   * derived from the order of `projectDefinitions` below, so reordering or
+   * dropping an entry renumbers the set instead of leaving gaps.
+   */
   number: number;
   title: string;
   description?: string;
@@ -71,261 +82,21 @@ export interface Project {
   caseStudy?: CaseStudy;
 }
 
-export const projects: Project[] = [
+type ProjectDefinition = Omit<Project, "number">;
+
+/**
+ * Source order is the printed order. Index work first (the grid reads it in
+ * this sequence), then the compact "More" list.
+ */
+const projectDefinitions: ProjectDefinition[] = [
   // ── Primary work ──────────────────────────────────────────────────────────
   {
-    slug: "design-system",
-    number: 1,
-    title: "AI-Optimized Design System",
-    description:
-      "Token-driven component library that cut UI delivery from weeks to days.",
-    category: "pro",
-    role: "Frontend Engineer",
-    team: "Platform + Design",
-    shipped: "2024",
-    status: "SHIPPED",
-    tech: ["React", "TypeScript", "Storybook", "Figma Tokens"],
-    tilt: -1.2,
-    thumbnail: {
-      kind: "flip",
-      accent: "blue",
-      alt: "Design system — tokens, type scale, and components, flipping to the project spec",
-      params: {
-        front: {
-          label: "DESIGN SYSTEM",
-          sublabel: "tokens · components",
-          swatches: [
-            "#3B82F6",
-            "#E08A5F",
-            "#34D399",
-            "#E5E5E5",
-            "#9A9A9D",
-            "#3A3A3F",
-          ],
-          type: {
-            display: "Aa",
-            sample: "The quick brown fox",
-            scaleLabel: "DISPLAY · BODY · LABEL",
-          },
-          button: { label: "Ship →" },
-          badge: "SHIPPED",
-          showToggle: true,
-          input: "search components…",
-          showRadii: true,
-        },
-        back: {
-          heading: "SPEC",
-          rows: [
-            { k: "STACK", v: "Next · Tailwind · TS · Figma" },
-            { k: "IMPACT", v: "−50% dup logic", accent: true },
-            { k: "DELIVERY", v: "2–3 wk → <1 wk" },
-            { k: "ROLE", v: "Frontend Engineer" },
-            { k: "YEAR", v: "2024" },
-          ],
-        },
-      },
-    },
-    note: "Flip thumbnail — dark token artboard front, spec sheet back on hover.",
-    caseStudy: {
-      tagline:
-        "We didn't set out to build a design system. We were trying to stop an AI from generating the wrong shade of blue.",
-      tags: ["AI Agents", "Figma Tokens", "Tailwind", "Storybook"],
-      hero: { accent: "teal" },
-      sections: [
-        {
-          id: "the-wrong-blue",
-          heading: "Confidently Wrong",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "It started with a button. We ran a Figma design through our MCP setup, asked the agent to implement it, and got back clean, confident code. The button was blue. Just not the right blue.",
-            },
-            {
-              type: "paragraph",
-              text: "Our brand blue lives at av-blue-500 — a custom token in our Tailwind config. In Figma, it was simply labeled blue. When the LLM saw that coming through the MCP context, it mapped it to Tailwind's stock blue-500. Same name, different hex. The output looked plausible enough to slip past a quick review.",
-              emphasis: ["av-blue-500", "blue", "blue-500"],
-            },
-            {
-              type: "diagram",
-              kind: "token-mismatch",
-            },
-            {
-              type: "paragraph",
-              text: "And it wasn't just blue. Any Figma variable name that overlapped with Tailwind's built-in vocabulary was a potential mismatch. We'd catch it in review, ask for corrections, re-run. The frustrating part wasn't that the AI got it wrong — it had no way to know it was wrong.",
-            },
-          ],
-        },
-        {
-          id: "the-bandaid",
-          heading: "The Fix That Wasn't",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "The fastest thing we could do was write a .md file. Token naming convention, Figma-to-Tailwind translation, a line telling the agent 'when Figma says blue, use av-blue-500.' Dropped it into agent context for every UI task. It worked.",
-            },
-            {
-              type: "callout",
-              accent: "orange",
-              text: "Until someone forgot to include it. Until context filled up and it got truncated. Until a new session started with a clean slate. A doc that has to be manually loaded every time is not a system — it's a reminder that the system is broken.",
-            },
-          ],
-        },
-        {
-          id: "fixing-the-source",
-          heading: "Both Sides Were Ready",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "The real problem was structural. Figma had variables — just blue, green, brand-primary — declared with no architecture. No primitive layer, no semantic mappings, no consistent naming convention to anchor anything to.",
-            },
-            {
-              type: "paragraph",
-              text: "When we brought this to the design and product team, they weren't surprised. They'd wanted to fix Figma's token structure for a while too — the old setup had variables but no reusable component mappings, and designers were working around it constantly. The AI problem gave everyone a concrete reason to finally do it.",
-              emphasis: [
-                "The AI problem gave everyone a concrete reason to finally do it.",
-              ],
-            },
-            {
-              type: "list",
-              ordered: true,
-              items: [
-                {
-                  num: "01",
-                  title: "Primitives",
-                  text: "Raw values — every color in the palette named by scale. av-blue-50 through av-blue-950, matching the frontend token names exactly.",
-                },
-                {
-                  num: "02",
-                  title: "Semantic layer",
-                  text: "Intent-based tokens — action-primary, surface-default, text-muted. What designers reference in components.",
-                },
-                {
-                  num: "03",
-                  title: "Maps",
-                  text: "Explicit bindings from Figma semantic tokens to frontend Tailwind tokens. What the LLM actually resolves when it reads a design.",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "the-tradeoff",
-          heading: "The Call We Almost Got Wrong",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "Once tokens were cleaner on both sides, there was an obvious next question: should the frontend match it completely? Build a full custom design system — primitives, semantic layer, component styles — using CSS custom properties and typed objects instead of Tailwind utilities?",
-            },
-            {
-              type: "paragraph",
-              text: "We looked at it seriously. It's the clean-room ideal. But Tailwind already provides a semantic utility layer, we'd been on it since day one, and migrating the entire app would cost weeks for gains that were mostly theoretical. The av- prefix was already working. We kept it.",
-              emphasis: ["av-"],
-            },
-            {
-              type: "callout",
-              accent: "neutral",
-              text: "The right tradeoff isn't always the architecturally pure one. Sometimes it's the one that closes the actual gap without blowing up what's already working.",
-            },
-          ],
-        },
-        {
-          id: "teaching-the-llm",
-          heading: "Teaching the Machine",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "With tokens aligned, we wrote the real version of that earlier .md file — docs/design-system.md. Token translation tables, component APIs, exact prop shapes, common pitfalls. Everything an LLM needs to generate correct UI without guessing.",
-              emphasis: ["docs/design-system.md"],
-            },
-            {
-              type: "paragraph",
-              text: "One detail that matters: this doc isn't loaded into every agent context. AGENTS.md references it conditionally — the agent pulls it in only when the task involves UI. For everything else, the doc stays out of context entirely. Rough estimate, we're spending 30-40% less tokens on corrections and re-runs compared to before.",
-            },
-          ],
-        },
-        {
-          id: "component-rollout",
-          heading: "Component by Component",
-          blocks: [
-            {
-              type: "paragraph",
-              text: "Fixing tokens solved the color problem. But there's a second failure mode: an LLM reaching for a custom one-off implementation when a shared component already exists. We started documenting the component library, most-used first.",
-            },
-            {
-              type: "list",
-              ordered: false,
-              items: [
-                {
-                  title: "AVButton",
-                  text: "Props, variants, loading states, accessibility requirements.",
-                },
-                {
-                  title: "Icons16 / Icons24",
-                  text: "Import paths, stroke-vs-fill distinction, sizing conventions.",
-                },
-                {
-                  title: "AVShimmer",
-                  text: "When to use it, the parent-dimensions gotcha.",
-                },
-                {
-                  title: "AVTooltip",
-                  text: "Hover vs click mode, portal flag for overflow parents.",
-                },
-                {
-                  title: "AVTablePaginated",
-                  text: "Full table API including collapsible rows and progressive loading.",
-                },
-              ],
-            },
-            {
-              type: "paragraph",
-              text: "For the core ones — buttons, icons, shimmer, tooltip, metric cards — Storybook previews went up too. Locally hosted, so design can verify a component without running the full app.",
-            },
-            {
-              type: "paragraph",
-              text: "Still in progress. Every component that gets documented is one less thing the LLM has to invent.",
-            },
-          ],
-        },
-        {
-          id: "impact",
-          heading: "Where It Stands",
-          blocks: [
-            {
-              type: "metrics",
-              items: [
-                { value: "<1 wk", label: "UI delivery (was 2–3 wk)" },
-                { value: "~35%", label: "Less LLM context on corrections" },
-                { value: "10+", label: "Components documented" },
-              ],
-            },
-            {
-              type: "paragraph",
-              text: "There are still edge cases. An agent will occasionally reach for a raw Tailwind class when an av- token is the right call. But the floor is higher now, and the drift is much smaller.",
-              emphasis: ["the floor is higher"],
-            },
-            {
-              type: "paragraph",
-              text: "The bigger shift is that design and engineering are finally working from the same source of truth. That wasn't the original goal — it was a side effect of trying to fix an AI hallucination problem.",
-              emphasis: [
-                "side effect of trying to fix an AI hallucination problem.",
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
     slug: "compliance-reporting",
-    number: 2,
     title: "Compliance Reporting Platform",
-    description:
-      "A browser-native reporting system that matched the product—then exposed the cost of running Chromium in the wrong place.",
     category: "pro",
     role: "Frontend Engineer",
     team: "Compliance Engineering",
-    shipped: "2024",
+    shipped: "2025",
     status: "SHIPPED",
     tech: ["Next.js", "TypeScript", "Go", "chromedp", "SSR", "Print CSS"],
     tilt: 0.8,
@@ -339,6 +110,14 @@ export const projects: Project[] = [
         "The report looked like the product. Then real customer data showed that rendering architecture and execution architecture were two different decisions.",
       tags: ["Next.js", "chromedp", "SSR", "Print CSS"],
       hero: { accent: "blue" },
+      glance: {
+        problem:
+          "Customer-facing compliance reports had to look like the product (branded, paginated, previewable), and the backend was primarily Go.",
+        decision:
+          "Compose the document in the existing Next.js frontend and use Chromium's print pipeline as the renderer, behind a short-lived token on an SSR route.",
+        outcome:
+          "The document architecture solved the problem; the deployment model did not contain the workload. Automated generation was rolled back and never re-enabled.",
+      },
       sections: [
         {
           id: "the-product-requirement",
@@ -367,7 +146,9 @@ export const projects: Project[] = [
             {
               type: "paragraph",
               text: "I proposed building the report in the existing Next.js frontend and using Chromium's print pipeline as the document renderer. Aurva already had typography, color tokens, tables, badges, icons, and spacing conventions there. Rebuilding those primitives in Go would have created a second presentation system that could drift every time the product design changed.",
-              emphasis: ["building the report in the existing Next.js frontend"],
+              emphasis: [
+                "building the report in the existing Next.js frontend",
+              ],
             },
             {
               type: "list",
@@ -392,7 +173,7 @@ export const projects: Project[] = [
             },
             {
               type: "paragraph",
-              text: "The result was template-driven, component-based report composition—not a universal schema renderer. That boundary kept the system concrete enough to match the approved layouts while still sharing the parts that were actually common.",
+              text: "The result was template-driven, component-based report composition, not a universal schema renderer. That boundary kept the system concrete enough to match the approved layouts while still sharing the parts that were actually common.",
             },
           ],
         },
@@ -433,7 +214,8 @@ export const projects: Project[] = [
             {
               type: "demo",
               id: "compliance-report-views",
-              caption: "Synthetic data only. Switch the projection to see one compliance result reorganized for three different readers.",
+              caption:
+                "Synthetic data only. Switch the projection to see one compliance result reorganized for three different readers.",
             },
             {
               type: "list",
@@ -542,7 +324,9 @@ export const projects: Project[] = [
             {
               type: "paragraph",
               text: "Those memory figures are historical recollections, not current monitoring evidence. The exact incident mix was never isolated: one exceptionally large report, concurrent renders, or both may have contributed. Browser reuse reduced startup overhead, but reuse alone did not provide resource backpressure.",
-              emphasis: ["one exceptionally large report, concurrent renders, or both"],
+              emphasis: [
+                "one exceptionally large report, concurrent renders, or both",
+              ],
             },
             {
               type: "callout",
@@ -616,30 +400,283 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: "design-system",
+    title: "AI-Optimized Design System",
+    category: "pro",
+    role: "Frontend Engineer",
+    team: "Platform + Design",
+    shipped: "2026",
+    status: "SHIPPED",
+    tech: ["React", "TypeScript", "Storybook", "Figma Tokens"],
+    tilt: -1.2,
+    thumbnail: {
+      kind: "flip",
+      accent: "blue",
+      alt: "Design system: tokens, type scale, and components, flipping to the project spec",
+      params: {
+        front: {
+          label: "DESIGN SYSTEM",
+          sublabel: "tokens · components",
+          swatches: [
+            "#3B82F6",
+            "#E08A5F",
+            "#34D399",
+            "#E5E5E5",
+            "#9A9A9D",
+            "#3A3A3F",
+          ],
+          type: {
+            display: "Aa",
+            sample: "The quick brown fox",
+            scaleLabel: "DISPLAY · BODY · LABEL",
+          },
+          button: { label: "Ship →" },
+          badge: "SHIPPED",
+          showToggle: true,
+          input: "search components…",
+          showRadii: true,
+        },
+        back: {
+          heading: "SPEC",
+          rows: [
+            { k: "STACK", v: "Next · Tailwind · TS · Figma" },
+            { k: "IMPACT", v: "−50% dup logic", accent: true },
+            { k: "DELIVERY", v: "2–3 wk → <1 wk" },
+            { k: "ROLE", v: "Frontend Engineer" },
+            { k: "YEAR", v: "2024" },
+          ],
+        },
+      },
+    },
+    note: "Flip thumbnail: dark token artboard front, spec sheet back on hover.",
+    caseStudy: {
+      tagline:
+        "We didn't set out to build a design system. We were trying to stop an AI from generating the wrong shade of blue.",
+      tags: ["AI Agents", "Figma Tokens", "Tailwind", "Storybook"],
+      hero: { accent: "teal" },
+      glance: {
+        problem:
+          "An agent reading Figma variables through MCP kept resolving our brand blue to Tailwind's stock blue-500, and the .md file that fixed it only worked when someone remembered to load it.",
+        decision:
+          "Fix the source instead of the prompt: primitives, a semantic layer and explicit Figma-to-Tailwind maps on both sides, while staying on Tailwind rather than building a bespoke token runtime.",
+        outcome:
+          "Generated UI resolves to production tokens by default, and component delivery moved from two-to-three weeks to under one (rough estimate).",
+      },
+      sections: [
+        {
+          id: "the-wrong-blue",
+          heading: "Confidently Wrong",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "It started with a button. We ran a Figma design through our MCP setup, asked the agent to implement it, and got back clean, confident code. The button was blue. Just not the right blue.",
+            },
+            {
+              type: "paragraph",
+              text: "Our brand blue lives at av-blue-500, a custom token in our Tailwind config. In Figma, it was simply labeled blue. When the LLM saw that coming through the MCP context, it mapped it to Tailwind's stock blue-500. Same name, different hex. The output looked plausible enough to slip past a quick review.",
+              emphasis: ["av-blue-500", "blue", "blue-500"],
+            },
+            {
+              type: "diagram",
+              kind: "token-mismatch",
+            },
+            {
+              type: "paragraph",
+              text: "And it wasn't just blue. Any Figma variable name that overlapped with Tailwind's built-in vocabulary was a potential mismatch. We'd catch it in review, ask for corrections, re-run. The frustrating part wasn't that the AI got it wrong. It had no way to know it was wrong.",
+            },
+          ],
+        },
+        {
+          id: "the-bandaid",
+          heading: "The Fix That Wasn't",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The fastest thing we could do was write a .md file. Token naming convention, Figma-to-Tailwind translation, a line telling the agent 'when Figma says blue, use av-blue-500.' Dropped it into agent context for every UI task. It worked.",
+            },
+            {
+              type: "callout",
+              accent: "orange",
+              text: "Until someone forgot to include it. Until context filled up and it got truncated. Until a new session started with a clean slate. A doc that has to be manually loaded every time is not a system. It's a reminder that the system is broken.",
+            },
+          ],
+        },
+        {
+          id: "fixing-the-source",
+          heading: "Both Sides Were Ready",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The real problem was structural. Figma had variables (just blue, green, brand-primary) declared with no architecture. No primitive layer, no semantic mappings, no consistent naming convention to anchor anything to.",
+            },
+            {
+              type: "paragraph",
+              text: "When we brought this to the design and product team, they weren't surprised. They'd wanted to fix Figma's token structure for a while too: the old setup had variables but no reusable component mappings, and designers were working around it constantly. The AI problem gave everyone a concrete reason to finally do it.",
+              emphasis: [
+                "The AI problem gave everyone a concrete reason to finally do it.",
+              ],
+            },
+            {
+              type: "list",
+              ordered: true,
+              items: [
+                {
+                  num: "01",
+                  title: "Primitives",
+                  text: "Raw values: every color in the palette named by scale. av-blue-50 through av-blue-950, matching the frontend token names exactly.",
+                },
+                {
+                  num: "02",
+                  title: "Semantic layer",
+                  text: "Intent-based tokens: action-primary, surface-default, text-muted. What designers reference in components.",
+                },
+                {
+                  num: "03",
+                  title: "Maps",
+                  text: "Explicit bindings from Figma semantic tokens to frontend Tailwind tokens. What the LLM actually resolves when it reads a design.",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: "the-tradeoff",
+          heading: "The Call We Almost Got Wrong",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Once tokens were cleaner on both sides, there was an obvious next question: should the frontend match it completely? Build a full custom design system (primitives, semantic layer, component styles) using CSS custom properties and typed objects instead of Tailwind utilities?",
+            },
+            {
+              type: "paragraph",
+              text: "We looked at it seriously. It's the clean-room ideal. But Tailwind already provides a semantic utility layer, we'd been on it since day one, and migrating the entire app would cost weeks for gains that were mostly theoretical. The av- prefix was already working. We kept it.",
+              emphasis: ["av-"],
+            },
+            {
+              type: "callout",
+              accent: "neutral",
+              text: "The right tradeoff isn't always the architecturally pure one. Sometimes it's the one that closes the actual gap without blowing up what's already working.",
+            },
+          ],
+        },
+        {
+          id: "teaching-the-llm",
+          heading: "Teaching the Machine",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "With tokens aligned, we wrote the real version of that earlier .md file: docs/design-system.md. Token translation tables, component APIs, exact prop shapes, common pitfalls. Everything an LLM needs to generate correct UI without guessing.",
+              emphasis: ["docs/design-system.md"],
+            },
+            {
+              type: "paragraph",
+              text: "One detail that matters: this doc isn't loaded into every agent context. AGENTS.md references it conditionally, so the agent pulls it in only when the task involves UI. For everything else, the doc stays out of context entirely. Rough estimate, we're spending 30-40% less tokens on corrections and re-runs compared to before.",
+            },
+          ],
+        },
+        {
+          id: "component-rollout",
+          heading: "Component by Component",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "Fixing tokens solved the color problem. But there's a second failure mode: an LLM reaching for a custom one-off implementation when a shared component already exists. We started documenting the component library, most-used first.",
+            },
+            {
+              type: "list",
+              ordered: false,
+              items: [
+                {
+                  title: "AVButton",
+                  text: "Props, variants, loading states, accessibility requirements.",
+                },
+                {
+                  title: "Icons16 / Icons24",
+                  text: "Import paths, stroke-vs-fill distinction, sizing conventions.",
+                },
+                {
+                  title: "AVShimmer",
+                  text: "When to use it, the parent-dimensions gotcha.",
+                },
+                {
+                  title: "AVTooltip",
+                  text: "Hover vs click mode, portal flag for overflow parents.",
+                },
+                {
+                  title: "AVTablePaginated",
+                  text: "Full table API including collapsible rows and progressive loading.",
+                },
+              ],
+            },
+            {
+              type: "paragraph",
+              text: "For the core ones (buttons, icons, shimmer, tooltip, metric cards) Storybook previews went up too. Locally hosted, so design can verify a component without running the full app.",
+            },
+            {
+              type: "paragraph",
+              text: "Still in progress. Every component that gets documented is one less thing the LLM has to invent.",
+            },
+          ],
+        },
+        {
+          id: "impact",
+          heading: "Where It Stands",
+          blocks: [
+            {
+              type: "metrics",
+              items: [
+                { value: "<1 wk", label: "UI delivery (was 2–3 wk)" },
+                { value: "~35%", label: "Less LLM context on corrections" },
+                { value: "10+", label: "Components documented" },
+              ],
+            },
+            {
+              type: "paragraph",
+              text: "There are still edge cases. An agent will occasionally reach for a raw Tailwind class when an av- token is the right call. But the floor is higher now, and the drift is much smaller.",
+              emphasis: ["the floor is higher"],
+            },
+            {
+              type: "paragraph",
+              text: "The bigger shift is that design and engineering are finally working from the same source of truth. That wasn't the original goal. It was a side effect of trying to fix an AI hallucination problem.",
+              emphasis: [
+                "side effect of trying to fix an AI hallucination problem.",
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     slug: "view-transitions",
-    number: 3,
     title: "View Transitions: A Field Guide",
-    description:
-      "What the View Transitions API actually does — window + React, five variants, a live lab.",
     category: "creative",
     role: "Design + Dev",
     team: "Solo",
-    shipped: "2025",
+    shipped: "2026",
     status: "IN PROGRESS",
     tech: ["View Transitions", "CSS", "React", "Web APIs"],
     tilt: -0.8,
     thumbnail: {
       kind: "vt-cycle",
       accent: "cyan",
-      alt: "View Transitions lab — cross-fade, clip reveal, and slide variants cycling on hover",
+      alt: "View Transitions lab: cross-fade, clip reveal, and slide variants cycling on hover",
       params: { height: 240 },
     },
-    note: "Field guide to the VT API — interactive lab of five transition variants.",
+    note: "Field guide to the VT API, with an interactive lab of five transition variants.",
     caseStudy: {
       tagline:
-        "You're already inside a View Transition — every navigation on this site is one. Here's the API behind it, the variants, and the traps, with a live lab to poke at.",
+        "You're already inside a View Transition: every navigation on this site is one. Here's the API behind it, the variants, and the traps, with a live lab to poke at.",
       tags: ["View Transitions", "CSS", "React", "Web APIs"],
       hero: { accent: "blue" },
+      glance: {
+        problem:
+          "The View Transitions API demos well and breaks in ways the spec summary does not warn you about.",
+        decision:
+          "Write it as a field guide: five variants, the traps beside each one, and a live lab pairing a contained preview with the real API code.",
+        outcome:
+          "In progress. Every navigation on this site already runs on the API the guide describes.",
+      },
       sections: [
         {
           id: "already-in-one",
@@ -647,12 +684,12 @@ export const projects: Project[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "Every time you move between sections of this site, or open a case study, the browser isn't just swapping pages — it's running a View Transition. The slide, the circle reveal, the card that morphs into this page: all the same API.",
+              text: "Every time you move between sections of this site, or open a case study, the browser isn't just swapping pages. It's running a View Transition. The slide, the circle reveal, the card that morphs into this page: all the same API.",
             },
             {
               type: "callout",
               accent: "blue",
-              text: "This is a field guide, not a war story — what I learned wiring up this site, distilled into the variants and gotchas, with a live lab. The previews below are simulated (plain CSS/JS) so they stay contained; the real API code sits beside each one.",
+              text: "This is a field guide, not a war story: what I learned wiring up this site, distilled into the variants and gotchas, with a live lab. The previews below are simulated (plain CSS/JS) so they stay contained; the real API code sits beside each one.",
             },
           ],
         },
@@ -672,9 +709,7 @@ export const projects: Project[] = [
   },
   {
     slug: "liquid-distortion",
-    number: 4,
     title: "Liquid Distortion",
-    description: "Three.js shader pass that warps imagery like viscous fluid.",
     category: "creative",
     role: "Creative Dev",
     team: "Solo",
@@ -688,12 +723,20 @@ export const projects: Project[] = [
       poster: "/posters/liquid-distortion.svg",
       params: { height: 228 },
     },
-    note: "Shader distortion WIP — playground preview mounts on hover.",
+    note: "Shader distortion WIP. The playground preview mounts on hover.",
     caseStudy: {
       tagline:
         "A liquid effect that does not simulate water so much as it borrows the one thing water makes visible: momentum.",
       tags: ["Three.js", "GLSL", "Shader Pass", "WebGL"],
       hero: { accent: "teal" },
+      glance: {
+        problem:
+          "A pointer-driven image warp that reads as liquid rather than as a wobble following the cursor.",
+        decision:
+          "Drive the distortion from pointer momentum instead of pointer position: splat velocity into a field and let it settle.",
+        outcome:
+          "In progress. The shader pipeline runs; the write-up and the playground build are unfinished.",
+      },
       sections: [
         {
           id: "the-brief",
@@ -812,29 +855,34 @@ export const projects: Project[] = [
   },
   {
     slug: "this-site",
-    number: 5,
     title: "This Site",
-    description:
-      "Portfolio v2 — View Transitions, theme tokens, and tactile micro-interactions.",
     category: "creative",
     role: "Design + Dev",
     team: "Solo",
-    shipped: "2025",
+    shipped: "2026",
     status: "IN PROGRESS",
     tech: ["Next.js", "Tailwind", "GSAP", "View Transitions"],
     tilt: 1.3,
     thumbnail: {
       kind: "replay",
       accent: "cyan",
-      alt: "Sliding active-bar nav — a cursor moves between items and the accent bar glides on hover",
+      alt: "Sliding active-bar nav: a cursor moves between items and the accent bar glides on hover",
       params: { height: 240 },
     },
-    note: "This portfolio — live sliding-bar preview on hover; full View Transitions write-up inside.",
+    note: "This portfolio, with a live sliding-bar preview on hover and the full View Transitions write-up inside.",
     caseStudy: {
       tagline:
         "I wanted a two-pixel bar to glide between nav items. It took five rewrites and a lesson in how browsers actually paint a page.",
       tags: ["View Transitions", "GSAP", "Next.js", "Tailwind"],
       hero: { accent: "teal" },
+      glance: {
+        problem:
+          "A sliding indicator bar that worked on hover died on navigation, and the workarounds kept getting more elaborate.",
+        decision:
+          "Stop hand-rolling the movement: name the element, place it once in the DOM, and let the native View Transition own it.",
+        outcome:
+          "One shared 480ms transition, and the snapshot workarounds and timer chasing were deleted.",
+      },
       sections: [
         {
           id: "the-bar",
@@ -842,7 +890,7 @@ export const projects: Project[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "The section nav on this site has a sliding highlight on hover, and the page itself slides between sections using the View Transitions API. So when you move to a new section, the little accent bar marking the active item should glide from the old item to the new one — in the same motion as the page. A two-pixel sliver of color. Felt like a five-minute job.",
+              text: "The section nav on this site has a sliding highlight on hover, and the page itself slides between sections using the View Transitions API. So when you move to a new section, the little accent bar marking the active item should glide from the old item to the new one, in the same motion as the page. A two-pixel sliver of color. Felt like a five-minute job.",
             },
             {
               type: "paragraph",
@@ -857,12 +905,12 @@ export const projects: Project[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "The first version was the obvious one: a CSS transition on transform, and a bit of JS to move the bar to the active item. On hover it slid beautifully. On an actual section change, it teleported — no slide, just instantly there.",
+              text: "The first version was the obvious one: a CSS transition on transform, and a bit of JS to move the bar to the active item. On hover it slid beautifully. On an actual section change, it teleported. No slide, just instantly there.",
             },
             {
               type: "callout",
               accent: "orange",
-              text: "The hover case and the navigation case looked identical in the code. They are not the same problem. Hovering happens on a live, painted page. Navigating happens inside a View Transition — and that changes everything about what the browser is willing to draw.",
+              text: "The hover case and the navigation case looked identical in the code. They are not the same problem. Hovering happens on a live, painted page. Navigating happens inside a View Transition, and that changes everything about what the browser is willing to draw.",
             },
           ],
         },
@@ -872,13 +920,13 @@ export const projects: Project[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "Here's what a View Transition actually does. When you call startViewTransition, the browser freezes the current page into an image, swaps the DOM to the new page, freezes that into a second image, and animates between the two pictures. For the length of that animation, the real elements aren't what you're looking at — their snapshots are.",
+              text: "Here's what a View Transition actually does. When you call startViewTransition, the browser freezes the current page into an image, swaps the DOM to the new page, freezes that into a second image, and animates between the two pictures. For the length of that animation, the real elements aren't what you're looking at. Their snapshots are.",
               emphasis: ["startViewTransition", "snapshots"],
             },
             {
               type: "callout",
               accent: "blue",
-              text: "A CSS transition running during a View Transition is a tree falling in an empty forest. The element does move — but the frame it moves on is never the frame on screen. You're animating a thing the browser has already replaced with a photo of itself.",
+              text: "A CSS transition running during a View Transition is a tree falling in an empty forest. The element does move, but the frame it moves on is never the frame on screen. You're animating a thing the browser has already replaced with a photo of itself.",
             },
           ],
         },
@@ -888,11 +936,11 @@ export const projects: Project[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "So I tried to outwait it. Subscribe to a 'transition finished' event, then move the bar once the DOM was live again. It still jumped. I added the position-tracking, restored the CSS transition by hand, sequenced the frames — and it still jumped.",
+              text: "So I tried to outwait it. Subscribe to a 'transition finished' event, then move the bar once the DOM was live again. It still jumped. I added the position-tracking, restored the CSS transition by hand, sequenced the frames, and it still jumped.",
             },
             {
               type: "paragraph",
-              text: "The deeper problem was structural, and I'd been ignoring it. The sidebar isn't persistent. Each section is its own page rendering its own shell, so the entire nav unmounts and remounts on every navigation. There was no surviving bar to animate from — the new one mounted already sitting at its destination.",
+              text: "The deeper problem was structural, and I'd been ignoring it. The sidebar isn't persistent. Each section is its own page rendering its own shell, so the entire nav unmounts and remounts on every navigation. There was no surviving bar to animate from. The new one mounted already sitting at its destination.",
               emphasis: ["no surviving bar to animate from"],
             },
           ],
@@ -903,7 +951,7 @@ export const projects: Project[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "The fix was to stop animating the bar myself and let the View Transition do it. The same machinery that slides the page can slide the bar — I just had to tell it the bar was worth tracking.",
+              text: "The fix was to stop animating the bar myself and let the View Transition do it. The same machinery that slides the page can slide the bar. I just had to tell it the bar was worth tracking.",
             },
             {
               type: "list",
@@ -917,12 +965,12 @@ export const projects: Project[] = [
                 {
                   num: "02",
                   title: "Place it in the DOM",
-                  text: "Render the bar inside the active list item instead of positioning it with JS. Now its location is correct in both snapshots automatically — the old page captures it on the old item, the new page on the new one. Zero measurement.",
+                  text: "Render the bar inside the active list item instead of positioning it with JS. Now its location is correct in both snapshots automatically: the old page captures it on the old item, the new page on the new one. Zero measurement.",
                 },
                 {
                   num: "03",
                   title: "Delete the rest",
-                  text: "The timers, the module-level position cache, the completion subscription, the manual transform math — all of it came out. The browser interpolates between the two captured positions for free.",
+                  text: "The timers, the module-level position cache, the completion subscription, the manual transform math: all of it came out. The browser interpolates between the two captured positions for free.",
                 },
               ],
             },
@@ -934,7 +982,7 @@ export const projects: Project[] = [
               type: "demo",
               id: "sliding-bar",
               caption:
-                "Click an item — the bar slides to it. Open 'How it works' for the markup + CSS.",
+                "Click an item and the bar slides to it. Open 'How it works' for the markup + CSS.",
             },
             {
               type: "callout",
@@ -949,7 +997,7 @@ export const projects: Project[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "Now the page slides and the accent bar glides to the new active item in the same gesture — same easing, same 480ms, one continuous motion. The only way to confirm it was the way that counts: watching it in a real browser, after the console logs showed the snapshot quietly doing the work I'd been trying to do by hand.",
+              text: "Now the page slides and the accent bar glides to the new active item in the same gesture: same easing, same 480ms, one continuous motion. The only way to confirm it was the way that counts: watching it in a real browser, after the console logs showed the snapshot quietly doing the work I'd been trying to do by hand.",
               emphasis: ["480ms"],
             },
             {
@@ -963,7 +1011,7 @@ export const projects: Project[] = [
             {
               type: "callout",
               accent: "neutral",
-              text: "The lesson wasn't really about View Transitions. It was about noticing when the platform already does the thing you're hand-rolling — and having the discipline to get out of its way.",
+              text: "The lesson wasn't really about View Transitions. It was about noticing when the platform already does the thing you're hand-rolling, and having the discipline to get out of its way.",
             },
           ],
         },
@@ -971,127 +1019,9 @@ export const projects: Project[] = [
     },
   },
   {
-    slug: "sso-alert-pipelines",
-    number: 7,
-    title: "SSO & Alert Pipelines",
-    description:
-      "SAML SSO for Google/Microsoft plus event-driven alerts to Slack, Jira, Coralogix, and S3.",
-    category: "pro",
-    role: "Full-Stack Engineer",
-    team: "Platform Security",
-    shipped: "2023",
-    status: "COMING SOON",
-    tech: ["SAML", "Node.js", "AWS", "Slack API"],
-    tilt: -0.6,
-  },
-  {
-    slug: "brush-reveal",
-    number: 8,
-    title: "Brush Reveal",
-    description: "SVG mask animation along a hand-drawn centerline path.",
-    category: "creative",
-    role: "Creative Dev",
-    team: "Solo",
-    shipped: "2025",
-    status: "COMING SOON",
-    tech: ["SVG", "GSAP", "CSS Masks"],
-    tilt: -0.9,
-  },
-  {
-    slug: "fluid-sim",
-    number: 9,
-    title: "Fluid Simulation",
-    description: "WebGL2 Navier–Stokes solver with interactive dye injection.",
-    category: "creative",
-    role: "Creative Dev",
-    team: "Solo",
-    shipped: "2024",
-    status: "COMING SOON",
-    tech: ["WebGL2", "GLSL", "TypeScript"],
-    tilt: -1.5,
-    // external: true,
-    // href: "https://github.com/Somu050600",
-  },
-  {
-    slug: "perf-pass",
-    number: 10,
-    title: "Performance Pass",
-    description:
-      "Bundle splitting, selective SSR/CSR, lazy loading, and caching — 30% TTI reduction.",
-    category: "pro",
-    role: "Frontend Engineer",
-    team: "Core Web",
-    shipped: "2023",
-    status: "COMING SOON",
-    tech: ["Webpack", "React", "Lighthouse", "CDN"],
-    tilt: 1.1,
-  },
-
-  // ── More (compact list) ────────────────────────────────────────────────────
-  {
-    slug: "wallet-rn",
-    number: 11,
-    title: "Wallet RN",
-    description: "React Native expense tracker with offline-first sync.",
-    category: "more",
-    role: "Mobile Dev",
-    team: "Solo",
-    shipped: "2025",
-    status: "OPEN SOURCE",
-    tech: ["React Native", "SQLite"],
-    external: true,
-    href: "https://github.com/Somu050600/wallet-app",
-  },
-  {
-    slug: "portfolio-v1",
-    number: 12,
-    title: "Portfolio - V1",
-    description: "First Portfolio project",
-    category: "more",
-    role: "Frontend",
-    team: "Self",
-    shipped: "2024",
-    status: "SHIPPED",
-    tech: ["React", "NextJs", "Tailwind"],
-    external: true,
-    href: "https://github.com/Somu050600/portfolio",
-  },
-  {
-    slug: "are-we-there-yet",
-    number: 13,
-    title: "Are We There Yet",
-    description: "Real-time trip tracker with ETA predictions.",
-    category: "more",
-    role: "Full-Stack",
-    team: "Hackathon",
-    shipped: "2026",
-    status: "SHIPPED",
-    tech: ["Mapbox", "Node.js", "WebSockets"],
-    external: true,
-    href: "https://github.com/Somu050600/wallet-app",
-  },
-  {
-    slug: "node-bites",
-    number: 14,
-    title: "Node Bites",
-    description:
-      "The Food Explorer App is a React-based application that allows users to explore various meal categories, view meals within those categories, and see detailed information about selected meals.",
-    category: "more",
-    role: "Frontend",
-    team: "Hackathon",
-    shipped: "2024",
-    status: "SHIPPED",
-    tech: ["React", "React Flow", "Tailwind"],
-    external: true,
-    href: "https://github.com/Somu050600/node-bites",
-  },
-  {
     slug: "photography-pipeline",
-    number: 6,
     title:
       "Engineering a Photography Portfolio Without Sacrificing the Photographs",
-    description:
-      "A read-only image pipeline for responsive photographs, RAW previews, private metadata, and interactive 360° work.",
     category: "creative",
     role: "Frontend Engineer & Photographer",
     team: "Independent",
@@ -1101,8 +1031,7 @@ export const projects: Project[] = [
     tilt: 0.8,
     thumbnail: {
       kind: "image",
-      poster:
-        "/photos/generated/img-20181015-195513-01-358f1451/grid.webp",
+      poster: "/photos/generated/img-20181015-195513-01-358f1451/grid.webp",
       alt: "Low sunlight shines through a stone arch toward a garden.",
       params: { objectPosition: "center 52%" },
     },
@@ -1111,9 +1040,16 @@ export const projects: Project[] = [
         "The hard part was not displaying twenty published photographs. It was preserving their detail, privacy, and 360-degree behavior without making every visitor download the archive.",
       tags: ["Image Pipeline", "Next.js", "Sharp", "Three.js"],
       hero: {
-        image:
-          "/photos/generated/20251219-000319-03a8c2a2/grid.webp",
+        image: "/photos/generated/20251219-000319-03a8c2a2/grid.webp",
         accent: "orange",
+      },
+      glance: {
+        problem:
+          "Twenty publishable photographs sat in a folder of mixed sources (RAW files, photospheres, private EXIF), and none of it should reach a visitor as an archive download.",
+        decision:
+          "One deterministic, read-only build pipeline with three branches (raster, RAW, photosphere) emitting role-specific files behind a manifest.",
+        outcome:
+          "172.5 MB of sources became 28.9 MB of generated assets, and a gallery view costs 201 KB of image transfer.",
       },
       sections: [
         {
@@ -1371,7 +1307,9 @@ export const projects: Project[] = [
             {
               type: "paragraph",
               text: "The gallery now downloads the detail appropriate to browsing, inspecting, or exploring a photosphere. The complete public derivative set is 83% smaller than the untouched selection in aggregate, while the role-aware comparison accounts honestly for duplicated viewing roles at a 57.92% average per-photo reduction.",
-              emphasis: ["detail appropriate to browsing, inspecting, or exploring a photosphere"],
+              emphasis: [
+                "detail appropriate to browsing, inspecting, or exploring a photosphere",
+              ],
             },
             {
               type: "paragraph",
@@ -1409,7 +1347,73 @@ export const projects: Project[] = [
       ],
     },
   },
+
+  // ── More (compact list) ────────────────────────────────────────────────────
+  {
+    slug: "wallet-rn",
+    title: "Wallet RN",
+    description:
+      "React Native wallet with encrypted local storage and camera card scanning for autofill.",
+    category: "more",
+    role: "Mobile Dev",
+    team: "Solo",
+    shipped: "2023",
+    status: "OPEN SOURCE",
+    tech: ["React Native", "Expo", "REST"],
+    external: true,
+    href: "https://github.com/Somu050600/wallet-app",
+  },
+  {
+    slug: "portfolio-v1",
+    title: "Portfolio - V1",
+    description: "First Portfolio project",
+    category: "more",
+    role: "Frontend",
+    team: "Self",
+    shipped: "2024",
+    status: "SHIPPED",
+    tech: ["React", "NextJs", "Tailwind"],
+    external: true,
+    href: "https://github.com/Somu050600/portfolio",
+  },
+  {
+    slug: "are-we-there-yet",
+    title: "Are We There Yet",
+    description:
+      "Location-based Android alarm app: background geofencing, foreground services, full-screen alerts.",
+    category: "more",
+    role: "Full-Stack",
+    team: "Hackathon",
+    shipped: "2024",
+    status: "SHIPPED",
+    tech: ["Flutter", "Kotlin", "Android SDK", "Geofencing"],
+    external: true,
+    href: "https://github.com/Somu050600/are-we-there-at",
+  },
+  {
+    slug: "node-bites",
+    title: "Node Bites",
+    description:
+      "The Food Explorer App is a React-based application that allows users to explore various meal categories, view meals within those categories, and see detailed information about selected meals.",
+    category: "more",
+    role: "Frontend",
+    team: "Hackathon",
+    shipped: "2024",
+    status: "SHIPPED",
+    tech: ["React", "React Flow", "Tailwind"],
+    external: true,
+    href: "https://github.com/Somu050600/node-bites",
+  },
 ];
+
+export const projects: Project[] = projectDefinitions.map((project, index) => ({
+  ...project,
+  number: index + 1,
+  // A card that teases a case study says exactly what the study's own
+  // sub-heading says. Two hand-maintained blurbs for one project drifted apart
+  // and read as two different pieces of work.
+  description: project.caseStudy?.tagline ?? project.description,
+}));
 
 export const categoryLabels: Record<Exclude<Category, "more">, string> = {
   pro: "Professional",
@@ -1426,6 +1430,24 @@ export function getProjectBySlug(slug: string): Project | undefined {
 
 export function getCaseStudySlugs(): string[] {
   return projects.filter((p) => p.caseStudy && !p.external).map((p) => p.slug);
+}
+
+/**
+ * Neighbours in printed order, so finishing a study has somewhere to go other
+ * than the back button.
+ */
+export function getAdjacentCaseStudies(slug: string): {
+  previous: Project | null;
+  next: Project | null;
+} {
+  const written = projects.filter((p) => p.caseStudy && !p.external);
+  const index = written.findIndex((p) => p.slug === slug);
+  if (index === -1) return { previous: null, next: null };
+
+  return {
+    previous: written[index - 1] ?? null,
+    next: written[index + 1] ?? null,
+  };
 }
 
 export function getIndexProjects(): Project[] {

@@ -6,7 +6,7 @@ import type { FlipThumbParams } from "@/lib/thumbnail";
 import { cn } from "@/lib/utils";
 import type { TreatmentProps } from "../registry";
 
-// Only reveal the back after the cursor has dwelt this long — sweeping across
+// Only reveal the back after the cursor has dwelt this long. Sweeping across
 // cards won't trigger a slide.
 const ENTER_DELAY = 200;
 
@@ -130,7 +130,7 @@ export default function FlipCard({ active, params, accent }: TreatmentProps) {
       aria-hidden
       onPointerEnter={(e) => { pendingDirRef.current = getDir(e); }}
     >
-      {/* c1 — front: visible at rest, slides out on hover */}
+      {/* c1 front: visible at rest, slides out on hover */}
       <div
         className={cn("thumb-screen absolute inset-0 flex flex-col gap-2.75 p-3.5", transition)}
         style={{ transform: revealed ? c1Exit(dir) : "translate(0,0)" }}
@@ -236,7 +236,7 @@ export default function FlipCard({ active, params, accent }: TreatmentProps) {
         )}
       </div>
 
-      {/* c2 — back: waits off-screen, slides in on hover */}
+      {/* c2 back: waits off-screen, slides in on hover */}
       <div
         className={cn("thumb-screen absolute inset-0 flex flex-col overflow-hidden p-3.5", !c2NoTransition && transition)}
         style={{ transform: revealed ? "translate(0,0)" : c2Rest(dir) }}

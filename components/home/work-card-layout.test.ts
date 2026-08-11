@@ -17,15 +17,17 @@ const projects = [
 ] as const;
 
 describe("work-card arrangement", () => {
-  test("features the lowest numbered project and preserves row-wise number order", () => {
+  test("features the lowest numbered project and fills columns in sequential halves", () => {
     const result = arrangeWorkProjects(projects);
 
     expect(result.featured?.slug).toBe("one");
+    // Column one holds the first half, so DOM order stays 2,3,4,5,…, the same
+    // order the ordinals are printed in and the keyboard traverses.
     expect(result.columns[0].map((project) => project.number)).toEqual([
-      2, 4, 6, 8,
+      2, 3, 4, 5,
     ]);
     expect(result.columns[1].map((project) => project.number)).toEqual([
-      3, 5, 7, 12,
+      6, 7, 8, 12,
     ]);
   });
 

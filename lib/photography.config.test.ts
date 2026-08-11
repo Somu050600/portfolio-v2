@@ -75,8 +75,24 @@ describe("generated photography data", () => {
   });
 
   test("formats factual labels and only available technical metadata", () => {
-    expect(photoLabel(photos[0])).toBe("Frame 01");
+    // Every published frame is named; the frame-number fallback is only for a
+    // photograph the pipeline adds before it has been titled.
+    expect(photos.every((photo) => !photoLabel(photo).startsWith("Frame "))).toBe(
+      true,
+    );
+    expect(photoLabel(photos[0])).toBe("Boat, Hazy Horizon");
     expect(photoMeta(photos[0])).not.toContain("undefined");
+  });
+
+  test("returns an empty meta line instead of a placeholder when EXIF is absent", () => {
+    const withoutMetadata = photos.filter(
+      (photo) => !photo.capturedAt && !photo.exif,
+    );
+
+    expect(withoutMetadata.length).toBeGreaterThan(0);
+    for (const photo of withoutMetadata) {
+      expect(photoMeta(photo)).toBe("");
+    }
   });
 });
 

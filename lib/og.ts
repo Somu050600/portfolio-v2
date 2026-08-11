@@ -5,7 +5,7 @@ import { getExperiment, getLiveExperimentSlugs } from "./playground.config";
 import { profile } from "./profile.config";
 import { getProjectBySlug } from "./projects.config";
 
-/** OG card canvas — the standard 1.91:1 social ratio. */
+/** OG card canvas: the standard 1.91:1 social ratio. */
 export const OG_SIZE = { width: 1200, height: 630 };
 
 export type OgTemplate = "hero" | "rail" | "band";
@@ -86,7 +86,8 @@ export function normalizeOgInput(input: OgInput): OgInput {
 const STATIC_OG_INPUTS: Record<string, OgInput> = {
   "/": {
     template: "hero",
-    title: landingConfig.hero.headline[0],
+    // The card carries one line, so drop the comma that runs into line two.
+    title: landingConfig.hero.headline[0].replace(/,$/u, ""),
     accent: landingConfig.hero.headline.at(-1),
     name: profile.name,
     stack: landingConfig.hero.specialties,
@@ -125,7 +126,7 @@ const STATIC_OG_INPUTS: Record<string, OgInput> = {
     kicker: "PLAYGROUND",
     title: "Playground",
     subtitle:
-      "Sketches and interaction studies — heavy demos pause when off-screen.",
+      "Sketches and interaction studies. Heavy demos pause when off-screen.",
     meta: ["EEGA.DEV", "TYPOGRAPHY", "WEBGL2", "MOTION"],
   },
 };
@@ -186,7 +187,7 @@ export function getOgImageMetadata(input: OgInput): OgImageMetadata[] {
   return [
     {
       id: "default",
-      alt: `${input.title.trim()} — eega.dev`,
+      alt: `${input.title.trim()} · eega.dev`,
       size: OG_SIZE,
       contentType: "image/png",
     },

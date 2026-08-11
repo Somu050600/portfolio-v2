@@ -1,10 +1,16 @@
 "use client";
 
-import { aboutPathStops, careAbout } from "@/lib/about.config";
+import {
+  aboutNarrative,
+  aboutPathStops,
+  aboutSkills,
+  careAbout,
+} from "@/lib/about.config";
 import { componentAttrs } from "@/lib/build-mode";
 import { profile } from "@/lib/profile.config";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import CopyEmail from "./CopyEmail";
 import SkillsGrid, { shouldRevealAtomicNumbers } from "./SkillsGrid";
 import ThemeTintedPortrait from "./ThemeTintedPortrait";
 
@@ -36,7 +42,7 @@ export default function AboutElements() {
               "shrink-0 text-metadata leading-none font-semibold tracking-[0.16em] text-accent uppercase",
             )}
           >
-            03 — ABOUT
+            03 · ABOUT
           </span>
           <span className="h-px flex-1 bg-border-color" aria-hidden />
           <span
@@ -45,7 +51,7 @@ export default function AboutElements() {
               "shrink-0 text-metadata leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
             )}
           >
-            24 ELEMENTS
+            {`${aboutSkills.length} ELEMENTS`}
           </span>
         </div>
         <h1
@@ -81,7 +87,7 @@ export default function AboutElements() {
                   "text-pretty text-sm leading-[1.72] font-normal text-ink-dim min-[901px]:max-w-[52ch] min-[901px]:text-[15px]",
                 )}
               >
-                Came to frontend the long way —{" "}
+                Came to frontend the long way:{" "}
                 <button
                   type="button"
                   aria-pressed={chemistryPinned}
@@ -102,6 +108,17 @@ export default function AboutElements() {
                 + B.E. Civil at BITS Pilani, then fell for the craft of
                 interfaces.
               </p>
+              {aboutNarrative.map((paragraph) => (
+                <p
+                  key={paragraph}
+                  className={cn(
+                    sans,
+                    "text-pretty text-sm leading-[1.72] font-normal text-ink-dim min-[901px]:max-w-[52ch] min-[901px]:text-[15px]",
+                  )}
+                >
+                  {paragraph}
+                </p>
+              ))}
               <p
                 className={cn(
                   mono,
@@ -239,14 +256,9 @@ function ContactCard() {
           Open to work
         </span>
       </div>
-      <span
-        className={cn(
-          mono,
-          "break-all text-metadata leading-[1.6] font-normal tracking-widest text-ink-faint",
-        )}
-      >
-        somasekhareega [at] gmail [dot] com
-      </span>
+      {/* Plain address: the footer already ships a raw mailto, so the
+          [at]/[dot] spelling only added friction for humans. */}
+      <CopyEmail />
       <a
         href={`mailto:${profile.contact.email}`}
         className={cn(

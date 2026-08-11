@@ -79,7 +79,7 @@ function PageA({ ref }: { ref: React.Ref<HTMLDivElement> }) {
   );
 }
 
-/** Gallery / grid layout — visibly different from A. */
+/** Gallery / grid layout, visibly different from A. */
 function PageB({ ref }: { ref: React.Ref<HTMLDivElement> }) {
   return (
     <div

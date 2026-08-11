@@ -7,24 +7,29 @@ import {
 
 describe("home navigation", () => {
   test("places Photography immediately before Playground", () => {
-    expect(homeNavItems).toEqual([
-      { key: "work", label: "01. Work", href: "/home" },
-      {
-        key: "experience",
-        label: "02. Experience",
-        href: "/home/experience",
-      },
-      { key: "about", label: "03. About", href: "/home/about" },
-      {
-        key: "photography",
-        label: "04. Photography",
-        href: "/home/photography",
-      },
-      {
-        key: "playground",
-        label: "05. Playground",
-        href: "/home/playground",
-      },
+    expect(homeNavItems.map((item) => [item.key, item.href])).toEqual([
+      ["work", "/home"],
+      ["experience", "/home/experience"],
+      ["about", "/home/about"],
+      ["photography", "/home/photography"],
+      ["playground", "/home/playground"],
+    ]);
+  });
+
+  test("derives ordinals from position so no menu can drift", () => {
+    expect(homeNavItems.map((item) => item.ordinal)).toEqual([
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+    ]);
+    expect(homeNavItems.map((item) => item.label)).toEqual([
+      "Work",
+      "Experience",
+      "About",
+      "Photography",
+      "Playground",
     ]);
   });
 

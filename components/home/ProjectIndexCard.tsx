@@ -131,7 +131,9 @@ function CardContent({
               ))}
             </div>
           </div>
-          <p className="line-clamp-2 min-h-[2.8em] font-body text-body-sm text-ink-dim">
+          {/* Three lines: the blurb is now the case study's own sub-heading,
+              which is a sentence or two rather than a one-line label. */}
+          <p className="line-clamp-3 min-h-[4.2em] font-body text-body-sm text-ink-dim">
             {description}
           </p>
 
@@ -188,7 +190,7 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
   const inspect = componentAttrs(
     "ProjectIndexCard",
     note ??
-      "Cream index card — hover reveals ROLE / TEAM / TIMEFRAME meta grid.",
+      "Cream index card. Hover reveals ROLE / TEAM / TIMEFRAME meta grid.",
   );
 
   const cardClass = cn(
@@ -219,7 +221,7 @@ export default function ProjectIndexCard(props: ProjectIndexCardProps) {
     cover({ href: targetHref, originEl: cardRef.current, morph: willMorph });
   };
 
-  // These cards aren't <Link>, so Next never prefetches them — the first morph
+  // These cards aren't <Link>, so Next never prefetches them, and the first morph
   // pays the route fetch (visible delay). Warm the case-study route on hover /
   // focus so it's cached by click time. External links can't be prefetched.
   const prefetch = () => {

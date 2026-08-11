@@ -70,7 +70,7 @@ export default function WorkHero() {
       className="mx-auto w-[min(calc(100%-2rem),940px)] pt-14 pb-10 md:pt-20 md:pb-12"
       {...componentAttrs(
         "WorkHero",
-        "Front-door headline — GSAP line-mask reveal, replays after page transition.",
+        "Front-door headline: GSAP line-mask reveal, replays after page transition.",
       )}
     >
       <h1

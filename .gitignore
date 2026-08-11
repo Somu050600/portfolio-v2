@@ -9,7 +9,7 @@
 # env files
 .env*.local
 
-# production env (committing .env.production is intentional — no secrets)
+# production env (committing .env.production is intentional, no secrets)
 # .env.production
 
 # misc

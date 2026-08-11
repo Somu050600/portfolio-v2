@@ -1,8 +1,9 @@
 "use client";
 
 import { componentAttrs } from "@/lib/build-mode";
-import { roles, type Role } from "@/lib/experience.config";
+import { metricsProvenance, roles, type Role } from "@/lib/experience.config";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { useState } from "react";
 
 const mono = "font-mono";
@@ -73,7 +74,7 @@ function ExperienceRole({
       }}
       {...componentAttrs(
         `ExperienceTimeline.${role.company}`,
-        `${role.role} at ${role.company} — ${role.dateLabel}.`,
+        `${role.role} at ${role.company}, ${role.dateLabel}.`,
       )}
       className={cn(
         "relative grid grid-cols-[120px_minmax(0,1fr)] gap-x-9.5 border-t border-dotted border-border-color py-6 pb-6.5",
@@ -201,7 +202,7 @@ function ExperienceRole({
                     )}
                   >
                     <span className="shrink-0 text-accent" aria-hidden>
-                      —
+                      ·
                     </span>
                     <span>{bullet}</span>
                   </li>
@@ -217,6 +218,28 @@ function ExperienceRole({
                   </li>
                 ))}
               </ul>
+
+              {/* The two pages used to not know about each other. */}
+              {role.caseStudies && role.caseStudies.length > 0 && (
+                <ul
+                  className="mt-2 flex flex-col gap-1.5"
+                  aria-label={`${role.company} case studies`}
+                >
+                  {role.caseStudies.map((study) => (
+                    <li key={study.slug}>
+                      <Link
+                        href={`/home/work/${study.slug}`}
+                        className={cn(
+                          sans,
+                          "text-body-sm font-medium text-accent underline decoration-accent/30 underline-offset-4 transition-colors hover:decoration-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
+                        )}
+                      >
+                        {`Read the case study: ${study.label} ↗`}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>
@@ -234,7 +257,7 @@ export default function ExperienceTimeline() {
       className="flex flex-col gap-7.5"
       {...componentAttrs(
         "ExperienceTimeline",
-        "Spine timeline — accessible single-open role disclosures with visible metrics.",
+        "Spine timeline: accessible single-open role disclosures with visible metrics.",
       )}
     >
       <header className="flex flex-col gap-3.75">
@@ -245,7 +268,7 @@ export default function ExperienceTimeline() {
               "shrink-0 text-metadata leading-none font-semibold tracking-[0.16em] text-accent uppercase",
             )}
           >
-            02 — EXPERIENCE
+            02 · EXPERIENCE
           </span>
           <span className="h-px flex-1 bg-border-color" aria-hidden />
           <span
@@ -254,7 +277,7 @@ export default function ExperienceTimeline() {
               "shrink-0 text-metadata leading-none font-normal tracking-[0.14em] text-ink-faint uppercase",
             )}
           >
-            03 ROLES · 2023 — NOW
+            03 ROLES · 2023 TO NOW
           </span>
         </div>
         <h1
@@ -273,8 +296,16 @@ export default function ExperienceTimeline() {
             "max-w-[62ch] text-body-sm font-normal text-ink-dim",
           )}
         >
-          Every role here has a number attached to it — that&apos;s deliberate.
+          Every role here has a number attached to it, and that&apos;s deliberate.
           Hover a role to see what it actually involved.
+        </p>
+        <p
+          className={cn(
+            mono,
+            "max-w-[62ch] text-[11.5px] leading-[1.6] font-normal text-ink-faint",
+          )}
+        >
+          {metricsProvenance}
         </p>
       </header>
 

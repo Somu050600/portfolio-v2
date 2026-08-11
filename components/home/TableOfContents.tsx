@@ -18,7 +18,7 @@ function resolveActiveKey(pathname: string): HomeNavKey {
 }
 
 type TableOfContentsProps = {
-  /** May return a promise — the transition waits for it (mobile drawer close). */
+  /** May return a promise. The transition waits for it (mobile drawer close). */
   onNavigate?: () => void | Promise<void>;
 };
 
@@ -65,7 +65,6 @@ export default function TableOfContents({
       <ul data-toc-list className="flex flex-col gap-1.75">
         {homeNavItems.map((item) => {
           const isActive = item.key === active;
-          const [number, label] = item.label.split(". ");
 
           return (
             <li key={item.key}>
@@ -86,7 +85,7 @@ export default function TableOfContents({
                       : "text-ink-faint group-hover:text-accent",
                   )}
                 >
-                  {number}
+                  {item.ordinal}
                 </span>
                 <span
                   className={cn(
@@ -96,7 +95,7 @@ export default function TableOfContents({
                       : "text-ink-faint group-hover:text-ink",
                   )}
                 >
-                  {label}
+                  {item.label}
                 </span>
               </Link>
             </li>

@@ -75,7 +75,7 @@ export default function PanoramaViewer({
   const [interactive, setInteractive] = useState(false);
   const [immersive, setImmersive] = useState(false);
   const [gyroDenied, setGyroDenied] = useState(false);
-  // Handheld only — a gyroscope button on a laptop is dead weight.
+  // Handheld only: a gyroscope button on a laptop is dead weight.
   const gyroAvailable =
     useMediaQuery("(pointer: coarse)") &&
     typeof window !== "undefined" &&
@@ -227,7 +227,7 @@ export default function PanoramaViewer({
         readGyroTarget(event);
       };
 
-      /** Degrees per pixel — zoomed in tracks slower, so aim stays precise. */
+      /** Degrees per pixel. Zoomed in tracks slower, so aim stays precise. */
       const sensitivity = () => controls.fov / 600;
 
       const settled = () =>
@@ -243,7 +243,7 @@ export default function PanoramaViewer({
 
         if (gyroActive) {
           if (gyroReading) {
-            // Ease toward the device pose — raw sensor frames are jittery.
+            // Ease toward the device pose, because raw sensor frames are jittery.
             const follow = 1 - Math.exp(-dt / 70);
             controls.yaw += shortestYawDelta(controls.yaw, gyroTarget.yaw) * follow;
             controls.pitch += (gyroTarget.pitch - controls.pitch) * follow;
@@ -511,6 +511,10 @@ export default function PanoramaViewer({
   };
 
   return (
+    // role="application" with tabIndex and a full arrow-key handler is the
+    // intended pattern for a viewport you look around inside; jsx-a11y does not
+    // treat "application" as interactive, so the generic rules misfire here.
+    /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
     <div
       ref={rootRef}
       // touch-none hands every finger to the canvas: without it the browser
@@ -523,6 +527,7 @@ export default function PanoramaViewer({
       data-panorama
       data-immersive={immersive || undefined}
       aria-label={`${alt} Interactive 360-degree panorama. Drag or use arrow keys to look around; scroll or pinch to zoom.`}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- the viewer is the control
       tabIndex={0}
       data-initial-yaw={PANORAMA_INITIAL_YAW_DEGREES}
       style={{ viewTransitionName: immersive ? undefined : transitionName }}

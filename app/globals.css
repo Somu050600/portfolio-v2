@@ -10,11 +10,11 @@
    so shadcn components automatically reflect our design system.
    AccentProvider writes --accent / --accent-fg / --accent-soft at runtime.
    Pre-paint script in layout.tsx writes the accent vars before first paint.
-   NO CSS transitions on any of these — the View Transitions API owns the visual.
+   NO CSS transitions on any of these: the View Transitions API owns the visual.
    ========================================================================== */
 
 :root {
-  /* --- Portfolio semantic tokens (LIGHT — warm-grey paper) -------------- */
+  /* --- Portfolio semantic tokens (LIGHT: warm-grey paper) -------------- */
   --bg: #ece8df;
   --surface: #f6f3ec;
   --elevated: #e1dbce;
@@ -27,7 +27,7 @@
   --status: #3e7a36;
   --punch: #c9be9f;
   /* --accent / --accent-fg / --accent-soft are written by AccentProvider
-     (and pre-paint script) — fallbacks below match THEME_DEFAULTS.lightAccent */
+     (and pre-paint script). Fallbacks below match THEME_DEFAULTS.lightAccent */
   --accent: #b85423;
   --accent-fg: #ffffff;
   --accent-soft: rgba(184, 84, 35, 0.14);
@@ -72,7 +72,7 @@
 }
 
 .dark {
-  /* --- Portfolio semantic tokens (DARK — Vercel near-black) -------------- */
+  /* --- Portfolio semantic tokens (DARK: Vercel near-black) -------------- */
   --bg: #0a0a0a;
   --surface: #141414;
   --elevated: #1c1c1c;
@@ -84,7 +84,7 @@
   --ink-faint: #5a5a5a;
   --status: #3fb950;
   --punch: #2a2a2a;
-  /* fallbacks — AccentProvider / pre-paint script override these at runtime */
+  /* fallbacks. AccentProvider / pre-paint script override these at runtime */
   --accent: #3b82f6;
   --accent-fg: #ffffff;
   --accent-soft: rgba(59, 130, 246, 0.14);
@@ -120,7 +120,7 @@
   --sidebar-ring: var(--accent);
 }
 
-/* Thumbnail "screen" — always dark regardless of page theme */
+/* Thumbnail "screen": always dark regardless of page theme */
 :root,
 .dark {
   --thumb-bg: #121316;
@@ -139,7 +139,7 @@
    TAILWIND @THEME INLINE
    Maps Tailwind utility classes to our semantic CSS vars.
    bg-bg, text-ink, text-ink-dim, border-border-color, bg-accent,
-   text-accent-fg, bg-accent-soft  — all live-update when vars change.
+   text-accent-fg, bg-accent-soft: all live-update when vars change.
    ========================================================================== */
 @theme inline {
   /* Portfolio semantic utilities */
@@ -235,7 +235,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    /* Use semantic token — resolves to --bg via --background */
+    /* Use semantic token, which resolves to --bg via --background */
     background: var(--bg);
     color: var(--ink);
     font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
@@ -248,14 +248,14 @@
 }
 
 /* ==========================================================================
-   INTRO OVERLAY — pre-paint attr hides overlay for returning visitors
+   INTRO OVERLAY: pre-paint attr hides overlay for returning visitors
    ========================================================================== */
 html[data-intro-seen] [data-intro-overlay] {
   display: none;
 }
 
 /* ==========================================================================
-   VIEW TRANSITIONS — disable default cross-fade so WAAPI clip-path is sole visual.
+   VIEW TRANSITIONS: disable default cross-fade so WAAPI clip-path is sole visual.
    Theme toggle uses a slant-wipe; page transitions use a circle-reveal.
    Both animate ::view-transition-new(root); old sits underneath.
    ========================================================================== */
@@ -266,12 +266,12 @@ html[data-intro-seen] [data-intro-overlay] {
 }
 
 /* Freeze the root group when the old and new documents have different root
-   geometry — otherwise the UA group animation tweens the root snapshot's
+   geometry. Otherwise the UA group animation tweens the root snapshot's
    width/height for 250ms and the whole page slides while the circle opens.
    Geometry differs when a classic scrollbar appears (landing does not scroll,
    /home does) or when the mobile URL bar changes the viewport between
    snapshots. Inert on overlay scrollbars (macOS): there old == new, measured.
-   It is NOT what fixed the off-origin circle reveal — that was px vs %
+   It is NOT what fixed the off-origin circle reveal. That was px vs %
    clip-path resolution, see PageTransitionOverlay.tsx.
    DEBUG: html[data-vt-group-anim] (localStorage vtGroupAnim=1, see
    lib/vt-debug.ts) restores the UA animation so the two can be A/B'd. */
@@ -311,7 +311,7 @@ html:not([data-vt-group-anim])::view-transition-group(root) {
 }
 
 /* ==========================================================================
-   CARD ↔ CASE-STUDY MORPH — tuned timing for the shared-element groups.
+   CARD ↔ CASE-STUDY MORPH: tuned timing for the shared-element groups.
    These names only exist while a morph transition is in flight.
    ========================================================================== */
 ::view-transition-group(cs-frame),
@@ -347,7 +347,7 @@ html:not([data-vt-group-anim])::view-transition-group(root) {
 }
 
 /* ==========================================================================
-   HOME SECTION SLIDE — directional vertical push between the four sections.
+   HOME SECTION SLIDE: directional vertical push between the four sections.
    The content pane is only named while [data-slide-active] is set, so this
    never disturbs the root circle-reveal or the cs-* morph. On mobile, the
    sticky navbar gets its own stable shared group so it is not repainted as
@@ -439,7 +439,7 @@ html[data-slide-dir="down"]::view-transition-new(home-content) {
 }
 
 /* ==========================================================================
-   LANDING HERO  (/ — warm paper, theme-independent)
+   LANDING HERO  (/ : warm paper, theme-independent)
 
    Everything expressible as a utility lives in the JSX (LandingHero.tsx,
    FocusFrame.tsx). What stays here is what utilities express badly: the token
@@ -449,7 +449,7 @@ html[data-slide-dir="down"]::view-transition-new(home-content) {
    Text greys and rules come from the brand tokens (brand-theme.css, which also
    pins the light values at .landing-hero scope). Paper, spotlight tint, accent
    and guilloché colour are art direction: they are what the data-temperature
-   easter egg cycles, so they are owned by the presets below — "warm" is the
+   easter egg cycles, so they are owned by the presets below. "warm" is the
    default and matches the original design.
    ========================================================================== */
 .landing-hero {
@@ -522,9 +522,11 @@ html[data-slide-dir="down"]::view-transition-new(home-content) {
 }
 
 /* DotGothic16 is monospaced, so narrow Latin glyphs sit in a full-width advance
-   and leave gaps — "Beaut i ful ly." Pull them in per glyph; negative tracking
+   and leave gaps, as in "Beaut i ful ly." Pull them in per glyph; negative tracking
    across the whole word would collide the wide letters instead. Two tiers by
-   how much slack the glyph actually has. */
+   how much slack the glyph actually has. Inert for words without these glyphs
+   (the current accent word, "Exposed", has none), kept because the accent word
+   is copy and will change again. */
 .landing-final-word .landing-char[data-char="i"],
 .landing-final-word .landing-char[data-char="l"],
 .landing-final-word .landing-char[data-char="j"],
@@ -595,7 +597,7 @@ html[data-slide-dir="down"]::view-transition-new(home-content) {
   }
 }
 
-/* Flip thumbnail — dark screen surface + container-query density */
+/* Flip thumbnail: dark screen surface + container-query density */
 .thumb-flip {
   container-type: inline-size;
   container-name: thumb;

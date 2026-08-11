@@ -63,7 +63,7 @@ export const PIXEL_SCROLL_LINES = [
 
 const POKE_LINES = [
   "hi there",
-  "oh — hello again",
+  "oh, hello again",
   "i'm Pixel",
   "how are you?",
   "that tickles",
@@ -72,12 +72,12 @@ const POKE_LINES = [
   "is this fun for you?",
   "really?",
   "i have work to do",
-  "somu — come get him",
+  "somu, come get him",
   "...",
   "fine. poke away",
   "that's fourteen",
   "you win. i am tired",
-  "ok — you clearly need something",
+  "ok, you clearly need something",
   "email him. he likes persistent people",
 ] as const;
 

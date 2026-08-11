@@ -9,8 +9,16 @@ type PageMetadataOptions = {
   absoluteTitle?: boolean;
 };
 
-export const homepageTitle = `${profile.name} (${profile.handle}) — ${profile.jobTitle}`;
-export const homepageDescription = `Portfolio of ${profile.name}, also known as ${profile.handle} — a frontend engineer specialising in React, Next.js, TypeScript, design systems and web performance.`;
+/**
+ * Frozen when the page is generated, which for the statically prerendered case
+ * studies is the deploy that published this revision of the text. It answers
+ * "when was this last edited", not "when did the work happen"; the work's own
+ * dates live in the Timeframe field.
+ */
+export const buildTime = new Date().toISOString();
+
+export const homepageTitle = `${profile.name} (${profile.handle}) · ${profile.jobTitle}`;
+export const homepageDescription = `Portfolio of ${profile.name}, also known as ${profile.handle}, a frontend engineer specialising in React, Next.js, TypeScript, design systems and web performance.`;
 
 export const seoEntityIds = {
   person: `${profile.url}/#person`,
@@ -59,11 +67,42 @@ export const aboutJsonLd = {
       "@type": "ProfilePage",
       "@id": seoEntityIds.profilePage,
       url: `${profile.url}/home/about`,
-      name: `${profile.name} — ${profile.jobTitle}`,
+      name: `${profile.name}, ${profile.jobTitle}`,
       mainEntity: { "@id": seoEntityIds.person },
     },
   ],
 } as const;
+
+/**
+ * Breadcrumbs for a case study: Work is the index at /home, and /home/work now
+ * resolves to it, so the printed hierarchy matches real URLs.
+ */
+export function caseStudyBreadcrumbJsonLd({
+  slug,
+  title,
+}: {
+  slug: string;
+  title: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Work",
+        item: `${profile.url}/home`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: title,
+        item: `${profile.url}/home/work/${slug}`,
+      },
+    ],
+  } as const;
+}
 
 export function serializeJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
@@ -95,6 +134,8 @@ export function createPageMetadata({
             ...sharedOpenGraph,
             type: "article",
             authors: [`${profile.url}/home/about`],
+            publishedTime: buildTime,
+            modifiedTime: buildTime,
           }
         : { ...sharedOpenGraph, type: "website" },
     twitter: {

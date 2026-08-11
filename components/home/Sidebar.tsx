@@ -41,7 +41,7 @@ export default function Sidebar() {
     drawerClosedRef.current = null;
   }, []);
 
-  /** Resolves once the drawer has finished closing — or immediately if shut. */
+  /** Resolves once the drawer has finished closing, or immediately if shut. */
   const closeMenu = useCallback(() => {
     if (!open) return Promise.resolve();
     setOpen(false);
@@ -58,7 +58,7 @@ export default function Sidebar() {
       }
 
       event.preventDefault();
-      // Read the anchor now — currentTarget is gone once we await.
+      // Read the anchor now: currentTarget is gone once we await.
       const originEl = event.currentTarget;
       void closeMenu().then(() =>
         cover({ href: "/", originEl, direction: "backward" }),
@@ -235,10 +235,12 @@ function Wordmark({
 }) {
   return (
     <div className="flex items-baseline gap-2.25">
+      {/* Same wordmark as the splash header: mono, uppercase, letterspaced.
+          One brand mark, two pages. */}
       <Link
         href="/"
         onClick={onClick}
-        className="font-display text-[20px] leading-none font-semibold text-ink transition-colors hover:text-accent"
+        className="font-mono text-[15px] leading-none font-medium tracking-[0.3em] text-ink uppercase transition-colors hover:text-accent"
       >
         {profile.handle}
       </Link>
@@ -263,7 +265,10 @@ function StatusRow({ localTime }: { localTime: string }) {
       <p className={`${typeStyles.metadata} leading-none text-ink-dim`}>
         {profile.availability}
       </p>
-      <time className="ml-auto font-mono text-metadata leading-none font-medium text-ink-faint tabular-nums">
+      <time
+        suppressHydrationWarning
+        className="ml-auto font-mono text-metadata leading-none font-medium text-ink-faint tabular-nums"
+      >
         {localTime}
       </time>
     </div>

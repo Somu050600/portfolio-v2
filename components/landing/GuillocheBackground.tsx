@@ -8,7 +8,7 @@ import {
  * GuillocheBackground
  *
  * A full-bleed, engraving-style line field for the landing hero. Abstract
- * guilloché influence only — no reproduction of any real banknote or
+ * guilloché influence only, with no reproduction of any real banknote or
  * protected security-print artwork.
  *
  * Renders as a server component: pure SVG, no client JS, no hydration.

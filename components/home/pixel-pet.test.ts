@@ -34,7 +34,7 @@ describe("Pixel poke arc", () => {
       eyeOpacity: 0.8,
     });
     expect(getPokeReaction(11, 11, false)).toMatchObject({
-      text: "somu — come get him",
+      text: "somu, come get him",
       mood: "annoyed",
       eyeOpacity: 0.45,
       tone: "punch",
@@ -62,7 +62,7 @@ describe("Pixel poke arc", () => {
   test("replaces only the first poke for returning visitors", () => {
     expect(getPokeReaction(1, 8, true).text).toBe("oh. you are back");
     expect(getPokeReaction(1, 21, true).text).toBe("not this again");
-    expect(getPokeReaction(2, 22, true).text).toBe("oh — hello again");
+    expect(getPokeReaction(2, 22, true).text).toBe("oh, hello again");
   });
 });
 

@@ -21,7 +21,7 @@ export default function SlidingBarDemo({
   className,
 }: SlidingBarDemoProps) {
   // activeIndex drives the bar (moves on click). cursorIndex drives the cursor
-  // (moves first, then clicks) — kept separate so the bar doesn't follow the
+  // (moves first, then clicks), kept separate so the bar doesn't follow the
   // cursor's arrival, only its click.
   const [activeIndex, setActiveIndex] = useState(0);
   const [cursorIndex, setCursorIndex] = useState(0);
@@ -41,7 +41,7 @@ export default function SlidingBarDemo({
     const tick = () => {
       i = (i + 1) % ITEMS.length;
       setCursorIndex(i); // 1. cursor glides to the next item
-      // 2. once it arrives, click — and only now does the bar move
+      // 2. once it arrives, click, and only now does the bar move
       queue.push(
         window.setTimeout(() => {
           setClicking(true);
@@ -83,7 +83,7 @@ export default function SlidingBarDemo({
       </p>
 
       <div className="relative" style={{ height: ITEMS.length * STEP }}>
-        {/* sliding accent bar — follows activeIndex (the click), not the cursor */}
+        {/* sliding accent bar, follows activeIndex (the click), not the cursor */}
         <span
           className="pointer-events-none absolute left-0 z-10 w-0.5 rounded-full bg-accent"
           style={{
@@ -97,7 +97,7 @@ export default function SlidingBarDemo({
         {ITEMS.map((label, i) => {
           const isActive = i === activeIndex;
           // In autoplay, show a hover highlight on the item the cursor is over
-          // (before it clicks) — mirrors real hover, distinct from active.
+          // (before it clicks). Mirrors real hover, distinct from active.
           const isCursorOver = autoplay && i === cursorIndex && !isActive;
           return (
             <button

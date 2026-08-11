@@ -102,6 +102,14 @@ export default function ProjectGrid() {
           </ul>
         </section>
       )}
+
+      {/* Replaces the four placeholder cards: says what's unwritten without
+          shipping click targets that go nowhere. */}
+      <p className="max-w-xl font-body text-body-sm text-ink-faint">
+        Not written up yet: the performance pass, the SSO and alert-pipeline
+        integrations, and two shader studies. They appear here once there is
+        something honest to say about them.
+      </p>
     </section>
   );
 }

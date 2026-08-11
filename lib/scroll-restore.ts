@@ -1,8 +1,8 @@
 // Scroll restoration for back-navigation. The grid page remounts on every nav
 // (scroll resets to 0), which breaks the reverse card↔case-study morph: the
 // target card ends up below the fold when the View Transition snapshots the
-// new page. We save the grid's scroll on the way in and restore it — before
-// the snapshot — on the way back, so the card is on-screen for the morph.
+// new page. We save the grid's scroll on the way in and restore it (before
+// the snapshot) on the way back, so the card is on-screen for the morph.
 
 type LenisLike = {
   scrollTo: (target: number, opts?: { immediate?: boolean }) => void;

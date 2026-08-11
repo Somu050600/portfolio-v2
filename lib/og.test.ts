@@ -86,7 +86,7 @@ test("maps every published static route to a distinct light-theme card", () => {
 
   expect(cards.every(Boolean)).toBe(true);
   expect(cards.map((card) => card?.title)).toEqual([
-    "Clarity in interface.",
+    "What shipped, what scaled",
     "Work",
     "Experience",
     "About",
@@ -112,7 +112,7 @@ test("derives complete image metadata and alt text from each card title", () => 
   ).toEqual([
     {
       id: "default",
-      alt: "Photography — eega.dev",
+      alt: "Photography · eega.dev",
       size: { width: 1200, height: 630 },
       contentType: "image/png",
     },
@@ -127,7 +127,7 @@ test("keeps the full route title in alt text when visible card copy is clamped",
     "Engineering a Photography Portfolio Without Sacrificing the Photographs";
   expect(
     getOgImageMetadata({ template: "band", title })[0]?.alt,
-  ).toBe(`${title} — eega.dev`);
+  ).toBe(`${title} · eega.dev`);
 });
 
 test("renders every OG type role with existing portfolio fonts only", () => {
@@ -243,7 +243,9 @@ test("keeps the hero glow lighter than its surrounding paper field", async () =>
     return data[offset] + data[offset + 1] + data[offset + 2];
   };
 
-  expect(luminanceAt(600, 315)).toBeGreaterThan(luminanceAt(110, 315));
+  // Sampled above the headline block: the assertion is about the glow layer,
+  // not about where the copy happens to break.
+  expect(luminanceAt(600, 120)).toBeGreaterThan(luminanceAt(110, 120));
 });
 
 test("renders the generated Apple icon with the vendored fonts", async () => {

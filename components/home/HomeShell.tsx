@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import SkipLink from "@/components/SkipLink";
 import HomeFooter from "./HomeFooter";
 import Sidebar from "./Sidebar";
 
@@ -11,9 +12,12 @@ export default function HomeShell({
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-bg text-ink lg:flex-row">
+      <SkipLink />
       <Sidebar />
       <div className="home-content flex min-w-0 flex-1 flex-col">
-        <div className="mx-auto w-full max-w-6xl">{children}</div>
+        <div id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl">
+          {children}
+        </div>
         {showMobileFooter && <HomeFooter />}
       </div>
     </div>

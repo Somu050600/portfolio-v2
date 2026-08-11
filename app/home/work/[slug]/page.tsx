@@ -12,11 +12,21 @@ import {
   caseStudyMetaKey,
   caseStudyMono,
 } from "@/components/casestudy/case-study-classes";
+import SkipLink from "@/components/SkipLink";
 import Thumbnail from "@/components/thumbnail/Thumbnail";
 import { profile } from "@/lib/profile.config";
-import { getCaseStudySlugs, getProjectBySlug } from "@/lib/projects.config";
+import {
+  getAdjacentCaseStudies,
+  getCaseStudySlugs,
+  getProjectBySlug,
+} from "@/lib/projects.config";
 import { typeStyles } from "@/lib/typography";
-import { createPageMetadata } from "@/lib/seo";
+import {
+  buildTime,
+  caseStudyBreadcrumbJsonLd,
+  createPageMetadata,
+  serializeJsonLd,
+} from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 type PageProps = {
@@ -62,10 +72,27 @@ export default async function CaseStudyPage({ params }: PageProps) {
     { key: "Timeframe", value: project.shipped },
   ].filter((item) => item.value);
   const heroCaption = project.thumbnail?.alt ?? project.title;
+  const { previous, next } = getAdjacentCaseStudies(slug);
+  // Stamped when this revision was built, so a study about 2024 work read in
+  // 2026 says when it was last written down, separately from when it happened.
+  const lastUpdated = new Intl.DateTimeFormat("en-GB", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(buildTime));
 
   return (
     <div className="min-h-screen overflow-x-clip bg-bg text-ink">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            caseStudyBreadcrumbJsonLd({ slug, title: project.title }),
+          ),
+        }}
+      />
       <CaseStudyMorph slug={slug} />
+      <SkipLink />
       <div className="grid min-h-screen w-full grid-cols-[264px_minmax(0,1fr)] max-lg:block">
         <CaseStudySidebar
           sections={sectionLinks}
@@ -73,6 +100,8 @@ export default async function CaseStudyPage({ params }: PageProps) {
           externalHref={project.href}
         />
         <main
+          id="main-content"
+          tabIndex={-1}
           data-cs-main
           className="min-w-0 pt-16 pb-18 max-lg:pt-12 max-[480px]:pt-9 max-[480px]:pb-14"
         >
@@ -108,6 +137,8 @@ export default async function CaseStudyPage({ params }: PageProps) {
               >
                 {profile.name}
               </Link>
+              {" · "}
+              <time dateTime={buildTime}>{`Last updated ${lastUpdated}`}</time>
             </p>
             {caseStudy.tags.length > 0 && (
               <ul className="flex flex-wrap gap-2">
@@ -131,6 +162,32 @@ export default async function CaseStudyPage({ params }: PageProps) {
                     <dt className={caseStudyMetaKey}>{item.key}</dt>
                     <dd className={`${typeStyles.bodySmall} font-medium text-ink`}>
                       {item.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            {caseStudy.glance && (
+              <dl
+                data-cs-glance
+                className="flex flex-col gap-4 rounded-2xl border border-border-color bg-surface p-5 max-[480px]:p-4"
+              >
+                {(
+                  [
+                    ["Problem", caseStudy.glance.problem],
+                    ["Decision", caseStudy.glance.decision],
+                    ["Outcome", caseStudy.glance.outcome],
+                  ] as const
+                ).map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="grid grid-cols-[84px_minmax(0,1fr)] gap-4 max-[480px]:grid-cols-1 max-[480px]:gap-1.5"
+                  >
+                    <dt className={caseStudyMetaKey}>{label}</dt>
+                    <dd
+                      className={`${typeStyles.bodySmall} text-pretty text-ink-dim`}
+                    >
+                      {value}
                     </dd>
                   </div>
                 ))}
@@ -221,6 +278,39 @@ export default async function CaseStudyPage({ params }: PageProps) {
                 className="pointer-events-none absolute bottom-0 left-0 h-px w-px"
                 aria-hidden
               />
+            )}
+            {(previous || next) && (
+              <nav
+                aria-label="Other case studies"
+                className="grid grid-cols-2 gap-4 border-t border-border-color pt-5.5 max-[480px]:grid-cols-1"
+              >
+                {[
+                  { project: previous, label: "Previous" },
+                  { project: next, label: "Next" },
+                ].map(({ project: sibling, label }) =>
+                  sibling ? (
+                    <Link
+                      key={label}
+                      href={`/home/work/${sibling.slug}`}
+                      className={cn(
+                        "flex flex-col gap-2 rounded-2xl border border-border-color bg-surface p-4 transition-colors hover:border-accent",
+                        label === "Next" && "text-right",
+                      )}
+                    >
+                      <span className={caseStudyMetaKey}>
+                        {label === "Next" ? `${label} →` : `← ${label}`}
+                      </span>
+                      <span
+                        className={`${typeStyles.bodySmall} font-medium text-ink`}
+                      >
+                        {sibling.title}
+                      </span>
+                    </Link>
+                  ) : (
+                    <span key={label} aria-hidden />
+                  ),
+                )}
+              </nav>
             )}
             {project.href && (
               <footer className="hidden flex-col gap-2 border-t border-border-color pt-5.5 max-lg:flex">

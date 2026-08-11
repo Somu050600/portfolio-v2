@@ -25,7 +25,7 @@ const VARIANTS: Variant[] = [
     key: "cross-fade",
     label: "Cross-fade",
     Preview: CrossFade,
-    note: "The default. With no view-transition-name on anything, the browser snapshots the whole page as one image (root) and cross-fades old → new. Free — you get it just by wrapping the DOM change.",
+    note: "The default. With no view-transition-name on anything, the browser snapshots the whole page as one image (root) and cross-fades old → new. Free: you get it just by wrapping the DOM change.",
     code: `// the entire default transition
 document.startViewTransition(() => {
   // swap the DOM however you like
@@ -36,7 +36,7 @@ document.startViewTransition(() => {
     key: "morph",
     label: "Morph",
     Preview: Morph,
-    note: "Shared-element transition — tag an element on both pages with the same view-transition-name and the browser interpolates its position and size between them.",
+    note: "Shared-element transition. Tag an element on both pages with the same view-transition-name and the browser interpolates its position and size between them.",
     code: `/* both pages */
 .card, .detail-hero { view-transition-name: hero; }`,
   },
@@ -44,7 +44,7 @@ document.startViewTransition(() => {
     key: "clip",
     label: "Clip reveal",
     Preview: Clip,
-    note: "Animate the new snapshot's clip-path — e.g. a circle growing from the click point — for a reveal instead of a fade.",
+    note: "Animate the new snapshot's clip-path, e.g. a circle growing from the click point, for a reveal instead of a fade.",
     code: `::view-transition-new(root) {
   animation: reveal 0.5s ease;
 }
@@ -56,7 +56,7 @@ document.startViewTransition(() => {
     key: "slide",
     label: "Slide",
     Preview: Slide,
-    note: "Give old and new their own keyframes — one slides out, the other in — for a directional push between views.",
+    note: "Give old and new their own keyframes, one sliding out and the other in, for a directional push between views.",
     code: `::view-transition-old(root) { animation: slide-out 0.4s; }
 ::view-transition-new(root) { animation: slide-in 0.4s; }`,
   },

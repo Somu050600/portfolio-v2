@@ -10,12 +10,12 @@ type MemoryInfo = {
 };
 
 function formatMs(n: number | null) {
-  if (n == null) return "—";
+  if (n == null) return "·";
   return `${Math.round(n)}ms`;
 }
 
 function formatCls(n: number | null) {
-  if (n == null) return "—";
+  if (n == null) return "·";
   return n.toFixed(3);
 }
 

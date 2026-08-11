@@ -1,15 +1,28 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import { aboutSkills } from "@/lib/about.config";
 import * as skillsModule from "./SkillsGrid";
 
-test("renders the 24 skills as a filterable periodic table", () => {
+test("renders every configured skill as a filterable periodic table", () => {
   const markup = renderToStaticMarkup(<skillsModule.default />);
 
-  expect(markup.match(/data-skill-element/g) ?? []).toHaveLength(24);
+  expect(markup.match(/data-skill-element/g) ?? []).toHaveLength(
+    aboutSkills.length,
+  );
   expect(markup).toContain('aria-label="Filter skills by group"');
   expect(markup).toContain("STATE &amp; DATA");
   expect(markup).toContain("REACT QUERY");
-  expect(markup).toContain("POSTMAN");
+});
+
+test("covers what the site is built from, and drops the keyword filler", () => {
+  const names: string[] = aboutSkills.map((skill) => skill.name);
+
+  for (const name of ["STORYBOOK", "GSAP", "THREE.JS", "VIEW TRANSITIONS"]) {
+    expect(names).toContain(name);
+  }
+  for (const name of ["POSTMAN", "CHAKRA", "ANT DESIGN", "RN PAPER", "MUI"]) {
+    expect(names).not.toContain(name);
+  }
 });
 
 test("dims only skills outside the active group", () => {

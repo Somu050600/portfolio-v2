@@ -13,7 +13,7 @@ const STEP_MS = 1200;
 /**
  * Live-preview thumbnail for the View Transitions field guide. At rest it shows
  * the first variant; on hover (`active`) it cycles cross-fade → clip → slide on
- * a loop — a montage of the lab.
+ * a loop, a montage of the lab.
  */
 export default function VTCycle({ active }: TreatmentProps) {
   const [idx, setIdx] = useState(0);

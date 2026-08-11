@@ -10,7 +10,7 @@ const easeInOut = (t: number) =>
 /**
  * Simulated clip-path reveal: the incoming page grows from the center as a
  * circle, covering the current one. Each Run reveals the other page. The clip
- * is driven by a raw rAF loop (no tweened object — React Compiler freezes those,
+ * is driven by a raw rAF loop (no tweened object, because React Compiler freezes those,
  * which is why a gsap-object tween silently no-ops here).
  */
 export default function Clip({ runToken }: { runToken: number }) {

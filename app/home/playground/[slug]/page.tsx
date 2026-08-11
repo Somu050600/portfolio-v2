@@ -27,7 +27,7 @@ export async function generateMetadata({
   const exp = getExperiment(slug);
   if (!exp) return { title: "Playground" };
   return createPageMetadata({
-    title: `${exp.title} — Playground`,
+    title: `${exp.title} · Playground`,
     description: exp.description,
     path: `/home/playground/${slug}`,
   });

@@ -1,12 +1,14 @@
 import { expect, test } from "bun:test";
 import { getIndexProjects, getProjectBySlug } from "./projects.config";
 
-test("keeps compliance reporting as project two", () => {
+test("leads the index with compliance reporting", () => {
   const compliance = getProjectBySlug("compliance-reporting");
-  const liquid = getProjectBySlug("liquid-distortion");
+  const designSystem = getProjectBySlug("design-system");
 
-  expect(compliance?.number).toBe(2);
-  expect(liquid?.number).toBe(4);
+  // The hook above the grid teases "the one that took down Prod", so the
+  // payoff is the first card rather than the second.
+  expect(compliance?.number).toBe(1);
+  expect(designSystem?.number).toBe(2);
 
   const indexNumbers = getIndexProjects().map((project) => project.number);
   expect(new Set(indexNumbers).size).toBe(indexNumbers.length);

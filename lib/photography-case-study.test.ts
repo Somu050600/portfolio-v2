@@ -21,8 +21,10 @@ test("publishes the photography pipeline through the native case-study model", (
   });
   const orderedProjects = [...projects].sort((a, b) => a.number - b.number);
   expect(orderedProjects.map(({ number }) => number)).toEqual(
-    Array.from({ length: 14 }, (_, index) => index + 1),
+    Array.from({ length: projects.length }, (_, index) => index + 1),
   );
+  // Every index card now has a case study or a live external link. The six
+  // written studies occupy the first six slots.
   expect(
     orderedProjects.filter(({ caseStudy }) => caseStudy).map(({ number }) => number),
   ).toEqual([1, 2, 3, 4, 5, 6]);

@@ -53,7 +53,7 @@ function TokenMismatchDiagram() {
           </div>
         </div>
         <p className="px-4 py-2.5 font-mono text-metadata tracking-wide text-ink-faint">
-          Same name, different hex — no error thrown, wrong color rendered.
+          Same name, different hex. No error thrown, wrong color rendered.
         </p>
       </div>
     </figure>
@@ -137,7 +137,7 @@ function DualRenderDiagram() {
     <figure className={cn("not-prose", caseStudyArtifact)}>
       <div className="rounded-xl border border-border-color bg-surface overflow-hidden">
         <p className="px-4 pt-3 pb-3 font-mono text-metadata tracking-[0.15em] text-ink-faint uppercase">
-          Same HTML — two stylesheets
+          Same HTML, two stylesheets
         </p>
         <div className="grid grid-cols-2 gap-px bg-border-color">
           <div className="bg-surface px-4 py-4">
@@ -175,7 +175,7 @@ function DualRenderDiagram() {
         </div>
         <p className="px-4 py-2.5 font-mono text-metadata tracking-wide text-ink-faint">
           The header is invisible on screen so it doesn&apos;t clutter the
-          preview — the Chromium print pipeline reveals it only in print.
+          preview. The Chromium print pipeline reveals it only in print.
         </p>
       </div>
     </figure>
@@ -259,7 +259,7 @@ function VtApproachesDiagram() {
     "compute the new position in JS",
     "run a CSS transition on the element",
     "…but it fires during the View Transition",
-    "the live element isn't painted — only its snapshot is",
+    "the live element isn't painted, only its snapshot is",
   ];
   const nameIt = [
     "give the bar a view-transition-name",

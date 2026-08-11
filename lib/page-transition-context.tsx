@@ -17,7 +17,7 @@ export type CoverOptions = {
   originEl?: HTMLElement | null;
   /**
    * Exact viewport point the circle reveal should grow from (e.g. a tap/click
-   * position). Takes precedence over originEl — use it so the reveal blooms
+   * position). Takes precedence over originEl, so use it when the reveal blooms
    * from where the user actually pressed, not the element's center.
    */
   originPoint?: { x: number; y: number };
@@ -41,7 +41,7 @@ export type CoverOptions = {
   slide?: boolean;
   /**
    * When true, the new page descends from the top edge like a shade being
-   * pulled down — no origin needed, so keyboard activation looks identical to
+   * pulled down. No origin needed, so keyboard activation looks identical to
    * a click. Used by the landing header nav, which sits at that top edge; the
    * circle reveal stays exclusive to the EXPLORE CTA.
    */

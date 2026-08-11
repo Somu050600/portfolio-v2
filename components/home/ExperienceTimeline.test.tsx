@@ -5,8 +5,8 @@ import * as timelineModule from "./ExperienceTimeline";
 test("renders the approved experience narrative as accessible disclosures", () => {
   const markup = renderToStaticMarkup(<timelineModule.default />);
 
-  expect(markup).toContain("02 — EXPERIENCE");
-  expect(markup).toContain("03 ROLES · 2023 — NOW");
+  expect(markup).toContain("02 · EXPERIENCE");
+  expect(markup).toContain("03 ROLES · 2023 TO NOW");
   expect(markup).toContain("Security, compliance, commerce.");
   expect(markup).toContain("Three roles, measurable outcomes.");
   expect(markup).toContain("−30% TTI");

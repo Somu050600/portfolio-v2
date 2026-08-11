@@ -19,7 +19,7 @@ const FIELD_HOVER_SCALE = 0.72;
 /** Field growth / follow rate, and the pill's magnetic rate. ~320ms to settle. */
 const FIELD_LERP = 0.17;
 const MAGNET_LERP = 0.14;
-/** How far the pill drifts toward the pointer, px — deliberately tiny. */
+/** How far the pill drifts toward the pointer, px. Deliberately tiny. */
 const MAGNET_MAX = 4;
 /** Fraction of the pointer's offset from centre that becomes drift. */
 const MAGNET_RATIO = 0.14;
@@ -212,7 +212,7 @@ export default function ExploreCta({
       <Arrow />
 
       {interactive ? (
-        // Same content, light, clipped to the field — so only the glyphs the
+        // Same content, light, clipped to the field, so only the glyphs the
         // dark field covers invert, rather than the whole label on hover.
         <span
           aria-hidden="true"

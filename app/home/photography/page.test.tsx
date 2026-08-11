@@ -16,7 +16,7 @@ const { default: PhotographyGallery } = await import(
 test("renders every processed photograph as a ratio-reserved frame", () => {
   const markup = renderToStaticMarkup(<PhotographyPage />);
 
-  expect(markup).toContain("04 — PHOTOGRAPHY");
+  expect(markup).toContain("04 · PHOTOGRAPHY");
   expect(markup).toContain("Photographs");
   expect(markup).toContain(
     "Twenty selected photographs, developed for the web without touching the originals.",

@@ -10,7 +10,7 @@ const MODES = ["spotlight", "magnetic", "decode", "swell"] as const;
 type Mode = (typeof MODES)[number];
 
 const SAMPLE =
-  "Interfaces should feel inevitable — like they were always meant to move this way.";
+  "Interfaces should feel inevitable, like they were always meant to move this way.";
 
 const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -180,7 +180,7 @@ export default function TypeLab() {
       className="flex flex-col gap-8"
       {...componentAttrs(
         "TypeLab",
-        "Per-char type modes — spotlight, magnetic, decode scramble, swell.",
+        "Per-char type modes: spotlight, magnetic, decode scramble, swell.",
       )}
     >
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Type modes">

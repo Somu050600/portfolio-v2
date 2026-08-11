@@ -77,7 +77,7 @@ export default function DemoBlock({
         <span>interactive</span>
       </div>
 
-      {/* Demo stage — dotted grid on the base bg, so the component (its own
+      {/* Demo stage: dotted grid on the base bg, so the component (its own
           elevated card) reads as sitting on a canvas, distinct from the frame. */}
       <div className="flex justify-center bg-thumb-bg bg-[radial-gradient(circle,var(--thumb-border)_1px,transparent_1px)] bg-size-[15px_15px] p-6">
         <Component />
@@ -94,7 +94,7 @@ export default function DemoBlock({
         </figcaption>
       )}
 
-      {/* How it works — note + code, collapsed together (shadcn-style peek).
+      {/* How it works: note + code, collapsed together (shadcn-style peek).
           Outer = positioning context (fade + button stay put); inner = the
           clamped/animated block that scrolls when expanded. */}
       <div className="relative border-t border-thumb-border">
@@ -118,7 +118,7 @@ export default function DemoBlock({
           </pre>
         </div>
 
-        {/* fade mask — only while collapsed */}
+        {/* fade mask, only while collapsed */}
         <div
           className={cn(
             "pointer-events-none absolute inset-x-0 bottom-0 h-20 transition-opacity duration-200",
@@ -127,7 +127,7 @@ export default function DemoBlock({
           )}
         />
 
-        {/* floating toggle — lives in the outer wrapper so it never scrolls */}
+        {/* floating toggle, lives in the outer wrapper so it never scrolls */}
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}

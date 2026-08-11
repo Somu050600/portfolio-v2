@@ -43,7 +43,7 @@ export interface FlipThumbParams {
   compact?: boolean;
 }
 
-/** CSS-only treatments — mount in-view without consuming animation slots. */
+/** CSS-only treatments. They mount in-view without consuming animation slots. */
 export const CHEAP_KINDS = new Set<ThumbnailKind>([
   "flip",
   "parallax",

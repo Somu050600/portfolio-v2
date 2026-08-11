@@ -127,7 +127,7 @@ export function useHeadlineMagnetics({ headlineRef, enabled }: Options) {
       }
 
       // Written straight to the `translate` property rather than through a
-      // custom property the stylesheet has to consume — one less layer between
+      // custom property the stylesheet has to consume, one less layer between
       // this loop and the pixels.
       c.el.style.translate = `${c.x.toFixed(2)}px ${c.y.toFixed(2)}px`;
       // Accent characters are already accent-coloured; only ink chars mix.

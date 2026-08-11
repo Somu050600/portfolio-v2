@@ -50,7 +50,7 @@ test("static routes publish title-derived image metadata", async () => {
     expect(routeModule.generateImageMetadata()).toEqual([
       {
         id: "default",
-        alt: `${input.title} — eega.dev`,
+        alt: `${input.title} · eega.dev`,
         size: { width: 1200, height: 630 },
         contentType: "image/png",
       },
@@ -76,7 +76,7 @@ test("dynamic route metadata preserves each full title and stable index", async 
   ).toEqual([
     {
       id: "default",
-      alt: "Engineering a Photography Portfolio Without Sacrificing the Photographs — eega.dev",
+      alt: "Engineering a Photography Portfolio Without Sacrificing the Photographs · eega.dev",
       size: { width: 1200, height: 630 },
       contentType: "image/png",
     },
@@ -86,7 +86,7 @@ test("dynamic route metadata preserves each full title and stable index", async 
   ).toEqual([
     {
       id: "default",
-      alt: "Fluid Sim — eega.dev",
+      alt: "Fluid Sim · eega.dev",
       size: { width: 1200, height: 630 },
       contentType: "image/png",
     },

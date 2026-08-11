@@ -25,18 +25,9 @@ export const metadata: Metadata = {
   applicationName: `${profile.name} (${profile.handle})`,
   authors: [{ name: profile.name, url: profile.url }],
   creator: profile.name,
-  keywords: [
-    "Frontend Developer",
-    "Frontend Engineer",
-    "React",
-    "Next.js",
-    "TypeScript",
-    "Design Systems",
-    "View Transitions",
-    "Web Performance",
-    profile.name,
-    "Somu",
-  ],
+  // No `keywords`: no search engine has used the meta tag in over a decade,
+  // and this audience reads source. The JSON-LD `knowsAbout` graph below
+  // carries the same information to the consumers that do read it.
   openGraph: {
     type: "website",
     siteName: profile.name,
@@ -85,7 +76,7 @@ export default function RootLayout({
       <head>
         {/* Intro overlay pre-paint gate */}
         <script dangerouslySetInnerHTML={{ __html: introCheckScript }} />
-        {/* Accent CSS vars pre-paint — prevents accent flash on reload */}
+        {/* Accent CSS vars pre-paint, which prevents accent flash on reload */}
         <script dangerouslySetInnerHTML={{ __html: ACCENT_PREPAINT_SCRIPT }} />
         {/* Canonical Person + WebSite entity graph */}
         <script

@@ -20,11 +20,20 @@ export default function PlaygroundPage() {
             Playground
           </h1>
           <p className={`${typeStyles.body} mt-4 text-ink-dim`}>
-            Sketches and interaction studies — heavy demos are code-split and
+            Sketches and interaction studies. Heavy demos are code-split and
             pause when off-screen.
           </p>
         </header>
         <PlaygroundGrid />
+        {/* Prose instead of placeholder cards: signals what's in flight
+            without shipping dead click targets. */}
+        <p
+          className={`${typeStyles.bodySmall} mt-10 max-w-2xl text-ink-faint`}
+        >
+          In flight: a shader-based liquid warp, an SVG brush reveal, and an
+          accent-harmony explorer wired to the theme tokens. They land here when
+          they run.
+        </p>
       </main>
     </HomeShell>
   );

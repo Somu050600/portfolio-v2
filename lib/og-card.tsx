@@ -76,10 +76,13 @@ function HeroCard({ input }: { input: OgInput }) {
       </div>
 
       <div tw="relative flex flex-col items-center" style={{ gap: 6 }}>
+        {/* Satori never auto-shrinks type, so the headline steps down once past
+            the width the 82px cut can hold inside 920px. */}
         <div
-          tw="flex text-[82px] font-semibold leading-[1.06]"
+          tw="flex font-semibold leading-[1.06]"
           style={{
             fontFamily: "Poppins",
+            fontSize: input.title.length > 22 ? 58 : 82,
             letterSpacing: "-0.035em",
             maxWidth: 920,
             whiteSpace: "pre-line",
@@ -89,7 +92,8 @@ function HeroCard({ input }: { input: OgInput }) {
         </div>
         <div
           tw="flex text-[44px] font-normal leading-none text-[#2f6f62]"
-          style={{ fontFamily: "DotGothic16", letterSpacing: "-0.04em" }}
+          // Tracked out to match the page treatment of the accent word.
+          style={{ fontFamily: "DotGothic16", letterSpacing: "0.08em" }}
         >
           {input.accent ?? "Beautifully"}
         </div>

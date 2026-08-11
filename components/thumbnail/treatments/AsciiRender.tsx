@@ -89,7 +89,7 @@ export default function AsciiRender({ active, width, height, accent }: Treatment
   const widthRef = useRef(width);
   const heightRef = useRef(height);
 
-  // Keep activeRef in sync — no side-effects, just a ref write.
+  // Keep activeRef in sync. No side-effects, just a ref write.
   useEffect(() => {
     activeRef.current = active;
   }, [active]);
@@ -127,7 +127,7 @@ export default function AsciiRender({ active, width, height, accent }: Treatment
     drawFrame(ctx, width, height, color, dropsRef.current, 0);
 
     // Mutate one char every ~800ms so grid feels slightly alive at rest.
-    // No rAF — just a slow interval that does a single canvas redraw.
+    // No rAF, just a slow interval that does a single canvas redraw.
     const mutateInterval = setInterval(() => {
       if (activeRef.current) return; // rAF loop handles this while hovering
       const drops = dropsRef.current;
@@ -146,7 +146,7 @@ export default function AsciiRender({ active, width, height, accent }: Treatment
   }, [width, height, accent]);
 
   // Start rAF loop when active; loop self-terminates when back at rest.
-  // No setInterval polling — React drives the start, rAF drives the frames.
+  // No setInterval polling: React drives the start, rAF drives the frames.
   useEffect(() => {
     if (!active) return;
     if (rafRef.current) return; // already running

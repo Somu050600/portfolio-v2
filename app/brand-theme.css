@@ -2,8 +2,8 @@
    Loaded after globals.css so it can refine the visual identity without
    disturbing the existing semantic token and View Transition architecture. */
 
-/* .landing-hero is listed here on purpose. The landing is theme-independent —
-   always light, no theme toggle on the page — so it re-declares the LIGHT brand
+/* .landing-hero is listed here on purpose. The landing is theme-independent
+   (always light, no theme toggle on the page), so it re-declares the LIGHT brand
    values at its own scope. A matching declaration beats inheritance from
    html.dark, so the landing stays light in dark mode while the greys are still
    declared exactly once. This is the layer that wins (loaded after globals.css),

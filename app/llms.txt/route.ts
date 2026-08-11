@@ -4,7 +4,7 @@ import { projects } from "@/lib/projects.config";
 export const dynamic = "force-static";
 
 /**
- * /llms.txt — an LLM/agent-friendly summary of the site (the emerging
+ * /llms.txt: an LLM/agent-friendly summary of the site (the emerging
  * llms.txt convention). Curated context + links so an agent gets the gist
  * without crawling. Generated from config so it never drifts.
  */
@@ -13,7 +13,7 @@ export function GET() {
   const caseStudies = projects.filter((p) => p.caseStudy);
 
   const md = [
-    `# ${profile.name} (${profile.handle}) — ${profile.jobTitle}`,
+    `# ${profile.name} (${profile.handle}) · ${profile.jobTitle}`,
     "",
     `> ${profile.tagline}`,
     "",
@@ -42,7 +42,7 @@ export function GET() {
     `- GitHub: ${profile.contact.github}`,
     `- LinkedIn: ${profile.contact.linkedin}`,
     `- Email: ${profile.contact.email}`,
-    `- Resume: ${profile.contact.resumeUrl}`,
+    `- Resume: ${base}${profile.contact.resumeUrl}`,
     "",
   ].join("\n");
 

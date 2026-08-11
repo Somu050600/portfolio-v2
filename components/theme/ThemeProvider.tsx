@@ -8,10 +8,10 @@ import type { ReactNode } from "react";
 
 /**
  * Root theme provider. Composes:
- *   1. next-themes  — persists & applies mode (light / dark / system) via
+ *   1. next-themes  persists & applies mode (light / dark / system) via
  *                     `class` attribute on <html>. First-visit default: dark.
- *   2. AccentProvider — owns per-mode accent selection, live preview, commit.
- *   3. TooltipProvider — required by shadcn Tooltip components.
+ *   2. AccentProvider owns per-mode accent selection, live preview, commit.
+ *   3. TooltipProvider is required by shadcn Tooltip components.
  *
  * Drop-in replacement for the bare next-themes ThemeProvider in app/layout.tsx.
  */

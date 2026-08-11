@@ -28,7 +28,7 @@ function readStrokePath(): string {
 }
 
 // Extracts inner SVG content (everything between the <svg> tags).
-// Colors are owned by the SVG file itself — export with the correct fills.
+// Colors are owned by the SVG file itself, so export with the correct fills.
 function readFillContent(): string {
   const svg = readFileSync(
     join(process.cwd(), "assets/svg/signature-fill.svg"),

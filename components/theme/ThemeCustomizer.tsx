@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { useAccent } from "./AccentProvider";
 
 // ---------------------------------------------------------------------------
-// Gear icon — exported so Header / Sidebar can mount the full panel anywhere
+// Gear icon, exported so Header / Sidebar can mount the full panel anywhere
 // ---------------------------------------------------------------------------
 export function ThemeCustomizerTrigger({ className }: { className?: string }) {
   return (
@@ -55,7 +55,7 @@ export function ThemeCustomizerTrigger({ className }: { className?: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// ThemeCustomizer — non-modal corner panel (wraps a Dialog.Root)
+// ThemeCustomizer: non-modal corner panel (wraps a Dialog.Root)
 // Children should include <ThemeCustomizerTrigger /> to open the panel.
 // ---------------------------------------------------------------------------
 export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
@@ -158,7 +158,7 @@ export function ThemeCustomizer({ children }: { children: React.ReactNode }) {
       {children}
 
       <DialogPrimitive.Portal>
-        {/* Transparent backdrop — page stays fully interactive for live preview */}
+        {/* Transparent backdrop, page stays fully interactive for live preview */}
         <DialogPrimitive.Backdrop className="pointer-events-none fixed inset-0 z-9980 bg-transparent" />
         <DialogPrimitive.Popup
           data-lenis-prevent

@@ -31,7 +31,7 @@ describe("SEO metadata", () => {
     const { metadata: rootMetadata } = await import("./layout");
 
     expect(rootMetadata.title).toEqual({
-      default: "Eega Somasekhara Reddy (Somu) — Frontend Engineer",
+      default: "Eega Somasekhara Reddy (Somu) · Frontend Engineer",
       template: "%s · Eega Somasekhara Reddy",
     });
     expect(rootMetadata.applicationName).toBe("Eega Somasekhara Reddy (Somu)");
@@ -66,16 +66,16 @@ describe("SEO metadata", () => {
     });
 
     expect(metadata).toMatchObject({
-      title: "Type Lab — Playground",
+      title: "Type Lab · Playground",
       alternates: { canonical: "/home/playground/type-lab" },
       openGraph: {
         type: "website",
         url: "/home/playground/type-lab",
-        title: "Type Lab — Playground · Eega Somasekhara Reddy",
+        title: "Type Lab · Playground · Eega Somasekhara Reddy",
       },
       twitter: {
         card: "summary_large_image",
-        title: "Type Lab — Playground · Eega Somasekhara Reddy",
+        title: "Type Lab · Playground · Eega Somasekhara Reddy",
       },
     });
   });

@@ -30,7 +30,7 @@ interface AccentContextValue {
   currentDraft: ThemeDraft;
   /** Is there an unsaved change (draft ≠ committed)? */
   dirty: boolean;
-  /** Apply a draft to the live app — no transition. */
+  /** Apply a draft to the live app, with no transition. */
   preview: (draft: ThemeDraft) => void;
   /** Revert to committed state. */
   clearPreview: () => void;
@@ -86,7 +86,7 @@ function applyAccentVars(draft: ThemeDraft, resolvedMode: "light" | "dark") {
     resolvedMode === "dark" ? draft.darkAccent : draft.lightAccent;
   const vars = accentVars(resolvedMode, key);
   const root = document.documentElement.style;
-  // Write without any CSS transition — the VT API owns the visual.
+  // Write without any CSS transition: the VT API owns the visual.
   Object.entries(vars).forEach(([k, v]) => root.setProperty(k, v));
   // Let accent-reactive effects (e.g. the hero spotlight glow) re-read --accent.
   window.dispatchEvent(new CustomEvent("theme:accent-change"));
@@ -127,7 +127,7 @@ export function AccentProvider({ children }: { children: ReactNode }) {
   const preview = useCallback(
     (draft: ThemeDraft) => {
       setCurrentDraft(draft);
-      // Mode change: call setTheme directly — no slant-wipe, just instant swap.
+      // Mode change: call setTheme directly. No slant-wipe, just instant swap.
       if (draft.mode !== (theme ?? THEME_DEFAULTS.mode)) {
         setTheme(draft.mode);
       }

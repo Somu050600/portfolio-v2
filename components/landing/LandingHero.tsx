@@ -1,5 +1,6 @@
 "use client";
 
+import { homeNavItems } from "@/lib/home.config";
 import { landingConfig } from "@/lib/landing.config";
 import { usePageTransition } from "@/lib/page-transition-context";
 import { profile } from "@/lib/profile.config";
@@ -56,11 +57,16 @@ const quadrantLabels = [
  * Final word of the headline. DotGothic16 has no italic cut, so the <em>'s
  * inherited italic is dropped rather than synthesised as a slant; per-glyph
  * tightening for its monospace advance lives in globals.css.
+ *
+ * "Exposed" is seven glyphs under two ~27-character lines, so it is tracked
+ * out rather than in, which keeps the optical weight the slot carries. The
+ * negative right margin absorbs the trailing letter-space so the word stays
+ * optically centred under the stack.
  */
 const FINAL_WORD_CLASS =
-  "landing-final-word font-accent-dot text-[0.92em] tracking-[-0.02em] not-italic";
+  "landing-final-word font-accent-dot text-[0.92em] tracking-[0.1em] -mr-[0.1em] not-italic";
 
-/** [key to press, what it does] — see use-landing-easter-eggs.ts */
+/** [key to press, what it does]. See use-landing-easter-eggs.ts */
 const easterEggHints = [
   ["⌥", "Technical"],
   ["F", "Lock focus"],
@@ -69,7 +75,7 @@ const easterEggHints = [
 ] as const;
 
 /**
- * Used by four nav items — one string beats four copies of the same classes.
+ * Shared by every nav item: one string beats a copy per link.
  * Bracket ticks flick in either side on hover/focus, echoing the focus-frame
  * corners: each is a 4px-wide box with three borders, so it reads as [ and ].
  */
@@ -140,7 +146,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
 
   // Hints cycle one at a time. All four stay in the DOM so assistive tech reads
   // the full set; only the active one is visible. Reduced motion shows them all
-  // inline instead — rotating text is movement too.
+  // inline instead, because rotating text is movement too.
   useEffect(() => {
     if (motionDisabled || hintsPaused) return;
     const id = window.setInterval(
@@ -190,7 +196,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
   }, [cover, motionDisabled, transitioning]);
 
   /**
-   * Header nav gets the shade pull, not the circle — the circle stays the CTA's
+   * Header nav gets the shade pull, not the circle. The circle stays the CTA's
    * gesture. No origin needed, so Enter on a focused link looks like a click.
    */
   const onNavClick = useCallback(
@@ -257,35 +263,23 @@ export default function LandingHero({ background }: LandingHeroProps) {
           SOMU
         </Link>
 
+        {/* Same five sections, same order as the /home rail. The splash is the
+            front door, so it can't hide two of them. */}
         <nav
           aria-label="Primary navigation"
-          className="hidden items-center gap-8 font-mono text-[15px] font-medium tracking-[0.02em] md:flex lg:gap-10"
+          className="hidden items-center gap-5 font-mono text-[15px] font-medium tracking-[0.02em] md:flex lg:gap-8"
           data-semantic-label="<nav>"
         >
-          <Link
-            className={navLinkClass}
-            href="/home"
-            onClick={(event) => onNavClick(event, "/home")}
-          >
-            Work
-          </Link>
-          <Link
-            className={navLinkClass}
-            href="/home/photography"
-            onClick={(event) => onNavClick(event, "/home/photography")}
-          >
-            Photography
-          </Link>
-          <Link
-            className={navLinkClass}
-            href="/home/about"
-            onClick={(event) => onNavClick(event, "/home/about")}
-          >
-            About
-          </Link>
-          <a className={navLinkClass} href={`mailto:${profile.contact.email}`}>
-            Contact
-          </a>
+          {homeNavItems.map((item) => (
+            <Link
+              key={item.key}
+              className={navLinkClass}
+              href={item.href}
+              onClick={(event) => onNavClick(event, item.href)}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         <button
@@ -301,38 +295,24 @@ export default function LandingHero({ background }: LandingHeroProps) {
         <nav
           id="landing-mobile-nav"
           aria-label="Mobile navigation"
+          data-landing-mobile-nav
           aria-hidden={!mobileNavOpen}
           className="invisible pointer-events-none absolute top-18 right-6 flex min-w-48 -translate-y-1.5 flex-col gap-[0.9rem] border border-(--landing-line) bg-[color-mix(in_srgb,var(--landing-paper)_94%,transparent)] p-5 font-mono text-xs tracking-[0.08em] text-(--landing-ink) opacity-0 shadow-[0_18px_50px_rgba(37,42,38,0.1)] backdrop-blur-md transition-[opacity,transform,visibility] duration-180 data-open:visible data-open:pointer-events-auto data-open:translate-y-0 data-open:opacity-100 md:hidden"
           data-open={mobileNavOpen ? "" : undefined}
         >
-          <Link
-            href="/home"
-            onClick={(event) => onNavClick(event, "/home")}
-            className="outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
-          >
-            Work
-          </Link>
-          <Link
-            href="/home/photography"
-            onClick={(event) => onNavClick(event, "/home/photography")}
-            className="outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
-          >
-            Photography
-          </Link>
-          <Link
-            href="/home/about"
-            onClick={(event) => onNavClick(event, "/home/about")}
-            className="outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
-          >
-            About
-          </Link>
-          <a
-            className="outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
-            href={`mailto:${profile.contact.email}`}
-            onClick={() => setMobileNavOpen(false)}
-          >
-            Contact
-          </a>
+          {homeNavItems.map((item) => (
+            <Link
+              key={item.key}
+              href={item.href}
+              onClick={(event) => onNavClick(event, item.href)}
+              className="outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
+            >
+              <span className="mr-2 text-(--landing-muted)">
+                {item.ordinal}
+              </span>
+              {item.label}
+            </Link>
+          ))}
         </nav>
       </header>
 
@@ -345,7 +325,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
             ref={headlineRef}
             id="landing-headline"
             // Every character span is aria-hidden, so the heading carries the
-            // text itself — this is also what names the section via
+            // text itself, which is also what names the section via
             // aria-labelledby.
             aria-label={headline.join(" ")}
             // Inspectable gate state: absent means the magnet is switched off
@@ -353,7 +333,9 @@ export default function LandingHero({ background }: LandingHeroProps) {
             data-magnetic={pointerInteractive ? "" : undefined}
             // Three-layer depth: hairline for definition, soft mid, broad low
             // opacity. All drawn from --landing-ink so it follows temperature.
-            className="font-landing cursor-default text-balance text-[clamp(2.7rem,6.25vw,6.7rem)] leading-[1.16] font-normal tracking-[-0.015em] [text-shadow:0_1px_0_color-mix(in_oklab,var(--landing-ink)_12%,transparent),0_2px_6px_color-mix(in_oklab,var(--landing-ink)_10%,transparent),0_10px_30px_color-mix(in_oklab,var(--landing-ink)_8%,transparent)] max-md:text-nowrap max-md:text-[clamp(1.25rem,10vw,3.75rem)]"
+            // Sized for the longest line (~27 characters). The previous step
+            // was set for a 21-character line and crowds the viewport here.
+            className="font-landing cursor-default text-balance text-[clamp(2.1rem,4.9vw,5.3rem)] leading-[1.16] font-normal tracking-[-0.015em] [text-shadow:0_1px_0_color-mix(in_oklab,var(--landing-ink)_12%,transparent),0_2px_6px_color-mix(in_oklab,var(--landing-ink)_10%,transparent),0_10px_30px_color-mix(in_oklab,var(--landing-ink)_8%,transparent)] max-md:text-nowrap max-md:text-[clamp(1rem,7.6vw,2.9rem)]"
             data-active-line={displayedLine ?? undefined}
             data-semantic-label="<h1>"
           >
@@ -428,7 +410,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
           {focusStatus}
         </p>
 
-        {/* The four easter eggs are otherwise undiscoverable — this is the only
+        {/* The four easter eggs are otherwise undiscoverable. This is the only
             on-page pointer to them. One at a time, looping; hover to hold. */}
         <ul
           aria-label="Hidden interactions"
@@ -467,6 +449,8 @@ export default function LandingHero({ background }: LandingHeroProps) {
         <button
           type="button"
           aria-pressed={motionDisabled}
+          // "Motion · Full" alone does not say what pressing it does.
+          aria-label="Reduce motion on this page"
           onClick={() => setMotionOverride(!motionDisabled)}
           className="group inline-flex shrink-0 items-center gap-2 text-metadata tracking-[0.12em] text-(--landing-muted) uppercase outline-offset-4 hover:text-(--landing-accent) focus-visible:text-(--landing-accent)"
         >

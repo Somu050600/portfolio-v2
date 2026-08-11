@@ -86,7 +86,7 @@ export default function FluidSimFull({
     <canvas
       ref={canvasRef}
       className={className}
-      aria-label="Fluid simulation — drag to inject dye"
+      aria-label="Fluid simulation, drag to inject dye"
       onPointerMove={(e) => {
         const rect = canvasRef.current?.getBoundingClientRect();
         if (!rect) return;

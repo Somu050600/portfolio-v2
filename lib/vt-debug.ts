@@ -2,10 +2,10 @@
 
 /**
  * TEMPORARY instrumentation for the circle-reveal origin bug
- * (Chrome starts the circle somewhere other than the EXPLORE button; Brave —
- * also Chromium — starts it at the button).
+ * (Chrome starts the circle somewhere other than the EXPLORE button; Brave,
+ * also Chromium, starts it at the button).
  *
- * Enable:  localStorage.setItem("vtdebug", "1")   — or load any page with ?vtdebug=1
+ * Enable:  localStorage.setItem("vtdebug", "1")   (or load any page with ?vtdebug=1)
  * Disable: localStorage.removeItem("vtdebug")
  *
  * A/B the suspect CSS rule (`::view-transition-group(root) { animation: none }`,
@@ -81,7 +81,7 @@ export function applyVtGroupAnimFlag() {
 
 /* ---------------------------------------------------------------------------
    One report per transition. Stages accumulate, then flush as a SINGLE object:
-   right-click → "Copy object" in devtools, or paste — it is also written to the
+   right-click → "Copy object" in devtools, or paste. It is also written to the
    clipboard as JSON and parked on window.__vtReport (devtools: copy(__vtReport)).
    --------------------------------------------------------------------------- */
 
@@ -89,7 +89,7 @@ type Report = Record<string, unknown>;
 
 let report: Report | null = null;
 
-/** Every debug flag, verbatim — so a pasted report says which run it was. */
+/** Every debug flag, verbatim, so a pasted report says which run it was. */
 export function flagsSnapshot() {
   const keys = ["vtdebug", "vtGroupAnim", "vtSlow", "vtPx"];
   const out: Record<string, string | null> = {};
@@ -138,11 +138,11 @@ export async function vtReportFlush() {
     await navigator.clipboard.writeText(json);
     clipboard = "copied to clipboard";
   } catch (error) {
-    clipboard = `clipboard blocked (${String(error)}) — use copy(__vtReport)`;
+    clipboard = `clipboard blocked (${String(error)}). Use copy(__vtReport)`;
   }
 
   console.log(
-    `%c[vt] REPORT — ${clipboard}`,
+    `%c[vt] REPORT · ${clipboard}`,
     "color:#526f5c;font-weight:600",
     payload,
   );
@@ -291,7 +291,7 @@ export function forcePxClip() {
  * Calibration overlay in the NEW document: a dot + full-viewport crosshair at
  * the origin we asked for, plus ruler ticks every 100px. Tagged with its own
  * view-transition-name so it is painted THROUGH the transition (root snapshots
- * otherwise hide live DOM) — and, being its own group, it is NOT subject to
+ * otherwise hide live DOM), and, being its own group, it is NOT subject to
  * whatever the root snapshot's pixel space is doing. Screenshot mid-animation:
  * circle centre vs crosshair = the exact error.
  */
