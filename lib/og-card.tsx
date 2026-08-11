@@ -88,8 +88,8 @@ function HeroCard({ input }: { input: OgInput }) {
           {input.title}
         </div>
         <div
-          tw="flex text-[44px] font-medium leading-none text-[#2f6f62]"
-          style={{ fontFamily: "JetBrains Mono", letterSpacing: "-0.04em" }}
+          tw="flex text-[44px] font-normal leading-none text-[#2f6f62]"
+          style={{ fontFamily: "DotGothic16", letterSpacing: "-0.04em" }}
         >
           {input.accent ?? "Beautifully"}
         </div>
@@ -241,9 +241,9 @@ function BandCard({ input }: { input: OgInput }) {
             EEGA.DEV
           </div>
           <div
-            tw="flex text-[76px] font-medium leading-[0.8] text-[#2f6f62]"
+            tw="flex text-[76px] font-normal leading-[0.8] text-[#2f6f62]"
             style={{
-              fontFamily: "JetBrains Mono",
+              fontFamily: "DotGothic16",
               opacity: 0.55,
             }}
           >

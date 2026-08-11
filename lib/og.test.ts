@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { renderToStaticMarkup } from "react-dom/server";
 import sharp from "sharp";
 import * as ogModule from "./og";
 
@@ -138,7 +139,37 @@ test("renders every OG type role with existing portfolio fonts only", () => {
     "Poppins:600",
     "JetBrains Mono:400",
     "JetBrains Mono:500",
+    "DotGothic16:400",
   ]);
+});
+
+test("applies DotGothic16 to the hero accent and band index", async () => {
+  const { OgCard } = await import("./og-card");
+  const hero = renderToStaticMarkup(
+    OgCard({
+      input: {
+        template: "hero",
+        title: "Clarity in interface.",
+        accent: "Beautifully",
+      },
+    }),
+  );
+  const band = renderToStaticMarkup(
+    OgCard({
+      input: {
+        template: "band",
+        title: "This Site",
+        index: "05",
+      },
+    }),
+  );
+
+  expect(hero).toMatch(
+    /style="[^"]*font-family:DotGothic16[^"]*"[^>]*>Beautifully</u,
+  );
+  expect(band).toMatch(
+    /style="[^"]*font-family:DotGothic16[^"]*"[^>]*>05</u,
+  );
 });
 
 test("provides one canonical landing-derived guilloche background", async () => {

@@ -289,6 +289,12 @@ export function ogCardFonts() {
       weight: 500 as const,
       style: "normal" as const,
     },
+    {
+      name: "DotGothic16",
+      data: readFileSync(join(dir, "DotGothic16-Regular.ttf")),
+      weight: 400 as const,
+      style: "normal" as const,
+    },
   ];
 }
 
