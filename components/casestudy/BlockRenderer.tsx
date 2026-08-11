@@ -62,12 +62,12 @@ function TokenMismatchDiagram() {
 
 function CompliancePipelineDiagram() {
   const steps = [
-    { label: "Go Backend", sub: "generates report data", note: "" },
-    { label: "JSON + Token", sub: "short-lived auth, expires fast", note: "unauth route" },
-    { label: "Puppeteer", sub: "headless Chromium instance", note: "⚠ memory cost" },
-    { label: "Next.js Page", sub: "getServerSideProps fetches + parses data", note: "" },
-    { label: "@page Print", sub: "margins, counters, page-breaks, timestamp", note: "" },
-    { label: "PDF", sub: "pixel-accurate, matches Figma layout", note: "✓ output" },
+    { label: "Async report job", sub: "Generating · Completed · Failed", note: "non-blocking UX" },
+    { label: "Go backend", sub: "prepares data + short-lived token", note: "backend-owned" },
+    { label: "Go + chromedp", sub: "drives headless Chromium", note: "⚠ heavy workload" },
+    { label: "Next.js SSR page", sub: "getServerSideProps fetches + renders", note: "frontend-owned" },
+    { label: "PrintToPDF", sub: "A4 CSS, page breaks, counters, headers", note: "" },
+    { label: "Stored PDF", sub: "report list + optional email / Slack", note: "✓ completed" },
   ];
   return (
     <figure className={cn("not-prose", caseStudyArtifact)}>
@@ -111,7 +111,8 @@ function CompliancePipelineDiagram() {
           ))}
         </div>
         <p className="mt-2 border-t border-border-color pt-3 font-mono text-metadata tracking-wide text-ink-faint">
-          Each request = one full Chromium instance. Cheap at low concurrency, fatal at scale.
+          Chromium was reused, but every report still added a heavy page and
+          paged-layout workload. Exact page/context lifecycle was not verified.
         </p>
       </div>
     </figure>
@@ -174,7 +175,7 @@ function DualRenderDiagram() {
         </div>
         <p className="px-4 py-2.5 font-mono text-metadata tracking-wide text-ink-faint">
           The header is invisible on screen so it doesn&apos;t clutter the
-          preview — Puppeteer reveals it only in print.
+          preview — the Chromium print pipeline reveals it only in print.
         </p>
       </div>
     </figure>
@@ -195,21 +196,21 @@ function MemoryBlowupDiagram() {
       value: 850,
       max: 1100,
       color: "bg-accent",
-      note: "700–900 MB",
+      note: "~700–900 MB",
     },
     {
       label: "Large client dataset",
       value: 1100,
       max: 1100,
       color: "bg-red-500",
-      note: "pod ceiling hit",
+      note: "~1 GB ceiling hit",
     },
   ];
   return (
     <figure className={cn("not-prose", caseStudyArtifact)}>
       <div className="rounded-xl border border-border-color bg-surface overflow-hidden">
         <p className="px-4 pt-3 pb-4 font-mono text-metadata tracking-[0.15em] text-ink-faint uppercase">
-          Report-generation pod memory
+          Remembered report-generation pod memory
         </p>
         <div className="px-4 pb-2 flex flex-col gap-4">
           {bars.map((bar) => {
@@ -243,7 +244,7 @@ function MemoryBlowupDiagram() {
           <div className="flex items-center gap-2 pb-1">
             <div className="h-px flex-1 border-t border-dashed border-red-400/50" />
             <span className="font-mono text-metadata tracking-wide text-red-400">
-              ~1 GB ceiling
+              Approximate figures · Exact mix unproven
             </span>
             <div className="h-px flex-1 border-t border-dashed border-red-400/50" />
           </div>

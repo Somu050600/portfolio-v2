@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import ComplianceReportDemo from "./ComplianceReportDemo";
 import LiquidDistortionDemo from "./LiquidDistortionDemo";
 import SlidingBarDemo from "./SlidingBarDemo";
 
@@ -12,6 +13,31 @@ export type DemoEntry = {
 };
 
 export const demoRegistry: Record<string, DemoEntry> = {
+  "compliance-report-views": {
+    label: "Live — one dataset, three report views",
+    Component: ComplianceReportDemo,
+    how: {
+      note: "The production reports shared a document shell and compliance domain data, then selected a composition from TemplateType. This synthetic example keeps the overall result fixed while changing how the same findings are grouped for a framework reviewer, cloud owner, or accountable team.",
+      lang: "tsx",
+      code: `const projection = {
+  [REPORT_TYPES.DEFAULT]: FrameworkReport,
+  [REPORT_TYPES.CLOUD_WISE]: CloudReport,
+  [REPORT_TYPES.OWNER_WISE]: OwnerReport,
+} satisfies Record<TemplateType, ReportComponent>;
+
+function ComplianceReport({ report }: Props) {
+  const ReportSections = projection[report.data.TemplateType];
+
+  return (
+    <ReportDocument>
+      <ReportTitle data={report.data} />
+      <TableOfContents data={report.data} />
+      <ReportSections report={report} />
+    </ReportDocument>
+  );
+}`,
+    },
+  },
   "liquid-distortion": {
     label: "Live — cursor momentum shader",
     Component: () => <LiquidDistortionDemo className="max-w-full" />,

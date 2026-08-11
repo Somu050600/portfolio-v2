@@ -63,3 +63,20 @@ test("renders the measured photography pipeline as a native case-study artifact"
   expect(html).toContain("Active viewer only");
   expect(html.match(/data-cs-artifact/g)).toHaveLength(2);
 });
+
+test("renders the compliance pipeline with the verified production boundary", () => {
+  const html = renderToStaticMarkup(
+    <BlockRenderer
+      blocks={[
+        { type: "diagram", kind: "compliance-pipeline" },
+        { type: "diagram", kind: "memory-blowup" },
+      ]}
+    />,
+  );
+
+  expect(html).toContain("Go + chromedp");
+  expect(html).toContain("Async report job");
+  expect(html).toContain("Exact mix unproven");
+  expect(html).not.toContain("Puppeteer");
+  expect(html).not.toContain("Each request = one full Chromium instance");
+});

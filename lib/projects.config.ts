@@ -321,13 +321,13 @@ export const projects: Project[] = [
     number: 2,
     title: "Compliance Reporting Platform",
     description:
-      "PDF compliance reports rendered as web pages — designed to look right, ended up blowing up a prod.",
+      "A browser-native reporting system that matched the product—then exposed the cost of running Chromium in the wrong place.",
     category: "pro",
     role: "Frontend Engineer",
     team: "Compliance Engineering",
     shipped: "2024",
     status: "SHIPPED",
-    tech: ["Next.js", "TypeScript", "Puppeteer", "SSR"],
+    tech: ["Next.js", "TypeScript", "Go", "chromedp", "SSR", "Print CSS"],
     tilt: 0.8,
     thumbnail: {
       kind: "ascii",
@@ -336,73 +336,131 @@ export const projects: Project[] = [
     },
     caseStudy: {
       tagline:
-        "The report looked perfect. Then we deployed it to a client with real data and watched the pod ceiling disappear.",
-      tags: ["PDF", "Puppeteer", "SSR", "Print CSS"],
+        "The report looked like the product. Then real customer data showed that rendering architecture and execution architecture were two different decisions.",
+      tags: ["Next.js", "chromedp", "SSR", "Print CSS"],
       hero: { accent: "blue" },
       sections: [
         {
-          id: "the-problem",
-          heading: "The Brief",
+          id: "the-product-requirement",
+          heading: "The PDF Looked Like a Product",
           blocks: [
             {
               type: "paragraph",
-              text: "Compliance reports needed to go out to customers — formatted, branded, printable PDFs. The backend is Go. The obvious path was a Go PDF library or a template renderer. We looked at it and quickly ruled it out.",
+              text: "The hard part was never writing bytes into a .pdf file. Aurva needed customer-facing compliance reports with branded title pages, status summaries, severity badges, long violation tables, framework breakdowns, appendices, a table of contents, timestamps, and page numbers. Customers also needed to preview the document before exporting it.",
             },
             {
               type: "paragraph",
-              text: "The design team had built detailed Figma layouts — multi-page reports with section headers, severity badges, data tables, coverage charts. Replicating that fidelity in a Go PDF template would've meant hand-coding every pixel of layout in a library that doesn't do CSS. That wasn't a week of work, it was a month, and it would break every time the design changed.",
+              text: "This was greenfield work. The backend was primarily Go, so the first architectural decision was whether the document should become a backend-owned template system or a real frontend surface rendered through the browser.",
+              emphasis: ["greenfield work"],
             },
             {
               type: "callout",
               accent: "blue",
-              text: "The question wasn't how to generate a PDF. It was how to turn a Figma design into a PDF without rebuilding it from scratch every sprint.",
+              text: "The question was not “Which PDF library?” It was “Where should the report's presentation system live?”",
             },
           ],
         },
         {
-          id: "the-approach",
-          heading: "The Approach",
+          id: "the-architecture-decision",
+          heading: "Let the Frontend Render It Once",
           blocks: [
             {
               type: "paragraph",
-              text: "We built it as a web page instead. The Go backend generates the report data, serializes it to JSON, creates a short-lived auth token, and hands both to Puppeteer. Puppeteer opens the Next.js report page — an unauthenticated route that accepts the token as a query param — and triggers a print.",
+              text: "I proposed building the report in the existing Next.js frontend and using Chromium's print pipeline as the document renderer. Aurva already had typography, color tokens, tables, badges, icons, and spacing conventions there. Rebuilding those primitives in Go would have created a second presentation system that could drift every time the product design changed.",
+              emphasis: ["building the report in the existing Next.js frontend"],
             },
             {
               type: "list",
-              ordered: false,
+              ordered: true,
               items: [
                 {
-                  title: "Unauth route with short-lived token",
-                  text: "The report page is public but useless without the token. Token expires fast — just long enough for Puppeteer to load the page.",
+                  num: "01",
+                  title: "Reuse the visual language",
+                  text: "Compose reports from the frontend design system instead of approximating the Figma work in a separate backend template stack.",
                 },
                 {
-                  title: "data.json via SSR",
-                  text: "getServerSideProps fetches the report JSON from the backend using the token, parses it, and passes the full typed structure to the page.",
+                  num: "02",
+                  title: "Keep the preview real",
+                  text: "Make the rendering URL a useful browser document with scrolling and anchor navigation, not an invisible intermediate artifact.",
                 },
                 {
-                  title: "5 template types",
-                  text: "Owner-wise, cloud-wise, individual owner, individual cloud, and a default framework view — same page, different render path based on TemplateType in the data.",
-                },
-                {
-                  title: "Ctrl+P simulation",
-                  text: "Puppeteer calls page.pdf() which triggers the browser's print pipeline — @page margins, page-break rules, everything.",
+                  num: "03",
+                  title: "Print the same semantic tree",
+                  text: "Use @media print and paged-media CSS to turn that HTML into an A4 document rather than maintaining a second PDF-only composition.",
                 },
               ],
             },
             {
-              type: "diagram",
-              kind: "compliance-pipeline",
-            },
-            {
               type: "paragraph",
-              text: "For the preview experience — when a user opens the report in a browser before downloading — we used @media print to make it feel like a document viewer, not a raw web page. The report header is hidden on screen and only appears in print. A4 dimensions, box shadows stripped, table rows protected from page breaks.",
-              emphasis: ["@media print"],
+              text: "The result was template-driven, component-based report composition—not a universal schema renderer. That boundary kept the system concrete enough to match the approved layouts while still sharing the parts that were actually common.",
             },
           ],
         },
         {
-          id: "dual-render",
-          heading: "Two Views, One Page",
+          id: "the-rendering-route",
+          heading: "SSR as Rendering Infrastructure",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The backend created a very short-lived token and opened a special route shaped like /reports/compliance?reportId=…&token=…. The route intentionally did not depend on a normal logged-in browser session. getServerSideProps read the parameters, fetched the serialized report payload with the token, parsed it, and rendered the document on the server.",
+              emphasis: ["getServerSideProps"],
+            },
+            {
+              type: "paragraph",
+              text: "SSR mattered because the page's machine consumer was a headless browser. Chromium received substantially rendered HTML instead of booting a client shell, fetching data, waiting for React state, waiting for layout, and only then entering the print pipeline.",
+              emphasis: ["machine consumer was a headless browser"],
+            },
+            {
+              type: "paragraph",
+              text: "At the time, Aurva did not yet have RBAC. The historical token was generic and short-lived, not narrowly scoped to one report permission. That was a pragmatic control for the original system, but it is not the authorization model I would design today.",
+            },
+            {
+              type: "callout",
+              accent: "orange",
+              text: "Short-lived is not the same as least-privilege. The route reduced exposure time; it did not make the token report-scoped.",
+            },
+          ],
+        },
+        {
+          id: "the-document-system",
+          heading: "One Domain, Five Report Projections",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The shared outer document rendered the report title, header, table of contents, page rules, and common layouts. TemplateType then selected the major summary, compliance, and appendix sections for DEFAULT, OWNER_WISE, INDIVIDUAL_OWNER_WISE, CLOUD_WISE, or INDIVIDUAL_CLOUD_WISE reports.",
+              emphasis: ["TemplateType"],
+            },
+            {
+              type: "demo",
+              id: "compliance-report-views",
+              caption: "Synthetic data only. Switch the projection to see one compliance result reorganized for three different readers.",
+            },
+            {
+              type: "list",
+              items: [
+                {
+                  title: "Framework",
+                  text: "Compliance overview, framework sections, and a unified violation appendix.",
+                },
+                {
+                  title: "Cloud",
+                  text: "Overall and cloud summaries, per-cloud compliance, and cloud-wise appendices.",
+                },
+                {
+                  title: "Owner",
+                  text: "Overall and user summaries, per-owner compliance, and owner-wise violation details.",
+                },
+              ],
+            },
+            {
+              type: "paragraph",
+              text: "The table of contents was built independently from the rendered document, although both consumed the same TemplateType and ordered data. TOC numbers came from array indices; body headings mixed CSS counters with manually rendered numbers. Anchors such as cloud-compliance-aws kept the browser document navigable, but there was no single document tree preventing numbering or structure from drifting.",
+            },
+          ],
+        },
+        {
+          id: "two-render-modes",
+          heading: "Two Render Modes, One HTML Tree",
           blocks: [
             {
               type: "diagram",
@@ -410,39 +468,71 @@ export const projects: Project[] = [
             },
             {
               type: "paragraph",
-              text: "One detail that's easy to miss: the same page serves two different audiences. A user previewing the report in their browser sees a clean document viewer — scrollable, white background, subtle card shadow. Puppeteer generating the PDF sees the print stylesheet — no shadow, exact A4 margins, auto section counters via CSS, page numbers injected via @page bottom-right.",
-              emphasis: ["@page bottom-right"],
+              text: "On screen, the report behaved like a document viewer: scrollable white pages, subtle shadows, and anchor-based TOC navigation. In print, @media print removed the screen treatment, enabled an A4-aware layout, revealed the fixed header, and activated page-break rules.",
+              emphasis: ["@media print"],
             },
             {
-              type: "paragraph",
-              text: "The generated timestamp in the PDF footer — 'Generated on Jun 12, 2024, 02:30 PM IST' — is injected as an inline <style> tag from the server with the actual time baked in. No client-side JS, no hydration gap. It's there when Puppeteer takes the snapshot.",
-              emphasis: ["Generated on Jun 12, 2024, 02:30 PM IST"],
+              type: "list",
+              items: [
+                {
+                  title: "Logical units",
+                  text: "break-inside: avoid kept status cards and appendix records from splitting awkwardly.",
+                },
+                {
+                  title: "Long tables",
+                  text: "Rows resisted page breaks while thead { display: table-header-group } repeated context on each page.",
+                },
+                {
+                  title: "Semantic boundaries",
+                  text: "break-before: page started owner, cloud, and appendix sections cleanly; the TOC used break-after: page.",
+                },
+                {
+                  title: "Generated furniture",
+                  text: "@page margin boxes carried an SSR-baked timestamp and counter(page), with internal space reserved for the fixed header and footer.",
+                },
+              ],
             },
             {
               type: "callout",
               accent: "teal",
-              text: "@media print did a lot of heavy lifting here — it's not just 'hide the navbar.' It's the thing that makes the same HTML file work as both a browser preview and a pixel-accurate PDF.",
+              text: "Print CSS was not a cleanup pass. It was the document layout engine layered over the same semantic report.",
             },
           ],
         },
         {
-          id: "what-went-wrong",
-          heading: "Then It Hit Prod",
+          id: "the-async-system",
+          heading: "A Report Was a Job, Not a Request",
           blocks: [
             {
               type: "paragraph",
-              text: "In development and early testing, it worked well. Report generation was fast, output looked exactly like the Figma designs, and the UX of previewing before downloading was noticeably better than anything we'd shipped before.",
+              text: "Generation was asynchronous. A user configured report scope, frameworks, filters, and optional email or Slack delivery, then returned to the product while the job moved through Generating, Completed, or Failed. Backend-owned retries and a manual Retry action handled failures without turning the create flow into a blocking screen.",
+            },
+            {
+              type: "diagram",
+              kind: "compliance-pipeline",
             },
             {
               type: "paragraph",
-              text: "Before this feature, the report-generation pod sat comfortably at around 250MB. After the first prod deploy — even with normal-sized reports — it jumped to 700–900MB. That was concerning, but the pod held.",
+              text: "The frontend owned the rendering architecture, SSR route, report components, variants, and print behavior. The backend team owned report data, token issuance, job orchestration, Go + chromedp execution, PDF storage, retry lifecycle, and external delivery. The end-to-end feature was a collaboration, even though the browser-rendering direction was my proposal.",
+              emphasis: ["frontend owned the rendering architecture"],
+            },
+          ],
+        },
+        {
+          id: "the-production-boundary",
+          heading: "The Document Worked. Its Placement Did Not.",
+          blocks: [
+            {
+              type: "paragraph",
+              text: "The reports matched the intended designs in development and smaller workloads. In production, however, the chromedp/Chromium path substantially increased memory pressure in the existing report-generation pod. A large customer workload eventually crossed its memory ceiling, the pod restarted, and automated PDF generation was rolled back.",
+              emphasis: ["The reports matched the intended designs"],
             },
             {
               type: "metrics",
               items: [
-                { value: "~250MB", label: "Pod baseline (CSV reports)" },
-                { value: "700–900MB", label: "After PDF feature deploy" },
-                { value: "~1GB", label: "Pod memory ceiling" },
+                { value: "~250MB", label: "Remembered CSV baseline" },
+                { value: "~700–900MB", label: "Remembered PDF workload" },
+                { value: "~1GB", label: "Remembered pod ceiling" },
               ],
             },
             {
@@ -451,36 +541,74 @@ export const projects: Project[] = [
             },
             {
               type: "paragraph",
-              text: "Then we deployed to a customer environment with a large dataset. Puppeteer spun up, loaded the report page, started rendering — and the pod ran out of memory mid-generation. The process died, the pod restarted, and every metrics dashboard turned red. We reverted the build the same day.",
-              emphasis: ["every metrics dashboard turned red"],
+              text: "Those memory figures are historical recollections, not current monitoring evidence. The exact incident mix was never isolated: one exceptionally large report, concurrent renders, or both may have contributed. Browser reuse reduced startup overhead, but reuse alone did not provide resource backpressure.",
+              emphasis: ["one exceptionally large report, concurrent renders, or both"],
             },
             {
               type: "callout",
               accent: "orange",
-              text: "Puppeteer isn't just a HTTP call. It's a full Chromium instance. Every concurrent report is a browser tab eating memory — and with large compliance datasets, each tab was enormous.",
-            },
-            {
-              type: "paragraph",
-              text: "The fix wasn't complicated in hindsight: headless rendering at scale belongs on the client, not inside a backend pod with a 1GB ceiling. When the user's browser renders the page and triggers print, the memory cost is theirs. When the server does it, the memory cost is yours — multiplied by every concurrent request.",
+              text: "The lesson is not “Chromium can never generate PDFs.” It is that a browser renderer is a resource-intensive workload that needs an execution architecture with explicit capacity management.",
             },
           ],
         },
         {
-          id: "where-it-landed",
-          heading: "Where It Landed",
+          id: "what-survived",
+          heading: "The Report Page Survived",
           blocks: [
             {
               type: "paragraph",
-              text: "Server-side PDF generation is off. The compliance report page still exists and still works — users can open it in a browser, preview it, and print to PDF themselves. The Figma designs, the dual-render pattern, the five template types — all of that is intact.",
+              text: "Automated server-side PDF generation was not re-enabled. The surviving production feature is the Next.js compliance-report page: five report variants, SSR data loading, shared sections, the TOC and anchors, A4-aware print styles, table pagination, headers, footers, and manual browser Print to PDF.",
             },
             {
               type: "paragraph",
-              text: "Server-side report generation now handles only CSV exports, the same as before. A proper fix — either a dedicated PDF microservice with tighter resource controls, or moving to a client-triggered download — is on the backlog.",
+              text: "That outcome matters because it separates two decisions that are easy to collapse. The document architecture solved the presentation and maintainability problem. The deployment model failed to safely contain the rendering workload.",
+              emphasis: ["document architecture", "deployment model"],
             },
             {
               type: "callout",
               accent: "neutral",
-              text: "It shipped, it looked great, it blew up a pod. That's a real outcome. The architecture wasn't wrong for the problem — it was wrong for the deployment context.",
+              text: "It shipped, produced the right output, and exposed a production assumption that did not survive customer scale. The useful part stayed; the unsafe automation did not.",
+            },
+          ],
+        },
+        {
+          id: "what-i-would-change",
+          heading: "What I Would Change Today",
+          blocks: [
+            {
+              type: "list",
+              ordered: true,
+              items: [
+                {
+                  num: "01",
+                  title: "Scope the rendering credential",
+                  text: "Use today's RBAC foundation to issue a very short-lived, least-privilege token limited to one report resource and the read operation required for rendering.",
+                },
+                {
+                  num: "02",
+                  title: "Create one document tree",
+                  text: "Derive section order, anchors, TOC entries, numbering, and rendered content from the same typed structure instead of coordinating parallel systems by convention.",
+                },
+                {
+                  num: "03",
+                  title: "Bound the renderer",
+                  text: "Move Chromium into dedicated workers with a queue, strict concurrency, timeouts, size limits, resource isolation, lifecycle monitoring, and capacity-aware autoscaling.",
+                },
+                {
+                  num: "04",
+                  title: "Benchmark Typst, do not assume it",
+                  text: "Test design fidelity, complex tables, all five projections, render speed, memory, and preview requirements before treating a document-native renderer as the rewrite answer.",
+                },
+              ],
+            },
+            {
+              type: "paragraph",
+              text: "The async UX already made bounded queueing compatible with the product: users were expecting Generating, Completed, and Failed states rather than an immediate download. The missing work was operational backpressure, not a new interaction model.",
+            },
+            {
+              type: "callout",
+              accent: "blue",
+              text: "Rendering architecture decides how a document is expressed. Execution architecture decides whether producing it is safe. This project taught me to design both explicitly.",
             },
           ],
         },
