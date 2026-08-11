@@ -8,7 +8,7 @@ export type PixelMemory = {
   last: number;
 };
 
-export type PixelSpeechKind = "greeting" | "nav" | "scroll" | "poke";
+export type PixelSpeechKind = "hint" | "greeting" | "nav" | "scroll" | "poke";
 export type PixelMood =
   | "curious"
   | "wary"
@@ -33,11 +33,25 @@ export const EMPTY_PIXEL_MEMORY: PixelMemory = {
 };
 
 export const PIXEL_SPEECH_PRIORITY: Record<PixelSpeechKind, number> = {
+  // Lowest of all: anything the visitor actually does outranks a nudge.
+  hint: 0,
   greeting: 0,
   nav: 1,
   scroll: 2,
   poke: 3,
 };
+
+/**
+ * Pixel only answers when poked, and nothing on the card says so. This is the
+ * one-time nudge, in his own voice rather than as UI chrome.
+ */
+export const PIXEL_HINT_LINE = "psst. poke me";
+export const PIXEL_HINT_HOLD_MS = 4_000;
+/**
+ * Pixel waits a beat longer than a page-level hint, so when both are armed on
+ * the About page the portrait speaks first and Pixel keeps his turn for later.
+ */
+export const PIXEL_HINT_EXTRA_DELAY_MS = 1_500;
 
 export function canPixelSpeechReplace(
   incoming: PixelSpeechKind,

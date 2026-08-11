@@ -2,6 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import {
+  DISCOVERY_IDLE_MS,
+  hasSeenHint,
+  markHintSeen,
+  shouldRevealHint,
+} from "@/lib/discovery-hints";
+import {
+  PIXEL_HINT_EXTRA_DELAY_MS,
+  PIXEL_HINT_HOLD_MS,
+  PIXEL_HINT_LINE,
   PIXEL_NAV_LINES,
   PIXEL_STORAGE_KEY,
   canPixelSpeechReplace,
@@ -15,6 +24,13 @@ import {
 } from "./pixel-pet";
 
 const PET_WIDTH = 62;
+/** Signs of intent, as opposed to a cursor drifting across the page. */
+const HINT_INTENT_EVENTS = [
+  "pointerdown",
+  "keydown",
+  "wheel",
+  "touchstart",
+] as const;
 const FRAME_MS = 1000 / 60;
 const POKE_SUPPRESSION_MS = 3_200;
 
@@ -107,6 +123,7 @@ export default function PixelPet() {
 
     const hideBubble = () => {
       bubble.style.opacity = "0";
+      delete bubble.dataset.discoveryHint;
       bubble.style.transform = "translateY(2px)";
       activeSpeech = null;
       activeUntil = 0;
@@ -190,6 +207,8 @@ export default function PixelPet() {
       eyeOpacity = reaction.eyeOpacity;
       say("poke", reaction.text, 2_900, reaction.tone);
 
+      retireHint();
+
       window.clearTimeout(pokeResetTimer);
       pokeResetTimer = window.setTimeout(() => {
         sessionPokes = 0;
@@ -197,6 +216,68 @@ export default function PixelPet() {
         counter.textContent = counterLabel("VISIT", visitCount);
       }, 45_000);
     };
+
+    // One-shot discovery nudge. Pixel reacts to clicks and nothing announces
+    // that, so after a still moment he asks for one himself. Shared memory with
+    // the other hints, so it is spent once per browser.
+    let hintTimer = 0;
+    let hintInView = false;
+
+    const revealPokeHint = () => {
+      // Anyone who has ever poked him has already found the interaction.
+      if (memory.pokes > 0 || sessionPokes > 0) return;
+      if (
+        !shouldRevealHint({
+          seen: hasSeenHint("pixel-poke"),
+          inView: hintInView,
+          // Never two nudges at once, and never over an open overlay.
+          busy:
+            document.querySelector(
+              "[data-discovery-hint], [data-mobile-menu], [role=dialog]",
+            ) !== null,
+        })
+      ) {
+        return;
+      }
+
+      // Only spend the hint if he actually got to say it: higher-priority
+      // speech (a poke, a nav line) can refuse the bubble.
+      if (!say("hint", PIXEL_HINT_LINE, PIXEL_HINT_HOLD_MS, "accent")) return;
+      bubble.dataset.discoveryHint = "pixel-poke";
+      markHintSeen("pixel-poke");
+      retireHint();
+    };
+
+    /** Spent, or beaten to it by a poke: stop watching for the rest of the visit. */
+    const retireHint = () => {
+      window.clearTimeout(hintTimer);
+      hintObserver.disconnect();
+      for (const event of HINT_INTENT_EVENTS) {
+        window.removeEventListener(event, onIntent);
+      }
+    };
+
+    const armHint = () => {
+      window.clearTimeout(hintTimer);
+      hintTimer = window.setTimeout(
+        revealPokeHint,
+        DISCOVERY_IDLE_MS + PIXEL_HINT_EXTRA_DELAY_MS,
+      );
+    };
+
+    const onIntent = () => {
+      if (bubble.dataset.discoveryHint) return;
+      armHint();
+    };
+
+    const hintObserver = new IntersectionObserver(
+      ([entry]) => {
+        hintInView = entry?.isIntersecting ?? false;
+        if (hintInView) armHint();
+        else window.clearTimeout(hintTimer);
+      },
+      { threshold: 0.6 },
+    );
 
     const navItems = Array.from(
       document.querySelectorAll<HTMLElement>("[data-pixel-nav]"),
@@ -340,6 +421,13 @@ export default function PixelPet() {
       counter.textContent = counterLabel("VISIT", 1);
     }
 
+    if (!hasSeenHint("pixel-poke")) {
+      hintObserver.observe(card);
+      for (const event of HINT_INTENT_EVENTS) {
+        window.addEventListener(event, onIntent, { passive: true });
+      }
+    }
+
     card.addEventListener("click", onPoke);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -353,6 +441,7 @@ export default function PixelPet() {
       clearPendingSpeech();
       window.clearTimeout(hideBubbleTimer);
       window.clearTimeout(pokeResetTimer);
+      retireHint();
       resizeObserver.disconnect();
       card.removeEventListener("click", onPoke);
       window.removeEventListener("pointermove", onPointerMove);

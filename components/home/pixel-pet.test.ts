@@ -18,6 +18,15 @@ describe("Pixel speech arbitration", () => {
     expect(canPixelSpeechReplace("nav", "poke")).toBe(false);
     expect(canPixelSpeechReplace("poke", "nav")).toBe(true);
   });
+
+  test("lets anything the visitor does interrupt the discovery nudge", () => {
+    for (const kind of ["greeting", "nav", "scroll", "poke"] as const) {
+      expect(canPixelSpeechReplace(kind, "hint")).toBe(true);
+    }
+    // The nudge itself never talks over real interaction.
+    expect(canPixelSpeechReplace("hint", "poke")).toBe(false);
+    expect(canPixelSpeechReplace("hint", "nav")).toBe(false);
+  });
 });
 
 describe("Pixel poke arc", () => {
