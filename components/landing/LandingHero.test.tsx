@@ -22,3 +22,15 @@ test("renders the full identity visibly once in the landing hero", () => {
   expect(markup).not.toContain("font-dot");
   expect(markup).not.toContain(`aria-label="${profile.name}`);
 });
+
+test("keeps the responsive headline to three unbroken lines", () => {
+  const markup = renderToStaticMarkup(<LandingHero background={null} />);
+  const headlineLines = markup.match(/data-headline-line="\d"/g) ?? [];
+
+  expect(headlineLines).toHaveLength(3);
+  expect(markup).toContain("max-md:text-nowrap");
+  expect(markup).toContain("max-md:text-[clamp(1rem,6vw,2.4rem)]");
+  expect(markup).toMatch(
+    /<em class="[^"]*font-accent-dot[^"]*font-semibold[^"]*">/,
+  );
+});
