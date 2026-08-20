@@ -53,7 +53,8 @@ test("keeps Pixel isolated in a token-backed desktop card", () => {
   if (!existsSync(pixelPath)) return;
 
   const pixelSource = readFileSync(pixelPath, "utf8");
-  expect(pixelSource).toContain('aria-hidden="true"');
+  expect(pixelSource).toContain('aria-label="Pixel pet"');
+  expect(pixelSource).toContain("CharacterPicker");
   expect(pixelSource).toContain("h-38");
   expect(pixelSource).toContain("border-border-color");
   expect(pixelSource).toContain("data-pixel-track");

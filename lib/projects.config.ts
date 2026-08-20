@@ -1037,7 +1037,7 @@ const projectDefinitions: ProjectDefinition[] = [
     },
     caseStudy: {
       tagline:
-        "The hard part was not displaying twenty published photographs. It was preserving their detail, privacy, and 360-degree behavior without making every visitor download the archive.",
+        "I wanted the photographs to keep their detail, privacy, and 360-degree behavior without making every visitor download the archive.",
       tags: ["Image Pipeline", "Next.js", "Sharp", "Three.js"],
       hero: {
         image: "/photos/generated/20251219-000319-03a8c2a2/grid.webp",
@@ -1045,11 +1045,11 @@ const projectDefinitions: ProjectDefinition[] = [
       },
       glance: {
         problem:
-          "Twenty publishable photographs sat in a folder of mixed sources (RAW files, photospheres, private EXIF), and none of it should reach a visitor as an archive download.",
+          "I had twenty photographs ready to publish, but the folder mixed RAW files, photospheres, and private EXIF that I could not simply move into the public site.",
         decision:
-          "One deterministic, read-only build pipeline with three branches (raster, RAW, photosphere) emitting role-specific files behind a manifest.",
+          "I built one deterministic, read-only pipeline with separate raster, RAW, and photosphere branches, then exposed only role-specific files through a typed manifest.",
         outcome:
-          "172.5 MB of sources became 28.9 MB of generated assets, and a gallery view costs 201 KB of image transfer.",
+          "I turned 172.5 MB of sources into 28.9 MB of generated assets while keeping the gallery view to 201 KB of image transfer.",
       },
       sections: [
         {
@@ -1058,12 +1058,12 @@ const projectDefinitions: ProjectDefinition[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "This photography page lives inside a frontend-engineering portfolio. That makes image delivery part of the work itself: the photographs need to remain visually convincing while the page still behaves like a fast, accessible application.",
-              emphasis: ["image delivery part of the work itself"],
+              text: "I built this photography page inside my frontend-engineering portfolio, so I treated image delivery as part of the work rather than a final export step. The photographs still had to feel visually convincing, but the page also had to behave like a fast, accessible application.",
+              emphasis: ["image delivery as part of the work"],
             },
             {
               type: "paragraph",
-              text: "The original gallery already had its contact-sheet layout, darkroom interactions, keyboard lightbox, responsive columns, and reduced-motion behavior. The implementation task was deliberately narrower: replace placeholder frames with a safe, reproducible asset system without redesigning the page.",
+              text: "I had already designed the contact-sheet layout, darkroom interactions, keyboard lightbox, responsive columns, and reduced-motion behavior. I deliberately kept this phase narrower: replace the placeholder frames with a safe, reproducible asset system without redesigning the page around the pipeline.",
             },
           ],
         },
@@ -1076,19 +1076,19 @@ const projectDefinitions: ProjectDefinition[] = [
               items: [
                 {
                   title: "Large and inconsistent sources",
-                  text: "The selected set totalled 172.5 MB across portrait, landscape, wide, alpha-channel PNG, JPEG, and DNG inputs.",
+                  text: "My selected set totalled 172.5 MB and mixed portrait, landscape, wide, alpha-channel PNG, JPEG, and DNG inputs.",
                 },
                 {
                   title: "Private metadata",
-                  text: "Seven files exposed GPS markers. Camera and lens details could be useful; coordinates, serials, source paths, filenames, and editing identities could not enter the public bundle.",
+                  text: "I found GPS markers in seven files. I wanted to keep useful camera and lens details, but coordinates, serials, source paths, filenames, and editing identities could not enter the public bundle.",
                 },
                 {
                   title: "Different viewing contexts",
-                  text: "A dense masonry grid, a small filmstrip, a full-screen viewer, and an 8K photosphere do not need the same bytes.",
+                  text: "I did not want a dense masonry grid, a small filmstrip, a full-screen viewer, and an 8K photosphere to request the same file when each context needed a different level of detail.",
                 },
                 {
                   title: "RAW and panorama branches",
-                  text: "Two DNGs needed explicit fallback decisions, while two confirmed photospheres had to remain interactive rather than becoming flattened wide strips.",
+                  text: "I needed explicit fallback rules for two DNGs, and I wanted two confirmed photospheres to remain interactive instead of publishing them as flattened wide strips.",
                 },
               ],
             },
@@ -1096,22 +1096,22 @@ const projectDefinitions: ProjectDefinition[] = [
         },
         {
           id: "constraints",
-          heading: "Safety Before Cleverness",
+          heading: "The Rules I Set Before Optimising",
           blocks: [
             {
               type: "callout",
               accent: "orange",
-              text: "The source folder is read-only. The pipeline never renames, moves, edits, strips, or deletes an original; it verifies every source checksum again after processing.",
+              text: "I made the source folder read-only. The pipeline never renames, moves, edits, strips, or deletes an original, and I verify every source checksum again after processing.",
             },
             {
               type: "paragraph",
-              text: "The first version stays local and static, keeps categories and tags empty, drafts factual alt text for review, uses no creative colour grading, never upscales, respects reduced motion, and loads panoramas only after a visitor opens one.",
+              text: "For the first version, I kept delivery local and static, left categories and tags empty, drafted factual alt text for review, avoided creative colour grading, and refused to upscale an image. I also preserved reduced-motion behavior and deferred each panorama until someone chose to open it.",
             },
           ],
         },
         {
           id: "source-audit",
-          heading: "What the Audit Actually Found",
+          heading: "What I Found Before Processing",
           blocks: [
             {
               type: "metrics",
@@ -1123,23 +1123,23 @@ const projectDefinitions: ProjectDefinition[] = [
             },
             {
               type: "paragraph",
-              text: "The set contained twenty standard rasters and two DNGs. GPano XMP confirmed two true equirectangular photospheres. Six other 2:1 files were flagged as possible panoramas for review, but they remain ordinary photographs because aspect ratio alone is not evidence of projection type.",
-              emphasis: ["aspect ratio alone is not evidence"],
+              text: "I was working with twenty standard rasters and two DNGs. I used GPano XMP to confirm that two files were genuine equirectangular photospheres. Six other files had a 2:1 ratio, but I kept them as ordinary photographs because aspect ratio alone was not enough evidence of their projection type.",
+              emphasis: ["aspect ratio alone was not enough evidence"],
             },
             {
               type: "paragraph",
-              text: "SHA-256 found no exact duplicate groups. Filename association and perceptual review identified two likely edit/original groups. Both user-confirmed duplicates are now excluded by checksum while their sources remain untouched.",
+              text: "I found no exact duplicate groups with SHA-256. Filename association and a perceptual review revealed two likely edit/original groups, so I confirmed which versions I wanted to publish and excluded the duplicates by checksum. I left every source file untouched.",
             },
           ],
         },
         {
           id: "architecture",
-          heading: "One Deterministic Path, Three Processing Branches",
+          heading: "The Pipeline I Chose",
           blocks: [
             { type: "diagram", kind: "photography-pipeline" },
             {
               type: "paragraph",
-              text: "A stable public ID combines a sanitized source stem with the first eight characters of its SHA-256 hash. The cache key combines the full source checksum, processing-profile version, Sharp version, and libvips version, so a warm rerun can skip unchanged work without relying on modification times.",
+              text: "I derive each stable public ID from a sanitized source stem and the first eight characters of its SHA-256 hash. For the cache key, I combine the full source checksum with the processing-profile, Sharp, and libvips versions. That lets me skip unchanged work on a warm rerun without trusting modification times.",
             },
           ],
         },
@@ -1149,12 +1149,12 @@ const projectDefinitions: ProjectDefinition[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "Sharp 0.34.5 and libvips 8.17.3 apply EXIF orientation, flatten any alpha channel, convert to sRGB, and create four uncropped WebP roles. Thumb uses a 360 px long edge at quality 55; grid uses 1400 px at 72; viewer uses 2800 px at 84; and the 32 px placeholder uses quality 30.",
+              text: "For standard images, I use Sharp 0.34.5 and libvips 8.17.3 to apply EXIF orientation, flatten any alpha channel, convert to sRGB, and create four uncropped WebP roles. I set thumb to a 360 px long edge at quality 55, grid to 1400 px at 72, viewer to 2800 px at 84, and the 32 px placeholder to quality 30.",
               emphasis: ["four uncropped WebP roles"],
             },
             {
               type: "paragraph",
-              text: "Public derivatives use Sharp's default metadata-stripping behavior. Dominant colours come from the generated grid image for stable contact-sheet wells, while the tiny WebP placeholder becomes the viewer blur data URL. No creative sharpening or grading is applied.",
+              text: "I rely on Sharp's default metadata stripping for public derivatives. I calculate dominant colours from the generated grid image so the contact-sheet wells stay stable, and I reuse the tiny WebP as the viewer blur data URL. I apply no creative sharpening or grading in the pipeline.",
             },
           ],
         },
@@ -1164,13 +1164,13 @@ const projectDefinitions: ProjectDefinition[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "The machine had no ExifTool, darktable, RawTherapee, or other full RAW developer. Both DNGs did expose sufficiently large embedded 8-bit previews: one at 3456 × 4608 after orientation and one at 1928 × 2560. The pipeline records both outcomes explicitly as extracted from embedded preview.",
+              text: "I did not have ExifTool, darktable, RawTherapee, or another full RAW developer available on the machine. Both DNGs did contain sufficiently large embedded 8-bit previews: one at 3456 × 4608 after orientation and one at 1928 × 2560. Rather than imply that I had developed the RAW files, I record both outcomes explicitly as extracted from embedded preview.",
               emphasis: ["extracted from embedded preview"],
             },
             {
               type: "callout",
               accent: "neutral",
-              text: "A small thumbnail would have triggered manual conversion instead. The pipeline does not treat any decodable DNG payload as automatically suitable for a full-screen result.",
+              text: "If either preview had only been a small thumbnail, I would have required a manual conversion. I do not treat every decodable DNG payload as automatically suitable for a full-screen result.",
             },
           ],
         },
@@ -1180,15 +1180,15 @@ const projectDefinitions: ProjectDefinition[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "Both confirmed panoramas retain an uncropped, 8192 px equirectangular JPEG at quality 88 with their GPano XMP re-injected after optimisation. Separate centre posters feed the thumb and grid roles, so browsing never downloads a compressed panoramic strip.",
+              text: "I keep each confirmed panorama as an uncropped, 8192 px equirectangular JPEG at quality 88 and re-inject its GPano XMP after optimisation. I generate separate centre posters for the thumb and grid roles so browsing never downloads a compressed panoramic strip.",
             },
             {
               type: "paragraph",
-              text: "The validator reopened both public panoramas, confirmed ProjectionType=equirectangular and UsePanoramaViewer=True, and measured normalized left/right seam scores of 0.0237 and 0.0249 against a 0.35 review threshold.",
+              text: "I wrote the validator to reopen both public panoramas, confirm ProjectionType=equirectangular and UsePanoramaViewer=True, and measure their normalized left/right seam scores. They scored 0.0237 and 0.0249 against my 0.35 review threshold.",
             },
             {
               type: "paragraph",
-              text: "When a panorama opens, Next.js dynamically loads the panorama component. That component then imports Three.js and requests the full equirectangular file. Until the texture is interactive, the normal poster remains visible as a fallback. Both photospheres now start at a 180-degree yaw from their previous default.",
+              text: "I split panorama loading into deliberate stages. When someone opens one, Next.js dynamically loads the panorama component; only then does the component import Three.js and request the full equirectangular file. I keep the normal poster visible until the texture becomes interactive, and I set both photospheres to start at a 180-degree yaw from their previous default.",
             },
           ],
         },
@@ -1199,19 +1199,19 @@ const projectDefinitions: ProjectDefinition[] = [
             { type: "diagram", kind: "photo-delivery" },
             {
               type: "paragraph",
-              text: "The grid sizes string mirrors the real two-, three-, and four-column layouts after page gutters. Only the first grid frame is eager and high-priority; the other nineteen are lazy. The filmstrip uses 360 px thumbs instead of repeating grid assets.",
+              text: "I wrote the grid sizes string around the actual two-, three-, and four-column layouts after page gutters. I made only the first grid frame eager and high-priority, left the other nineteen lazy, and gave the filmstrip 360 px thumbs instead of making it repeat the grid assets.",
             },
             {
               type: "paragraph",
-              text: "The lightbox mounts only the active viewer asset. After that image decodes, a generation token starts prefetching the previous and next viewer files; rapid navigation invalidates stale work. Performance marks cover click-to-decode, adjacent readiness, and panorama open-to-interactive timing.",
+              text: "I mount only the active viewer asset in the lightbox. After it decodes, I use a generation token to prefetch the previous and next viewer files; rapid navigation invalidates stale work. I added performance marks for click-to-decode, adjacent readiness, and panorama open-to-interactive timing so I could measure the real sequence.",
             },
             {
               type: "paragraph",
-              text: "Only the selected frame receives a temporary photo-active View Transition name. During open and close, that identity moves between the loaded grid image and the active viewer or panorama poster; keeping the other nineteen frames in the root snapshot prevents them from floating above the lightbox.",
+              text: "I give only the selected frame a temporary photo-active View Transition name. During open and close, I move that identity between the loaded grid image and the active viewer or panorama poster. Keeping the other nineteen frames in the root snapshot prevents them from floating above the lightbox.",
             },
             {
               type: "paragraph",
-              text: "The gallery does not use JavaScript virtualization. Next/Image already defers off-screen network work, and every frame reserves its aspect ratio, so unmounting masonry items would add observer state, blank back-scrolls, and repeat decodes for only twenty photographs. A scroll profile instead identified the route-wide Lenis 0.1 interpolation as the source of the heavy feeling, so Photography uses immediate scrolling while the rest of the portfolio keeps its smooth-scroll treatment.",
+              text: "I chose not to virtualize the gallery. It does not use JavaScript virtualization because Next/Image already defers off-screen network work, and I reserve every frame's aspect ratio; unmounting masonry items would have added observer state, blank back-scrolls, and repeat decodes for only twenty photographs. When the page still felt heavy, my scroll profile pointed to the route-wide Lenis 0.1 interpolation instead. I switched Photography to immediate scrolling while keeping the smooth-scroll treatment everywhere else.",
             },
           ],
         },
@@ -1221,11 +1221,11 @@ const projectDefinitions: ProjectDefinition[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "The private audit keeps source paths, filenames, checksums, metadata findings, associations, warnings, and duplicate rationale outside public assets. The generated client manifest keeps only stable IDs, role URLs, dimensions, safe camera fields, colours, blur placeholders, and alt-review state.",
+              text: "I keep source paths, filenames, checksums, metadata findings, associations, warnings, and duplicate rationale inside a private audit. The generated client manifest exposes only stable IDs, role URLs, dimensions, safe camera fields, colours, blur placeholders, and alt-review state.",
             },
             {
               type: "paragraph",
-              text: "All twenty published items have visually reviewed factual alt drafts, but remain marked draft until final editorial approval. The grid reserves exact aspect ratios and exposes the same descriptions through its image-opening controls. Keyboard arrows, Escape, focus return, reduced motion, and the panorama poster fallback remain intact.",
+              text: "I visually reviewed factual alt drafts for all twenty published items, but I keep them marked as drafts until final editorial approval. I reserve each exact aspect ratio in the grid and expose the same descriptions through the image-opening controls. I also kept keyboard arrows, Escape, focus return, reduced motion, and the panorama poster fallback intact.",
             },
           ],
         },
@@ -1243,44 +1243,44 @@ const projectDefinitions: ProjectDefinition[] = [
             },
             {
               type: "paragraph",
-              text: "Median source size was 6.55 MB. Median generated files were 8.8 KB for thumbs, 116 KB for grid, and 464 KB for standard viewers. Across role duplication, median per-photo reduction was 45.85% and average reduction was 57.92%.",
+              text: "I measured a 6.55 MB median source size. The generated medians came down to 8.8 KB for thumbs, 116 KB for grid images, and 464 KB for standard viewers. Even after accounting for duplicated viewing roles, I measured a 45.85% median per-photo reduction and a 57.92% average reduction.",
             },
             {
               type: "paragraph",
-              text: "The two full panoramas account for 16.08 MB of the 28.9 MB output, which is why they are isolated behind interaction. The cold run took 28.53 seconds. The final warm run skipped all twenty published sources in 1.43 ms, reran the complete twenty-two-source audit, and validated all published outputs.",
+              text: "The two full panoramas account for 16.08 MB of the 28.9 MB output, which justified keeping them behind interaction. My cold run took 28.53 seconds. On the final warm run, I skipped all twenty published sources in 1.43 ms while still rerunning the complete twenty-two-source audit and validating every published output.",
             },
             {
               type: "paragraph",
-              text: "A cache-disabled local production run at 1440 × 1000 transferred 1.18 MB initially, including 201 KB of image transfer, with zero initial layout shift and no panorama request. The active viewer decoded 63.2 ms after click, adjacent prefetch completed 9.6 ms later, and the panorama became interactive in 541 ms. At 390 × 844 with a 3× device scale and emulated 4G, the initial route transferred 1.75 MB, recorded a 1.31 s LCP, and again recorded zero layout shift. A 180 px wheel step reached 157 px in 10 ms and settled in 60 ms on Photography; the unchanged smooth route reached 35 px at 10 ms and remained at 150 px after 250 ms. These are local lab observations, not field performance claims.",
+              text: "In a cache-disabled local production run at 1440 × 1000, I measured 1.18 MB of initial transfer, including 201 KB of image transfer, with zero initial layout shift and no panorama request. The active viewer decoded 63.2 ms after click, adjacent prefetch completed 9.6 ms later, and the panorama became interactive in 541 ms. At 390 × 844 with a 3× device scale and emulated 4G, I measured 1.75 MB of initial transfer, a 1.31 s LCP, and again zero layout shift. A 180 px wheel step reached 157 px in 10 ms and settled in 60 ms on Photography; the unchanged smooth route reached 35 px at 10 ms and remained at 150 px after 250 ms. I treat these as local lab observations, not field performance claims.",
             },
           ],
         },
         {
           id: "decisions",
-          heading: "Decisions and Rejected Alternatives",
+          heading: "Choices I Made—and What I Rejected",
           blocks: [
             {
               type: "list",
               items: [
                 {
                   title: "Local assets over a CDN",
-                  text: "Twenty published photographs fit a source-controlled workflow today. A CDN would add operational complexity before scale requires it.",
+                  text: "I kept the twenty published photographs in a source-controlled workflow. A CDN would have added operational complexity before the collection's scale required it.",
                 },
                 {
                   title: "WebP over AVIF",
-                  text: "WebP keeps encoding fast and predictable in the existing Next.js path. No representative AVIF benchmark demonstrated a reason to add a second format in this pass.",
+                  text: "I chose WebP because it kept encoding fast and predictable in the existing Next.js path. I did not add AVIF without a representative benchmark showing that a second format would improve this collection.",
                 },
                 {
                   title: "Role-specific files over one master",
-                  text: "The filmstrip, masonry grid, viewer, and panorama have materially different jobs. A single master would make the browser repeatedly decode or request unnecessary detail.",
+                  text: "I generated separate files because the filmstrip, masonry grid, viewer, and panorama have materially different jobs. One master would have made the browser repeatedly decode or request detail it did not need.",
                 },
                 {
                   title: "Adjacent prefetch over preload-all",
-                  text: "Only two likely next images warm after the active frame is decoded. Hidden viewer files do not compete with initial grid delivery.",
+                  text: "I warm only the two likely next images after the active frame decodes. That keeps hidden viewer files from competing with the initial grid delivery.",
                 },
                 {
                   title: "Interactive panoramas over flattened strips",
-                  text: "The photospheres remain navigable photographs. Their larger files and rendering code are paid only by visitors who open them.",
+                  text: "I kept the photospheres navigable because the interaction is part of those photographs. Their larger files and rendering code are loaded only when a visitor chooses to open them.",
                 },
               ],
             },
@@ -1292,11 +1292,11 @@ const projectDefinitions: ProjectDefinition[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "The system adds a processing profile, cache, typed manifest, private review artifacts, validation reports, and four common roles per standard photograph. That is more metadata and storage than copying one JPEG into public.",
+              text: "I accepted more machinery than copying one JPEG into public: a processing profile, cache, typed manifest, private review artifacts, validation reports, and four common roles per standard photograph. That extra metadata and storage is the cost of making the output reproducible and context-aware.",
             },
             {
               type: "paragraph",
-              text: "Automatic RAW development remains intentionally conservative: embedded previews were adequate for this set, but future DNGs may require manual conversion or a dedicated developer. Panoramas remain the largest files, and alt text still needs human approval.",
+              text: "I also kept automatic RAW handling intentionally conservative. Embedded previews were adequate for this set, but I would manually convert future DNGs—or add a dedicated developer—when their previews are not sufficient. Panoramas remain my largest files, and the alt text still needs final human approval.",
             },
           ],
         },
@@ -1306,14 +1306,14 @@ const projectDefinitions: ProjectDefinition[] = [
           blocks: [
             {
               type: "paragraph",
-              text: "The gallery now downloads the detail appropriate to browsing, inspecting, or exploring a photosphere. The complete public derivative set is 83% smaller than the untouched selection in aggregate, while the role-aware comparison accounts honestly for duplicated viewing roles at a 57.92% average per-photo reduction.",
+              text: "I now send only the detail needed for browsing, inspecting, or exploring a photosphere. The complete public derivative set is 83% smaller than my untouched selection in aggregate, while the role-aware comparison accounts for duplicated viewing roles at a 57.92% average per-photo reduction.",
               emphasis: [
-                "detail appropriate to browsing, inspecting, or exploring a photosphere",
+                "only the detail needed for browsing, inspecting, or exploring a photosphere",
               ],
             },
             {
               type: "paragraph",
-              text: "More importantly, the originals remain unchanged, GPS never crosses the public boundary, layout space is known before download, and the two 360-degree photographs keep the interaction that makes them distinct.",
+              text: "More importantly, I left the originals unchanged, kept GPS outside the public boundary, reserved layout space before download, and preserved the interaction that makes the two 360-degree photographs distinct.",
             },
           ],
         },
@@ -1326,19 +1326,19 @@ const projectDefinitions: ProjectDefinition[] = [
               items: [
                 {
                   title: "Editorial approval",
-                  text: "Finalize the factual alt-text drafts after editorial review.",
+                  text: "I would finalize the factual alt-text drafts after one more editorial review.",
                 },
                 {
                   title: "RAW consistency",
-                  text: "Add a colour-managed RAW developer when the selection includes files whose embedded previews are not sufficient.",
+                  text: "I would add a colour-managed RAW developer when the selection includes files whose embedded previews are not sufficient.",
                 },
                 {
                   title: "Curated viewing",
-                  text: "Store focal points, collections, and per-panorama starting views only when they are deliberately authored.",
+                  text: "I would store focal points, collections, and per-panorama starting views only after deliberately authoring them.",
                 },
                 {
                   title: "Delivery scale",
-                  text: "Move derivatives to an image CDN only when collection size or deployment cost makes local assets the limiting factor.",
+                  text: "I would move derivatives to an image CDN only when collection size or deployment cost makes local assets the limiting factor.",
                 },
               ],
             },

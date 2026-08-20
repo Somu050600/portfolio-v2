@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   DISCOVERY_IDLE_MS,
   hasSeenHint,
@@ -22,6 +22,21 @@ import {
   type PixelSpeechKind,
   type PixelTone,
 } from "./pixel-pet";
+import { PixelCharacterStage } from "./PixelCharacter";
+import { CharacterPicker } from "./PixelCharacterPicker";
+import {
+  DEFAULT_PIXEL_CHARACTER,
+  DOG_TAIL_WAG_DURATION_MS,
+  PIXEL_CHARACTER_STORAGE_KEY,
+  advanceGaitPhase,
+  getLocalEyeTranslationX,
+  getTailWagDelay,
+  getTailWagRotation,
+  getTwoLegPose,
+  readPixelCharacterSelection,
+  writePixelCharacterSelection,
+  type PixelCharacterId,
+} from "./pixel-characters";
 
 const PET_WIDTH = 62;
 /** Signs of intent, as opposed to a cursor drifting across the page. */
@@ -34,6 +49,26 @@ const HINT_INTENT_EVENTS = [
 const FRAME_MS = 1000 / 60;
 const POKE_SUPPRESSION_MS = 3_200;
 
+function subscribeToStoredCharacter(onStoreChange: () => void) {
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === PIXEL_CHARACTER_STORAGE_KEY) onStoreChange();
+  };
+  window.addEventListener("storage", onStorage);
+  return () => window.removeEventListener("storage", onStorage);
+}
+
+function getStoredCharacterSnapshot() {
+  try {
+    return readPixelCharacterSelection(window.localStorage);
+  } catch {
+    return DEFAULT_PIXEL_CHARACTER;
+  }
+}
+
+function getServerCharacterSnapshot() {
+  return DEFAULT_PIXEL_CHARACTER;
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
@@ -43,6 +78,15 @@ function counterLabel(label: "VISIT" | "POKES", count: number) {
 }
 
 export default function PixelPet() {
+  const persistedCharacter = useSyncExternalStore(
+    subscribeToStoredCharacter,
+    getStoredCharacterSnapshot,
+    getServerCharacterSnapshot,
+  );
+  const [sessionCharacter, setSessionCharacter] =
+    useState<PixelCharacterId | null>(null);
+  const selectedCharacter = sessionCharacter ?? persistedCharacter;
+  const [pickerOpen, setPickerOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const petRef = useRef<HTMLDivElement>(null);
@@ -52,6 +96,15 @@ export default function PixelPet() {
   const bubbleRef = useRef<HTMLParagraphElement>(null);
   const counterRef = useRef<HTMLSpanElement>(null);
   const progressRef = useRef<HTMLSpanElement>(null);
+
+  const selectCharacter = (character: PixelCharacterId) => {
+    setSessionCharacter(character);
+    try {
+      writePixelCharacterSelection(window.localStorage, character);
+    } catch {
+      // The selection remains active for this page when storage is unavailable.
+    }
+  };
 
   useEffect(() => {
     const card = cardRef.current;
@@ -86,6 +139,9 @@ export default function PixelPet() {
     let lastFrame = performance.now();
     let x = 0;
     let direction = 1;
+    let gaitPhase = 0;
+    let tailWagStartedAt: number | null = null;
+    let nextTailWagAt = lastFrame + getTailWagDelay(Math.random());
     let maxX = 0;
     let trackRect = track.getBoundingClientRect();
     let cursorX = trackRect.left + trackRect.width / 2;
@@ -191,7 +247,9 @@ export default function PixelPet() {
       updateProgress(true);
     };
 
-    const onPoke = () => {
+    const onPoke = (event: MouseEvent) => {
+      if ((event.target as Element).closest("[data-pixel-picker]")) return;
+
       sessionPokes += 1;
       memory = { ...memory, pokes: memory.pokes + 1, last: Date.now() };
       writePixelMemory(memory);
@@ -308,6 +366,7 @@ export default function PixelPet() {
       const delta = clamp((now - lastFrame) / FRAME_MS, 0, 2);
       lastFrame = now;
       const talking = activeSpeech !== null && now < activeUntil;
+      const previousX = x;
 
       if (!reducedMotion) {
         if (!talking) {
@@ -327,12 +386,77 @@ export default function PixelPet() {
         lean = 0;
       }
 
+      const travelledPxThisFrame = Math.abs(x - previousX);
+      gaitPhase = advanceGaitPhase(gaitPhase, travelledPxThisFrame);
+
       const bob = reducedMotion ? 0 : -1.25 + Math.cos(now / 732) * 1.25;
       const scaleX = 1 + 0.13 * squash;
       const scaleY = 1 - 0.2 * squash;
       const rotation = reducedMotion ? 0 : lean * -7 * direction;
       pet.style.transform = `translate3d(${x}px, ${bob}px, 0)`;
-      body.style.transform = `rotate(${rotation}deg) scaleX(${direction}) scale(${scaleX}, ${scaleY})`;
+
+      const activeCharacter = pet.querySelector<HTMLElement>(
+        '[data-pixel-character][data-active="true"]',
+      );
+      const activeBody = activeCharacter?.querySelector<HTMLElement>(
+        "[data-pixel-body]",
+      );
+      const isCurrentCharacter =
+        activeCharacter?.dataset.pixelCharacter === "current";
+      const gaitBob =
+        reducedMotion || isCurrentCharacter
+          ? 0
+          : -Math.abs(Math.sin(gaitPhase)) * 2.4;
+      const bodyTransform = isCurrentCharacter
+        ? `rotate(${rotation}deg) scaleX(${direction}) scale(${scaleX}, ${scaleY})`
+        : `translateY(${gaitBob}px) rotate(${rotation}deg) scaleX(${direction}) scale(${scaleX}, ${scaleY})`;
+
+      if (activeBody) activeBody.style.transform = bodyTransform;
+
+      if (!isCurrentCharacter) {
+        activeCharacter
+          ?.querySelectorAll<SVGPathElement>("[data-pixel-leg]")
+          .forEach((leg) => {
+            const hip = {
+              x: Number(leg.dataset.hipX),
+              y: Number(leg.dataset.hipY),
+            };
+            const legLength = Number(leg.dataset.legLength);
+            const gaitSide = leg.dataset.gaitSide === "1" ? 1 : 0;
+            const pose = getTwoLegPose({
+              phase: gaitPhase,
+              side: gaitSide,
+              hip,
+              legLength,
+            });
+            leg.setAttribute(
+              "d",
+              `M ${pose.hip.x} ${pose.hip.y} L ${pose.knee.x} ${pose.knee.y} L ${pose.foot.x} ${pose.foot.y}`,
+            );
+          });
+      }
+
+      const dogTail = activeCharacter?.querySelector<SVGGraphicsElement>(
+        '[data-pixel-tail="dog"]',
+      );
+      if (dogTail) {
+        let tailRotation = 0;
+        if (!reducedMotion) {
+          if (tailWagStartedAt === null && now >= nextTailWagAt) {
+            tailWagStartedAt = now;
+          }
+          if (tailWagStartedAt !== null) {
+            const elapsedMs = now - tailWagStartedAt;
+            tailRotation = getTailWagRotation(elapsedMs);
+            if (elapsedMs >= DOG_TAIL_WAG_DURATION_MS) {
+              tailWagStartedAt = null;
+              nextTailWagAt = now + getTailWagDelay(Math.random());
+              tailRotation = 0;
+            }
+          }
+        }
+        dogTail.style.transform = `rotate(${tailRotation}deg)`;
+      }
 
       const petLeft = trackRect.left + x;
       const petTop = trackRect.bottom - 46 + bob;
@@ -341,21 +465,34 @@ export default function PixelPet() {
       const navLift = activeSpeech === "nav" && talking ? -2.6 : 0;
 
       [
-        [leftEye, petLeft + 19 + 3],
-        [rightEye, petLeft + 37 + 3],
-      ].forEach(([eye, eyeX]) => {
-        const element = eye as HTMLSpanElement;
+        ["left", leftEye, petLeft + 19 + 3],
+        ["right", rightEye, petLeft + 37 + 3],
+      ].forEach(([side, currentEye, eyeX]) => {
         const dx = cursorX - Number(eyeX);
         const dy = cursorY - eyeY;
         const distance = Math.hypot(dx, dy) || 1;
         const travel = Math.min(2, distance / 26);
         const cursorOffsetX = (dx / distance) * travel;
         const cursorOffsetY = (dy / distance) * travel;
-        const walkLead = direction * 1.3;
-        element.style.opacity = String(eyeOpacity);
-        element.style.transform = sleeping
-          ? `translate(${walkLead}px, ${navLift}px) scaleY(.13)`
-          : `translate(${cursorOffsetX + walkLead}px, ${cursorOffsetY + navLift}px)`;
+        const localEyeTranslationX = getLocalEyeTranslationX(
+          sleeping ? 0 : cursorOffsetX,
+          direction,
+        );
+        const eyeTransform = sleeping
+          ? `translate(${localEyeTranslationX}px, ${navLift}px) scaleY(.13)`
+          : `translate(${localEyeTranslationX}px, ${cursorOffsetY + navLift}px)`;
+
+        const activeEye = activeCharacter?.querySelector<HTMLElement>(
+          `[data-pixel-eye="${side}"]`,
+        );
+        const eyes = new Set<HTMLElement>([
+          currentEye as HTMLSpanElement,
+          ...(activeEye ? [activeEye] : []),
+        ]);
+        eyes.forEach((element) => {
+          element.style.opacity = String(eyeOpacity);
+          element.style.transform = eyeTransform;
+        });
       });
 
       if (bubble.style.opacity !== "0") {
@@ -389,6 +526,10 @@ export default function PixelPet() {
 
     const onReducedMotionChange = (event: MediaQueryListEvent) => {
       reducedMotion = event.matches;
+      if (reducedMotion) {
+        tailWagStartedAt = null;
+        nextTailWagAt = performance.now() + getTailWagDelay(Math.random());
+      }
     };
 
     const resizeObserver = new ResizeObserver(measure);
@@ -460,11 +601,19 @@ export default function PixelPet() {
     <div
       ref={cardRef}
       data-pixel-card
-      aria-hidden="true"
-      className="hidden h-38 cursor-pointer flex-col gap-2.5 overflow-hidden rounded-[10px] border border-border-color bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_82%,transparent),color-mix(in_srgb,var(--accent)_4.5%,var(--bg)))] p-3.25 shadow-sm select-none lg:flex"
+      role="group"
+      aria-label="Pixel pet"
+      className="relative hidden h-38 cursor-pointer flex-col gap-2.5 rounded-[10px] border border-border-color bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface)_82%,transparent),color-mix(in_srgb,var(--accent)_4.5%,var(--bg)))] p-3.25 shadow-sm select-none lg:flex"
     >
       <div className="flex items-center justify-between gap-3 font-mono text-metadata leading-none font-semibold tracking-[0.16em] text-ink-faint uppercase tabular-nums">
-        <span>Pixel</span>
+        <div data-pixel-picker>
+          <CharacterPicker
+            value={selectedCharacter}
+            open={pickerOpen}
+            onOpenChange={setPickerOpen}
+            onChange={selectCharacter}
+          />
+        </div>
         <span ref={counterRef}>VISIT 01</span>
       </div>
 
@@ -496,20 +645,12 @@ export default function PixelPet() {
           data-pixel-pet
           className="absolute bottom-px left-0 h-11.5 w-15.5 will-change-transform"
         >
-          <div
-            ref={bodyRef}
-            data-pixel-body
-            className="absolute bottom-0 left-0 h-11 w-15.5 origin-bottom overflow-hidden rounded-[21px_21px_13px_13px] border border-thumb-border bg-[linear-gradient(170deg,color-mix(in_srgb,var(--thumb-bg)_78%,white),var(--thumb-bg))] shadow-md will-change-transform"
-          >
-            <span
-              ref={leftEyeRef}
-              className="absolute bottom-5.5 left-4.75 h-2 w-1.5 rounded-[3px] bg-accent transition-transform duration-180 ease-out will-change-transform"
-            />
-            <span
-              ref={rightEyeRef}
-              className="absolute bottom-5.5 left-9.25 h-2 w-1.5 rounded-[3px] bg-accent transition-transform duration-180 ease-out will-change-transform"
-            />
-          </div>
+          <PixelCharacterStage
+            selected={selectedCharacter}
+            currentBodyRef={bodyRef}
+            currentLeftEyeRef={leftEyeRef}
+            currentRightEyeRef={rightEyeRef}
+          />
         </div>
       </div>
     </div>

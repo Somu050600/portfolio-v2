@@ -64,7 +64,7 @@ const quadrantLabels = [
  * optically centred under the stack.
  */
 const FINAL_WORD_CLASS =
-  "landing-final-word font-accent-dot text-[0.92em] tracking-[0.1em] -mr-[0.1em] not-italic";
+  "landing-final-word font-accent-dot text-[0.92em] font-semibold tracking-[0.1em] -mr-[0.1em] not-italic";
 
 /** [key to press, what it does]. See use-landing-easter-eggs.ts */
 const easterEggHints = [
@@ -335,7 +335,7 @@ export default function LandingHero({ background }: LandingHeroProps) {
             // opacity. All drawn from --landing-ink so it follows temperature.
             // Sized for the longest line (~27 characters). The previous step
             // was set for a 21-character line and crowds the viewport here.
-            className="font-landing cursor-default text-balance text-[clamp(2.1rem,4.9vw,5.3rem)] leading-[1.16] font-normal tracking-[-0.015em] [text-shadow:0_1px_0_color-mix(in_oklab,var(--landing-ink)_12%,transparent),0_2px_6px_color-mix(in_oklab,var(--landing-ink)_10%,transparent),0_10px_30px_color-mix(in_oklab,var(--landing-ink)_8%,transparent)] max-md:text-nowrap max-md:text-[clamp(1rem,7.6vw,2.9rem)]"
+            className="font-landing cursor-default text-balance text-[clamp(2.1rem,4.9vw,5.3rem)] leading-[1.16] font-normal tracking-[-0.015em] [text-shadow:0_1px_0_color-mix(in_oklab,var(--landing-ink)_12%,transparent),0_2px_6px_color-mix(in_oklab,var(--landing-ink)_10%,transparent),0_10px_30px_color-mix(in_oklab,var(--landing-ink)_8%,transparent)] max-md:text-nowrap max-md:text-[clamp(1rem,6vw,2.4rem)]"
             data-active-line={displayedLine ?? undefined}
             data-semantic-label="<h1>"
           >
