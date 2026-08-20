@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { coreFontVariables } from "@/app/fonts/core";
 import ConsoleSignature from "@/components/ConsoleSignature";
 import PageTransitionOverlay from "@/components/PageTransitionOverlay";
@@ -12,6 +13,7 @@ import {
   serializeJsonLd,
 } from "@/lib/seo";
 import { ACCENT_PREPAINT_SCRIPT } from "@/lib/theme.config";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import "./brand-theme.css";
 
@@ -95,6 +97,8 @@ export default function RootLayout({
           </PageTransitionProvider>
         </ThemeProvider>
         <ConsoleSignature />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
