@@ -36,6 +36,15 @@ describe("Pixel character renderers", () => {
     }
   });
 
+  test("gives every character one subtle detail driven by the active theme accent", () => {
+    for (const { id } of PIXEL_CHARACTERS) {
+      const root = selectedCharacterRoot(id);
+
+      expect(root?.match(/data-pixel-accent-detail=/g)?.length).toBe(1);
+      expect(root).toMatch(/var\(--accent\)|bg-accent/);
+    }
+  });
+
   test("gives side-view Dog and Cat four articulated legs in alternating pairs", () => {
     for (const id of ["dog", "cat"] as const) {
       const root = selectedCharacterRoot(id);
@@ -48,12 +57,36 @@ describe("Pixel character renderers", () => {
     }
   });
 
+  test("gives Dog a rectangular torso and one articulated dog tail", () => {
+    const dog = selectedCharacterRoot("dog");
+
+    expect(dog).toContain('data-pixel-dog-body="rectangular"');
+    expect(dog?.match(/data-pixel-tail="dog"/g)?.length).toBe(1);
+  });
+
+  test("keeps Sparrow in side profile with one forward-facing eye and layered plumage", () => {
+    const sparrow = selectedCharacterRoot("sparrow");
+
+    expect(sparrow).toContain('data-pixel-profile="side"');
+    expect(sparrow).toContain('data-pixel-sparrow-facing="forward"');
+    expect(sparrow?.match(/data-pixel-eye=/g)?.length).toBe(1);
+    expect(sparrow?.match(/data-pixel-wing-detail=/g)?.length).toBe(2);
+    expect(sparrow?.match(/data-pixel-tail-feather=/g)?.length).toBe(2);
+  });
+
   test("keeps Sparrow, Penguin, and Frog on the two-leg gait", () => {
     for (const id of ["sparrow", "penguin", "frog"] as const) {
       const root = selectedCharacterRoot(id);
       expect(root).toBeDefined();
       expect(root?.match(/data-pixel-leg=/g)?.length).toBe(2);
-      expect(root?.match(/data-pixel-eye=/g)?.length).toBe(2);
+    }
+  });
+
+  test("keeps Penguin and Frog front-facing with two eyes", () => {
+    for (const id of ["penguin", "frog"] as const) {
+      expect(selectedCharacterRoot(id)?.match(/data-pixel-eye=/g)?.length).toBe(
+        2,
+      );
     }
   });
 
@@ -75,7 +108,7 @@ describe("Pixel character renderers", () => {
   });
 });
 
-test("renders a compact six-choice picker with supplied pet previews", () => {
+test("renders the current character artwork in every picker preview", () => {
   const html = renderToStaticMarkup(
     <CharacterPicker
       value="dog"
@@ -87,9 +120,13 @@ test("renders a compact six-choice picker with supplied pet previews", () => {
 
   expect(html).toContain("PIXEL");
   expect(html).toContain('aria-label="Choose Pixel character"');
+  expect(html).toContain("data-pixel-picker-icon");
+  expect(html).toContain("text-accent");
   expect(html.match(/role="menuitemradio"/g)?.length).toBe(6);
-  for (const file of ["dog.png", "sparrow.png", "cat.png", "penguin.png", "frog.png"]) {
-    expect(html).toContain(file);
+  expect(html.match(/data-pixel-character-preview=/g)?.length).toBe(6);
+  for (const { id } of PIXEL_CHARACTERS) {
+    expect(html).toContain(`data-pixel-character-preview="${id}"`);
   }
+  expect(html).not.toContain("/pixel-characters/previews/");
   expect(html).toContain("Current Pixel");
 });

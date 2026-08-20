@@ -5,12 +5,21 @@ import {
   advanceGaitPhase,
   getLocalEyeTranslationX,
   getNextCharacterMenuIndex,
+  getTailWagDelay,
+  getTailWagRotation,
   getTwoLegPose,
+  readPixelCharacterSelection,
+  writePixelCharacterSelection,
 } from "./pixel-characters";
 
+type CharacterStorage = {
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+};
+
 describe("Pixel character catalog", () => {
-  test("defaults to Frog and exposes the six approved choices in picker order", () => {
-    expect(DEFAULT_PIXEL_CHARACTER).toBe("frog");
+  test("defaults to Dog and exposes the six approved choices in picker order", () => {
+    expect(DEFAULT_PIXEL_CHARACTER).toBe("dog");
     expect(PIXEL_CHARACTERS.map(({ id, name }) => [id, name])).toEqual([
       ["dog", "Tiny Dog"],
       ["sparrow", "Sparrow"],
@@ -32,6 +41,33 @@ describe("Pixel character catalog", () => {
     expect(getNextCharacterMenuIndex(2, "End", 6)).toBe(5);
     expect(getNextCharacterMenuIndex(2, "Enter", 6)).toBeNull();
     expect(getNextCharacterMenuIndex(0, "ArrowDown", 0)).toBeNull();
+  });
+
+  test("restores valid saved characters and falls back to Dog for stale values", () => {
+    expect(
+      readPixelCharacterSelection({
+        getItem: () => "sparrow",
+        setItem: () => {},
+      }),
+    ).toBe("sparrow");
+    expect(
+      readPixelCharacterSelection({
+        getItem: () => "retired-pet",
+        setItem: () => {},
+      }),
+    ).toBe("dog");
+    expect(readPixelCharacterSelection(null)).toBe("dog");
+  });
+
+  test("saves the selected character under the versioned Pixel key", () => {
+    const entries = new Map<string, string>();
+    const storage: CharacterStorage = {
+      getItem: (key) => entries.get(key) ?? null,
+      setItem: (key, value) => entries.set(key, value),
+    };
+
+    writePixelCharacterSelection(storage, "cat");
+    expect([...entries]).toEqual([["pixel.character.v1", "cat"]]);
   });
 });
 
@@ -81,5 +117,21 @@ describe("Pixel eye tracking", () => {
     expect(leftToRightLocalX * 1).toBeCloseTo(3.3);
     expect(rightToLeftLocalX).toBeCloseTo(-0.7);
     expect(rightToLeftLocalX * -1).toBeCloseTo(0.7);
+  });
+});
+
+describe("Dog tail wag", () => {
+  test("schedules bursts inside the approved random delay range", () => {
+    expect(getTailWagDelay(-1)).toBe(1_400);
+    expect(getTailWagDelay(0.5)).toBe(3_000);
+    expect(getTailWagDelay(2)).toBe(4_600);
+  });
+
+  test("wiggles in both directions during a burst and rests outside it", () => {
+    expect(getTailWagRotation(-1)).toBe(0);
+    expect(getTailWagRotation(0)).toBe(0);
+    expect(getTailWagRotation(90)).toBeGreaterThan(0);
+    expect(getTailWagRotation(150)).toBeLessThan(0);
+    expect(getTailWagRotation(720)).toBe(0);
   });
 });

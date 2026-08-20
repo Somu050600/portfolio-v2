@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   useCallback,
   useEffect,
@@ -9,7 +8,7 @@ import {
   type FocusEvent as ReactFocusEvent,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
-import { CurrentPixelRenderer } from "./PixelCharacter";
+import { PixelCharacterPreview } from "./PixelCharacter";
 import {
   PIXEL_CHARACTERS,
   getNextCharacterMenuIndex,
@@ -106,12 +105,21 @@ export function CharacterPicker({
         className="flex cursor-pointer items-center gap-1 rounded-sm text-inherit outline-none transition-colors hover:text-ink focus-visible:ring-1 focus-visible:ring-accent"
       >
         <span>PIXEL</span>
-        <span
+        <svg
+          data-pixel-picker-icon
           aria-hidden
-          className={`text-[9px] transition-transform ${open ? "rotate-180" : ""}`}
+          viewBox="0 0 16 16"
+          fill="none"
+          className={`size-3.5 rounded-full bg-accent/10 p-0.5 text-accent transition-transform ${open ? "rotate-180" : ""}`}
         >
-          ▾
-        </span>
+          <path
+            d="M4 6 L8 10 L12 6"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2.5"
+          />
+        </svg>
       </button>
 
       <div
@@ -140,19 +148,7 @@ export function CharacterPicker({
             className="flex w-full cursor-pointer items-center gap-2 rounded-md px-1.5 py-1 font-mono text-metadata leading-none tracking-normal text-ink-dim normal-case transition-colors hover:bg-bg hover:text-ink focus-visible:bg-bg focus-visible:text-ink focus-visible:outline-none aria-checked:bg-accent/10 aria-checked:text-accent"
           >
             <span className="flex h-8 w-10 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-bg/70">
-              {character.preview ? (
-                <Image
-                  src={character.preview}
-                  alt=""
-                  width={38}
-                  height={32}
-                  loading="eager"
-                  unoptimized
-                  className="h-8 w-auto object-contain"
-                />
-              ) : (
-                <CurrentPixelRenderer preview />
-              )}
+              <PixelCharacterPreview character={character.id} />
             </span>
             <span>{character.name}</span>
           </button>

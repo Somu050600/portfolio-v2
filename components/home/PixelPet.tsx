@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   DISCOVERY_IDLE_MS,
   hasSeenHint,
@@ -26,9 +26,15 @@ import { PixelCharacterStage } from "./PixelCharacter";
 import { CharacterPicker } from "./PixelCharacterPicker";
 import {
   DEFAULT_PIXEL_CHARACTER,
+  DOG_TAIL_WAG_DURATION_MS,
+  PIXEL_CHARACTER_STORAGE_KEY,
   advanceGaitPhase,
   getLocalEyeTranslationX,
+  getTailWagDelay,
+  getTailWagRotation,
   getTwoLegPose,
+  readPixelCharacterSelection,
+  writePixelCharacterSelection,
   type PixelCharacterId,
 } from "./pixel-characters";
 
@@ -43,6 +49,26 @@ const HINT_INTENT_EVENTS = [
 const FRAME_MS = 1000 / 60;
 const POKE_SUPPRESSION_MS = 3_200;
 
+function subscribeToStoredCharacter(onStoreChange: () => void) {
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === PIXEL_CHARACTER_STORAGE_KEY) onStoreChange();
+  };
+  window.addEventListener("storage", onStorage);
+  return () => window.removeEventListener("storage", onStorage);
+}
+
+function getStoredCharacterSnapshot() {
+  try {
+    return readPixelCharacterSelection(window.localStorage);
+  } catch {
+    return DEFAULT_PIXEL_CHARACTER;
+  }
+}
+
+function getServerCharacterSnapshot() {
+  return DEFAULT_PIXEL_CHARACTER;
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
@@ -52,8 +78,14 @@ function counterLabel(label: "VISIT" | "POKES", count: number) {
 }
 
 export default function PixelPet() {
-  const [selectedCharacter, setSelectedCharacter] =
-    useState<PixelCharacterId>(DEFAULT_PIXEL_CHARACTER);
+  const persistedCharacter = useSyncExternalStore(
+    subscribeToStoredCharacter,
+    getStoredCharacterSnapshot,
+    getServerCharacterSnapshot,
+  );
+  const [sessionCharacter, setSessionCharacter] =
+    useState<PixelCharacterId | null>(null);
+  const selectedCharacter = sessionCharacter ?? persistedCharacter;
   const [pickerOpen, setPickerOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -64,6 +96,15 @@ export default function PixelPet() {
   const bubbleRef = useRef<HTMLParagraphElement>(null);
   const counterRef = useRef<HTMLSpanElement>(null);
   const progressRef = useRef<HTMLSpanElement>(null);
+
+  const selectCharacter = (character: PixelCharacterId) => {
+    setSessionCharacter(character);
+    try {
+      writePixelCharacterSelection(window.localStorage, character);
+    } catch {
+      // The selection remains active for this page when storage is unavailable.
+    }
+  };
 
   useEffect(() => {
     const card = cardRef.current;
@@ -99,6 +140,8 @@ export default function PixelPet() {
     let x = 0;
     let direction = 1;
     let gaitPhase = 0;
+    let tailWagStartedAt: number | null = null;
+    let nextTailWagAt = lastFrame + getTailWagDelay(Math.random());
     let maxX = 0;
     let trackRect = track.getBoundingClientRect();
     let cursorX = trackRect.left + trackRect.width / 2;
@@ -393,6 +436,28 @@ export default function PixelPet() {
           });
       }
 
+      const dogTail = activeCharacter?.querySelector<SVGGraphicsElement>(
+        '[data-pixel-tail="dog"]',
+      );
+      if (dogTail) {
+        let tailRotation = 0;
+        if (!reducedMotion) {
+          if (tailWagStartedAt === null && now >= nextTailWagAt) {
+            tailWagStartedAt = now;
+          }
+          if (tailWagStartedAt !== null) {
+            const elapsedMs = now - tailWagStartedAt;
+            tailRotation = getTailWagRotation(elapsedMs);
+            if (elapsedMs >= DOG_TAIL_WAG_DURATION_MS) {
+              tailWagStartedAt = null;
+              nextTailWagAt = now + getTailWagDelay(Math.random());
+              tailRotation = 0;
+            }
+          }
+        }
+        dogTail.style.transform = `rotate(${tailRotation}deg)`;
+      }
+
       const petLeft = trackRect.left + x;
       const petTop = trackRect.bottom - 46 + bob;
       const sleeping = now - lastPointerMove >= 4_000;
@@ -461,6 +526,10 @@ export default function PixelPet() {
 
     const onReducedMotionChange = (event: MediaQueryListEvent) => {
       reducedMotion = event.matches;
+      if (reducedMotion) {
+        tailWagStartedAt = null;
+        nextTailWagAt = performance.now() + getTailWagDelay(Math.random());
+      }
     };
 
     const resizeObserver = new ResizeObserver(measure);
@@ -542,7 +611,7 @@ export default function PixelPet() {
             value={selectedCharacter}
             open={pickerOpen}
             onOpenChange={setPickerOpen}
-            onChange={setSelectedCharacter}
+            onChange={selectCharacter}
           />
         </div>
         <span ref={counterRef}>VISIT 01</span>

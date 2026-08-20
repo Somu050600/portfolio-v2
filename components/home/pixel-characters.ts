@@ -9,39 +9,68 @@ export type PixelCharacterId =
 export type PixelCharacterDefinition = {
   id: PixelCharacterId;
   name: string;
-  preview?: string;
 };
 
-export const DEFAULT_PIXEL_CHARACTER: PixelCharacterId = "frog";
+export const DEFAULT_PIXEL_CHARACTER: PixelCharacterId = "dog";
+export const PIXEL_CHARACTER_STORAGE_KEY = "pixel.character.v1";
+
+type PixelCharacterStorage = Pick<Storage, "getItem" | "setItem">;
 
 export const PIXEL_CHARACTERS: readonly PixelCharacterDefinition[] = [
   {
     id: "dog",
     name: "Tiny Dog",
-    preview: "/pixel-characters/previews/dog.png",
   },
   {
     id: "sparrow",
     name: "Sparrow",
-    preview: "/pixel-characters/previews/sparrow.png",
   },
   {
     id: "cat",
     name: "Black Cat",
-    preview: "/pixel-characters/previews/cat.png",
   },
   {
     id: "penguin",
     name: "Penguin",
-    preview: "/pixel-characters/previews/penguin.png",
   },
   {
     id: "frog",
     name: "Frog",
-    preview: "/pixel-characters/previews/frog.png",
   },
   { id: "current", name: "Current Pixel" },
 ];
+
+const PIXEL_CHARACTER_IDS = new Set<PixelCharacterId>(
+  PIXEL_CHARACTERS.map(({ id }) => id),
+);
+
+export function readPixelCharacterSelection(
+  storage: PixelCharacterStorage | null,
+): PixelCharacterId {
+  if (!storage) return DEFAULT_PIXEL_CHARACTER;
+
+  try {
+    const stored = storage.getItem(PIXEL_CHARACTER_STORAGE_KEY);
+    return PIXEL_CHARACTER_IDS.has(stored as PixelCharacterId)
+      ? (stored as PixelCharacterId)
+      : DEFAULT_PIXEL_CHARACTER;
+  } catch {
+    return DEFAULT_PIXEL_CHARACTER;
+  }
+}
+
+export function writePixelCharacterSelection(
+  storage: PixelCharacterStorage | null,
+  value: PixelCharacterId,
+) {
+  if (!storage) return;
+
+  try {
+    storage.setItem(PIXEL_CHARACTER_STORAGE_KEY, value);
+  } catch {
+    // Storage can be unavailable; the in-page selection still works.
+  }
+}
 
 export function getNextCharacterMenuIndex(
   currentIndex: number,
@@ -62,6 +91,21 @@ export function getLocalEyeTranslationX(
 ) {
   const screenTranslationX = cursorOffsetX + direction * 1.3;
   return screenTranslationX * direction;
+}
+
+export function getTailWagDelay(randomValue: number) {
+  const normalizedRandom = Math.min(1, Math.max(0, randomValue));
+  return 1_400 + normalizedRandom * 3_200;
+}
+
+export const DOG_TAIL_WAG_DURATION_MS = 720;
+
+export function getTailWagRotation(elapsedMs: number) {
+  if (elapsedMs <= 0 || elapsedMs >= DOG_TAIL_WAG_DURATION_MS) return 0;
+
+  const progress = elapsedMs / DOG_TAIL_WAG_DURATION_MS;
+  const envelope = Math.sin(progress * Math.PI);
+  return Math.sin(progress * Math.PI * 6) * 18 * envelope;
 }
 
 export type Vec2 = { x: number; y: number };

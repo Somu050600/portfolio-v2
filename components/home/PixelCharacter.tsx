@@ -27,6 +27,7 @@ function CurrentPixelBody({
       <span
         ref={leftEyeRef}
         data-pixel-eye="left"
+        data-pixel-accent-detail="eyes"
         className="absolute bottom-5.5 left-4.75 h-2 w-1.5 rounded-[3px] bg-accent transition-transform duration-180 ease-out will-change-transform"
       />
       <span
@@ -256,8 +257,41 @@ function DogRenderer() {
         legLength={8}
         stroke="#765a43"
       />
-      <path d="M13 28 L2 20 L15 22 Z" fill="#765a43" />
-      <ellipse cx="29" cy="27" rx="18" ry="11" fill="#bc9569" />
+      <g
+        data-pixel-tail="dog"
+        className="will-change-transform"
+        style={{ transformBox: "fill-box", transformOrigin: "right center" }}
+      >
+        <path
+          d="M15 28 C10 27 6 24 4 20 C2 16 4 13 7 15 C9 18 10 21 16 22 Z"
+          fill="#765a43"
+        />
+        <path
+          d="M7 16 C8 19 10 21 14 22"
+          fill="none"
+          stroke="#9a7958"
+          strokeLinecap="round"
+          strokeWidth="1.4"
+        />
+      </g>
+      <rect
+        data-pixel-dog-body="rectangular"
+        x="11"
+        y="18"
+        width="37"
+        height="20"
+        rx="7"
+        fill="#bc9569"
+      />
+      <path
+        data-pixel-accent-detail="collar"
+        d="M40 22 Q40 27 42 30"
+        fill="none"
+        stroke="var(--accent)"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+        opacity="0.78"
+      />
       <circle cx="46" cy="19" r="10.5" fill="#8a6b4f" />
       <path d="M40 13 L42 3 L49 10 Z" fill="#765a43" />
       <ellipse cx="53" cy="23" rx="7" ry="5" fill="#e3cda8" />
@@ -277,23 +311,75 @@ function DogRenderer() {
 
 function SparrowRenderer() {
   return (
-    <CharacterSvg>
+    <CharacterSvg profile="side">
       <ArticulatedLegs
-        leftHip={{ x: 27, y: 35 }}
-        rightHip={{ x: 37, y: 35 }}
+        leftHip={{ x: 27, y: 34 }}
+        rightHip={{ x: 37, y: 34 }}
         legLength={8}
         stroke="#c78d28"
         strokeWidth={2.4}
       />
-      <path d="M15 27 L3 21 L12 33 Z" fill="#765a43" />
-      <ellipse cx="30" cy="27" rx="20" ry="11" fill="#bc9569" />
-      <path d="M17 26 L29 19 L39 27 L27 34 Z" fill="#765a43" />
-      <circle cx="42" cy="17" r="10" fill="#765a43" />
-      <path d="M50 16 L61 20 L50 22 Z" fill="#d99628" />
-      <circle cx="38.5" cy="14" r="3" fill="#f4efe3" />
-      <circle cx="45.5" cy="14" r="3" fill="#f4efe3" />
-      <TrackableEye side="left" cx={38.5} cy={14} r={1.35} fill="#25211f" />
-      <TrackableEye side="right" cx={45.5} cy={14} r={1.35} fill="#25211f" />
+      <g data-pixel-sparrow-facing="forward">
+        <path
+          data-pixel-tail-feather="upper"
+          d="M18 25 L3 21 L14 30 Z"
+          fill="#514033"
+        />
+        <path
+          data-pixel-tail-feather="lower"
+          d="M18 29 L7 36 L20 32 Z"
+          fill="#765f49"
+        />
+        <path
+          d="M14 27 C17 19 27 16 38 18 C47 20 50 27 45 33 C40 39 26 39 18 34 C15 32 13 29 14 27 Z"
+          fill="#b89a72"
+        />
+        <path
+          d="M20 30 C25 34 33 36 40 32 C37 38 25 40 18 34 Z"
+          fill="#d4bea0"
+        />
+        <path
+          d="M16 25 C22 19 31 18 41 24 L32 34 C26 33 20 30 16 25 Z"
+          fill="#5f4939"
+        />
+        <path
+          data-pixel-wing-detail="upper-bar"
+          d="M21 24 C27 23 32 24 37 27"
+          fill="none"
+          stroke="#8f7355"
+          strokeLinecap="round"
+          strokeWidth="2"
+        />
+        <path
+          data-pixel-wing-detail="feather-tip"
+          data-pixel-accent-detail="wing-bar"
+          d="M23 29 L29 32 L35 29"
+          fill="none"
+          stroke="var(--accent)"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.6"
+          opacity="0.68"
+        />
+        <path
+          d="M35 20 C35 14 38 9 43 8 L43 2 L47 8 C52 9 55 14 53 20 L49 26 L41 25 Z"
+          fill="#5b4737"
+        />
+        <path d="M52 17 L61 20 L52 22 Z" fill="#d89a35" />
+        <path
+          d="M38 19 C40 22 43 24 48 24 L44 28 C40 27 37 24 36 21 Z"
+          fill="#8f7355"
+        />
+        <circle cx="48" cy="14.5" r="3.3" fill="#6977a6" />
+        <circle cx="48.5" cy="14.5" r="2.25" fill="#f4efe3" />
+        <TrackableEye
+          side="right"
+          cx={49}
+          cy={14.5}
+          r={1.15}
+          fill="#25211f"
+        />
+      </g>
     </CharacterSvg>
   );
 }
@@ -320,6 +406,15 @@ function CatRenderer() {
       <path d="M39 13 L41 3 L47 10 Z" fill="#282b32" />
       <path d="M47 10 L54 4 L53 14 Z" fill="#282b32" />
       <ellipse cx="53" cy="23" rx="6.5" ry="4.5" fill="#3b3e46" />
+      <path
+        data-pixel-accent-detail="collar"
+        d="M40 22 Q41 27 44 30"
+        fill="none"
+        stroke="var(--accent)"
+        strokeLinecap="round"
+        strokeWidth="1.7"
+        opacity="0.8"
+      />
       <path d="M56 21 L59 22.5 L56 24 Z" fill="#777b86" />
       <rect x="45" y="14" width="6" height="6" rx="1" fill="#e5dcff" />
       <TrackableEye side="right" cx={48} cy={17} r={1.6} fill="#4a3a67" />
@@ -347,6 +442,14 @@ function PenguinRenderer() {
       <path d="M44 24 L56 34 L42 31 Z" fill="#282b32" />
       <ellipse cx="31" cy="25" rx="17" ry="20" fill="#282b32" />
       <ellipse cx="31" cy="29" rx="11" ry="14" fill="#eee7d8" />
+      <circle
+        data-pixel-accent-detail="chest-badge"
+        cx="31"
+        cy="31"
+        r="1.65"
+        fill="var(--accent)"
+        opacity="0.72"
+      />
       <circle cx="25" cy="14" r="3.4" fill="#eee7d8" />
       <circle cx="37" cy="14" r="3.4" fill="#eee7d8" />
       <TrackableEye side="left" cx={25} cy={14} r={1.45} fill="#4a3a67" />
@@ -377,6 +480,14 @@ function FrogRenderer() {
       <circle cx="40" cy="15" r="4.2" fill="#eee7d8" />
       <TrackableEye side="left" cx={22} cy={15} r={2.2} fill="#28231f" />
       <TrackableEye side="right" cx={40} cy={15} r={2.2} fill="#28231f" />
+      <g
+        data-pixel-accent-detail="cheeks"
+        fill="var(--accent)"
+        opacity="0.58"
+      >
+        <circle cx="17" cy="26" r="1.45" />
+        <circle cx="45" cy="26" r="1.45" />
+      </g>
       <path d="M25 31 H37" fill="none" stroke="#2f382a" strokeWidth="2" />
     </CharacterSvg>
   );
@@ -428,5 +539,25 @@ export function PixelCharacterStage({
         );
       })}
     </>
+  );
+}
+
+export function PixelCharacterPreview({
+  character,
+}: {
+  character: PixelCharacterId;
+}) {
+  return (
+    <div
+      data-pixel-character-preview={character}
+      aria-hidden
+      className="relative h-8 w-10 shrink-0 overflow-hidden"
+    >
+      {character === "current" ? (
+        <CurrentPixelRenderer preview />
+      ) : (
+        NEW_RENDERERS[character]
+      )}
+    </div>
   );
 }
