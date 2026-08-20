@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { coreFontVariables } from "@/app/fonts/core";
 import ConsoleSignature from "@/components/ConsoleSignature";
 import PageTransitionOverlay from "@/components/PageTransitionOverlay";
@@ -96,6 +97,7 @@ export default function RootLayout({
           </PageTransitionProvider>
         </ThemeProvider>
         <ConsoleSignature />
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
